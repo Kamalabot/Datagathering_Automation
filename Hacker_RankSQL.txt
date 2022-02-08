@@ -1,4 +1,4 @@
-Query a list of CITY names from STATION for cities that have an even ID number. Print the results in any order, but exclude duplicates from the answer.
+Query_1 a list of CITY names from STATION for cities that have an even ID number. Print the results in any order, but exclude duplicates from the answer.
 The STATION table is described as follows:
 
 WITH sub_q AS(
@@ -10,5 +10,34 @@ WITH sub_q AS(
 SELECT CITY
 FROM sub_q
 
+Query_2
+SELECT DISTINCT(CITY) FROM STATION WHERE (ID%2)=0
 
 
+Query_3Find the difference between the total number of CITY entries 
+in the table and the number of distinct CITY entries in the table.
+
+SELECT (COUNT(CITY) - COUNT(DISTINCT CITY)) FROM STATION
+
+
+Query_4 the two cities in STATION with the shortest and longest CITY names, as well as their respective 
+lengths (i.e.: number of characters in the name). If there is more than one smallest or largest city, 
+choose the one that comes first when ordered alphabetically.
+
+SELECT MIN(CITY),LENGTH(CITY) FROM STATION GROUP BY LENGTH(CITY) ORDER BY LENGTH(CITY)
+
+select city, length(city) 
+from station
+order by length(city),city asc limit 1;
+
+select city, length(city) from station
+order by length(city) desc limit 1;
+
+Query_5 the list of CITY names starting with 
+vowels (i.e., a, e, i, o, or u) from STATION. Your result cannot contain duplicates.
+
+SELECT DISTINCT city FROM station WHERE city REGEXP "^[aeiou].*";
+
+Query_6 the list of CITY names ending with vowels (a, e, i, o, u) from STATION. 
+Your result cannot contain duplicates.
+SELECT DISTINCT CITY FROM STATION WHERE RIGHT(CITY,1) IN ('a','i','e','o','u')
