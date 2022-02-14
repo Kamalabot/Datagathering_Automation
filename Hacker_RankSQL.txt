@@ -41,3 +41,271 @@ SELECT DISTINCT city FROM station WHERE city REGEXP "^[aeiou].*";
 Query_6 the list of CITY names ending with vowels (a, e, i, o, u) from STATION. 
 Your result cannot contain duplicates.
 SELECT DISTINCT CITY FROM STATION WHERE RIGHT(CITY,1) IN ('a','i','e','o','u')
+
+Queries on Joins
+1)
+Given the CITY and COUNTRY tables, query the sum of the populations of all cities where the CONTINENT is 'Asia'.
+Note: CITY.CountryCode and COUNTRY.Code are matching key columns.
+>>part:1
+SELECT CODE, NAME
+FROM COUNTRY
+WHERE CONTINENT = 'ASIA'
+
+>>answer-
+SELECT SUM(ci.POPULATION) as ciPop
+FROM CITY as ci
+LEFT JOIN COUNTRY as co 
+ON co.CODE = ci.COUNTRYCODE
+WHERE co.CONTINENT = 'ASIA'
+GROUP BY co.CONTINENT
+
+2)
+Given the CITY and COUNTRY tables, query the names of all cities where the CONTINENT is 'Africa'.
+
+SELECT ci.NAME
+FROM CITY as ci
+LEFT JOIN COUNTRY as co 
+ON co.CODE = ci.COUNTRYCODE
+WHERE co.CONTINENT = 'AFRICA'
+
+3)
+Given the CITY and COUNTRY tables, query the names of all the continents (COUNTRY.Continent) and their 
+respective average city populations (CITY.Population) rounded down to the nearest integer.
+
+Trial 1: Failed 
+SELECT co.CONTINENT, ROUND(AVG(ci.POPULATION),1)
+FROM CITY as ci
+LEFT JOIN COUNTRY as co 
+ON co.CODE = ci.COUNTRYCODE
+GROUP BY co.CONTINENT
+
+Trial 2: Failed with Inner Join
+SELECT co.CONTINENT, ROUND(AVG(ci.POPULATION),1)
+FROM CITY as ci
+INNER JOIN COUNTRY as co 
+ON co.CODE = ci.COUNTRYCODE
+GROUP BY co.CONTINENT
+
+Trial 3: Fails
+SELECT AVG(ci.POPULATION) OVER(
+PARTITION BY co.CONTINENT
+ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS con_avg, co.CONTINENT
+FROM CITY as ci
+LEFT JOIN COUNTRY as co 
+ON ci.COUNTRYCODE = co.CODE
+
+Trial 4: part
+SELECT ci.POPULATION, co.CONTINENT
+FROM CITY as ci
+INNER JOIN COUNTRY as co 
+ON ci.COUNTRYCODE = co.CODE
+
+Trial 5: Issue was FLOOR()
+SELECT co.CONTINENT, FLOOR(AVG(ci.POPULATION))
+FROM CITY as ci
+INNER JOIN COUNTRY as co 
+ON ci.COUNTRYCODE = co.CODE
+GROUP BY co.CONTINENT
+
+4)
+You are given two tables: Students and Grades. Students contains three columns ID, Name and Marks.
+Ketty gives Eve a task to generate a report containing three columns: Name, Grade and Mark. Ketty doesn't want the NAMES of those students who received a grade lower than 8. The report must be in descending order by grade -- i.e. higher grades are entered first. If there is more than one student with the same grade (8-10) assigned to them, order those particular students by their name alphabetically. Finally, if the grade is lower than 8, use "NULL" as their name and list them by their grades in descending order. If there is more than one student with the same grade (1-7) assigned to them, order those particular students by their marks in ascending order.
+
+explore1: 
+SELECT NAME, MARKS
+FROM STUDENTS
+
+explor2:
+SELECT GRADE, MIN_MARK, MAX_MARK
+FROM GRADES
+HAVING MIN_MARK > 10
+
+TRIAL 1:
+SELECT s.NAME, s.MARKS
+FROM STUDENTS as s
+FULL JOIN GRADES as g
+GROUP BY s.NAME
+HAVING s.MARKS < g.MAX_MARK AND s.MARKS > g.MIN_MARK
+
+explore 3: (Incorrect)
+
+SELECT s.NAME, s.MARKS, g.MIN_MARK
+FROM STUDENTS as s
+FULL JOIN GRADES as g
+
+TRIAL 2: (Incorrect)
+
+WITH g AS(
+SELECT GRADE,MIN_MARK, MAX_MARK
+FROM GRADES
+)
+SELECT NAME, GRADE, MARKS
+FROM STUDENTS 
+HAVING MARKS between g.MIN_MARK and g.MAX_MARK
+ORDER BY GRADE
+
+TRIAL 3: (learn the ordering with 2 columns)
+
+WITH g AS(
+SELECT GRADE AS gr,MIN_MARK AS mm, MAX_MARK AS xm
+FROM GRADES
+)
+SELECT NAME, MARKS, gr
+FROM STUDENTS, g  # Need to include the CTE for processing
+WHERE MARKS BETWEEN mm and xm
+ORDER BY gr DESC
+
+Copied Solution: Learn about IF, JOIN without ON stmt, using multiple column ordering
+SELECT IF(GRADE < 8, NULL, NAME), GRADE, MARKS
+FROM STUDENTS JOIN GRADES
+WHERE MARKS BETWEEN MIN_MARK AND MAX_MARK
+ORDER BY GRADE DESC, NAME
+
+5)
+Qulia just finished conducting a coding contest, and she needs your help assembling the leaderboard! Write a query to print the respective hacker_id and name of hackers who achieved full scores for more than one challenge. Order your output in descending order by the total number of challenges in which the hacker earned a full score. If more than one hacker received full scores in same number of challenges, then sort them by ascending hacker_id.
+
+Copied Solution: Learn about multiple inner joins, and reaching the values through alias and dot notationss
+
+select h.hacker_id, h.name
+from submissions s
+
+inner join challenges c # 1st Join
+on s.challenge_id = c.challenge_id
+
+inner join difficulty d # 2nd Join
+on c.difficulty_level = d.difficulty_level 
+
+inner join hackers h # 3rd Join
+on s.hacker_id = h.hacker_id
+
+where s.score = d.score and c.difficulty_level = d.difficulty_level
+group by h.hacker_id, h.name 
+having count(s.hacker_id) > 1 # the count is not selected, but used for conditions
+order by count(s.hacker_id) desc, s.hacker_id asc
+
+6)
+Harry Potter and his friends are at Ollivander's with Ron, finally replacing Charlie's old broken wand.
+Hermione decides the best way to choose is by determining the minimum number of gold galleons needed to buy each non-evil wand of high power and age. Write a query to print the id, age, coins_needed, and power of the wands that Ron's interested in, sorted in order of descending power. If more than one wand has same power, sort the result in order of descending age.
+
+Trial 1: (Failed)
+
+SELECT w.ID, p.AGE,w.COINS_NEEDED, w.POWER
+FROM WANDS as W
+INNER JOIN WANDS_PROPERTIES as p 
+ON w.CODE = p.CODE
+WHERE p.IS_EVIL = 0
+ORDER BY p.AGE DESC, w.POWER DESC
+
+Trial 2: (Failed)
+SELECT w.ID, p.AGE,w.COINS_NEEDED, w.POWER
+FROM WANDS as W
+INNER JOIN WANDS_PROPERTY as p 
+ON w.CODE = p.CODE
+WHERE p.IS_EVIL = 0
+ORDER BY w.COINS_NEEDED DESC, w.POWER DESC
+
+Copied Solution:
+
+select w.id, p.age, w.coins_needed, w.power 
+from Wands as w 
+JOIN Wands_Property as p 
+on (w.code = p.code) 
+where p.is_evil = 0 and w.coins_needed = (
+    select min(coins_needed) 
+    from Wands as w1 
+    join Wands_Property as p1
+    on (w1.code = p1.code) 
+    where w1.power = w.power and p1.age = p.age)
+order by w.power desc, p.age desc
+
+explore : 
+
+select MIN(coins_needed), power
+from Wands 
+group by power
+order by power desc
+
+explore:
+select w.coins_needed, w.power,p.code,p.is_evil
+from Wands as w 
+join wands_property as p 
+on w.code = p.code
+
+explore : (failed)
+
+select w.coins_needed, w.power, p.code
+from Wands as w 
+join wands_property as p 
+on w.code = p.code
+group by w.power
+order by w.power desc
+
+7)
+Julia asked her students to create some coding challenges. Write a query to print the hacker_id, name, and the total number of challenges created by each student. Sort your results by the total number of challenges in descending order. If more than one student created the same number of challenges, then sort the result by hacker_id. If more than one student created the same number of challenges and the count is less than the maximum number of challenges created, then exclude those students from the result.
+
+trial 1 : Failed due to h.name not in aggregate 
+SELECT h.hacker_id, h.name,count(c.challenge_id) chlngs
+from hackers as h 
+outer join challenges as c 
+on h.hacker_id = c.hacker_id
+group by h.hacker_id
+order by chlngs, name
+
+trial 2: Unable to find the reason why it failing
+SELECT h.hacker_id,count(c.challenge_id) chlngs
+from hackers as h 
+inner join challenges as c 
+on h.hacker_id = c.hacker_id
+group by h.hacker_id
+order by chlngs desc
+having count(c.challenge_id) > 1
+
+
+These queries are mainly in the Aggregation
+1) Query a count of the number of cities in CITY having a Population larger than .
+
+explore : 
+SELECT COUNT(ID) as cit_count
+FROM CITY
+
+trial : Worked
+SELECT COUNT(ID) as cit_count
+FROM CITY
+WHERE POPULATION > 100000
+
+2) Query the total population of all cities in CITY where District is California.
+
+Trial: 
+SELECT SUM(POPULATION) AS sum_pop 
+FROM CITY
+GROUPBY DISTRICT
+WHERE DISTRICT = 'California'
+
+Trial : 
+
+SELECT SUM(POPULATION) 
+FROM CITY
+WHERE DISTRICT = 'California'
+
+3) Query the AVG population of all cities in CITY where District is California.
+
+SELECT AVG(POPULATION) 
+FROM CITY
+WHERE DISTRICT = 'California'
+
+4) Query the AVG population of all cities in CITY where District is California.
+
+Trial
+SELECT FLOOR(AVG(POPULATION))
+FROM CITY
+WHERE DISTRICT = 'California'
+
+Trial:
+SELECT ROUND(AVG(POPULATION))
+FROM CITY
+WHERE DISTRICT = 'California'
+
+Trial : Passed
+SELECT ROUND(AVG(POPULATION))
+FROM CITY
+
