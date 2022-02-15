@@ -309,3 +309,73 @@ Trial : Passed
 SELECT ROUND(AVG(POPULATION))
 FROM CITY
 
+5) Query the sum of the populations for all Japanese cities in CITY. The COUNTRYCODE for Japan is JPN.
+
+SELECT SUM(POPULATION)
+FROM CITY
+WHERE COUNTRYCODE = 'JPN'
+
+6) Query the difference between the maximum and minimum populations in CITY.
+
+SELECT MAX(POPULATION)-MIN(POPULATION)
+FROM CITY
+
+7) The Blunder, finding the difference of salary with 0 and without....
+
+SELECT CEIL(AVG(Salary)-AVG(REPLACE(Salary,'0',''))) 
+FROM EMPLOYEES;
+
+8) We define an employee's total earnings to be their monthly SALARY X MONTHs worked, and the maximum total earnings to be the maximum total earnings for any employee in the Employee table. Write a query to find the maximum total earnings for all employees as well as the total number of employees who have maximum total earnings. Then print these values as  space-separated integers
+
+Trial : Failed
+SELECT MAX(SALARY*MONTHS) AS max_sal, (SALARY*MONTHS) AS tot_sal, COUNT(NAME) AS name_cnt  
+FROM EMPLOYEE
+WHERE tot_sal = max_sal
+
+Trial : Queried but rubbish
+SELECT MAX(SALARY*MONTHS) AS max_sal, (SALARY*MONTHS) AS tot_sal, COUNT(NAME) AS name_cnt  
+FROM EMPLOYEE
+GROUP BY tot_sal
+
+Trial : Failed
+
+WITH SAL_CAL AS (SELECT (SALARY*MONTHS) AS tot_sal  
+                 FROM EMPLOYEE
+                )
+                SELECT MAX(tot_sal),COUNT(NAME)
+                FROM EMPLOYEE, SAL_CAL
+
+Trial : Failed
+
+WITH SK AS(
+    SELECT (SALARY*MONTHS) AS tot_sal
+    FROM EMPLOYEE
+    )
+    SELECT tot_sal, EMPLOYEE_ID, NAME
+    FROM EMPLOYEE, SK
+    HAVING tot_sal = max(tot_sal)
+
+solution : Copied
+
+select (salary * months)as earnings ,count(*) 
+from employee 
+group by 1 #This will select the numbered column, in this case 1st column
+order by earnings desc limit 1;
+
+9)
+Query the following two values from the STATION table:
+The sum of all values in LAT_N rounded to a scale of 2 decimal places.
+The sum of all values in LONG_W rounded to a scale of 2 decimal places.
+
+SELECT ROUND(SUM(LAT_N),2),ROUND(SUM(LONG_W),2)
+FROM STATION
+
+10) Finding the Root and Leaf nodes in Binary three
+
+SELECT CASE
+    WHEN P IS NULL THEN CONCAT(N, ' Root')
+    WHEN N IN (SELECT DISTINCT P FROM BST) THEN CONCAT(N, ' Inner')
+    ELSE CONCAT(N, ' Leaf')
+    END
+FROM BST
+ORDER BY N ASC
