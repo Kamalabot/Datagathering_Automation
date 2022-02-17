@@ -1,0 +1,98 @@
+The app developers can have access to the apps that are being used on the phones that their operating system is running. Using that they can identify the features that their next os release must have.
+
+How about an application that always keeps you connected, at the background. The application can have a list of people whom you regularly come in connection on daily basis. When you want to wake some one, you need to be part of their list. 
+Like how you wake up google with OK google, the same phrase can be used to send a trigger to person you want to get in touch. The application will have access to the phone lock screen of those who have installed. If the application finds the lock screen is closed, then will inform that the call trigger has been sent and ask us to leave a voice message.
+Converting the complete messages to emoticons by using simple classification and showing it without even opening the messages recieved. 
+
+Objective is to have a calm brain and be creative by connecting to my mind on frequent basis. Meeting my basic needs will keep me calm. While thinking about the goals, future the calmness gets shattered. Realising that 
+
+App whose purpose is to bet on the success or failure of the daily activities, done by the friends and family. How much would you stake yourself in getting something, or completing a task.
+Create it in DAO, so the stakes are the Tokens that are earned and bought. 
+
+Destructive, yet very interesting situation. Collective of debtors to the bank start defaulting their loans. They have no means to pay, and there is no collateral with them. In some sense the Credit speeds up progress of those who are not yet wealthy. Gives them the time needed to think, and execute new ideas. In that process the progress is created to those without it, and wealth to those bank's investor. 
+
+I have come to this level because, credit was extended by my family. Then the progress was multiplied as I got credit from the society. Society grew inequally, but it grew radically. Because of the simple assumption that, I will be employed and pay down my debts to the society. That itself is a contribution.
+
+
+What if there is a way to grow without becoming a debtor, like many who have become the millionaires? They don't take loans and they are in control of their time. Debt can be a stick that gets people to move, along with their perspective on the respect and connection they recieve from the world. 
+
+Getting bogged down by your own self-appraisal, which is abysmal?? Your self_Image is so inflated
+that even a sly remark from a friend wreaks havoc in your life?? Those are clearly symptoms of objective 
+less life. Medicine is Goals. Get some by looking outwards, looking for places to contribute, and 
+people to help.
+Keep your day filled with activity, like doing cardio exercise in the gym. 
+
+The git hub usage has to be increased. There are ways to show case the work that I am doing on 
+everyday basis. 
+
+There are couple of commands that I need to try and master, 
+Crosstab, sidetable, using multiple tables and aggregate them
+
+There are skills that are required at every level of the data science. Before going into the skills
+the application of datascience can be used in numerical/ statistical machine learning, language 
+modeling, and computer vision. 
+
+The process starts with the acquisition of data that is to be used for analysis. Currently, I can
+confidently pull-in data from CSV and XLS files. If there are multiple XL files, with sheets in 
+them that can be pulled in. 
+
+Need to train: 	On establishing pipe lines for the pictures, and text data. 
+       	        Practice working on the text ingestion and post processing.
+		Work on Json pattern recognition and pulling the necessary data for analysis.
+		Practice the business related aspects of excel, and pandas more throughly.
+		Learn about the one, two and multifactor EDA
+		Learn about the SQL query and establishing pipeline from the database
+
+Once the data is post processed, and ready in the long format, then comes the visualisation process.
+Here the libraries that I am confident is Seaborn, Plotly and Dash. The idea of creating dashboards 
+is very inspiring and the impact can be felt real time. As I am typing, I can think about the dash
+that can be created for the NFL dataset. 
+
+Need to learn: 	Creating functions based on the complex chart functions, and associated parameters.
+		Combine the lessons learnt from excel, and the charting functions to prettify charts.
+		Create the charts that can tell the story, without typing a single word
+		Showing multiple colors depending a particular cutoff on the axis
+		Creating most of the dashboard styles that were 
+		Creating a dashboard that provides information on the Indian companies, their management and news related to the 
+		management. This could be real fun.  
+		Work on extracting data from XL and manipulating it and rewriting it
+		Practice SQL query from the Hacker rank. Collect the complete basics to advanced querying for reference
+		Understand, how the OCR works
+		Learn how the PDF data extraction works
+		Creating database of companies, and their products in amazon, their reviews, price and specifications
+		Concentrate on get the data from a single page, and populate. There are benefits doing this as a 
+		project. I am being pulled in other directions like doing the EDA for the new competition, or 
+		working on the pdf extraction methods, or learning more on the sql and even dive deeper into the 
+		datascience. 
+		
+
+Based on the EDA, the dependency of the target variable with the independent variables can be infered
+The models ranging from logistic regression to advanced deep learning can be fitted on the data.
+Learning the basics of the models will give more confidence on the application to which a particular
+algorithm can be applied. Even though, the models can be applied in a blanket fashion to get the best
+possible cross validation and test scores.
+
+Knowing the difference between accuracy, precision and validation results using the curve is 
+important. The reduction in the validation score, while the test score being flat or increasing 
+shows the overfitting. 
+
+Need to Learn :about Cross Validation, Hyper parameters and Grid search processes in this area
+            Learning the Gridsearch, and CV process at the function level gave some idea. 
+            Hyper parameter tuning of the Neural networks needs to be further understood. 
+            Building the neural networks based on the problem at hand, is another area to be learnt
+	    Attend couple of interviews, and learn the ropes of the real world scenarios
+	    Complete watching the series about the various solvers and libraries out there, and their salient features
+	    Need to learn the extraction process from the PDF files, and the OCR libraries. This is important skill
+	    Need to understand how the 3D rendering using the Javascript can be leveraged for the web scraping
+	    Work on converting webpages by using xslt transformation, using lxml python library
+
+               
+Work on the Natural Language processing,Dimensionality reduction. 
+
+The driving factor behind this is to aggregate the news, information from NET and 
+other sources into the price predicting factors. It starts with the desire to understand the world 
+around you, and how you can impact the future
+
+Javascript language is showing a different route to the treasure trove of information that is on the 
+internet. Learning this language will help in getting data, that may not be easily accessible from 
+regular html pages
