@@ -96,3 +96,42 @@ around you, and how you can impact the future
 Javascript language is showing a different route to the treasure trove of information that is on the 
 internet. Learning this language will help in getting data, that may not be easily accessible from 
 regular html pages
+
+With the recent learnings taken from NLP notebooks, the language, entity and meaning representation is 
+made more interesting the with Spacy and Transformers libraries. Need to understand how these fit in 
+and start utilising them effectively. 
+Important is using the pytorch to run the learning models. The tensors represented in pytorch is different
+from the Numpy / Pandas representation. In order to reach that, first the basic understanding of the 
+libraries, and how they modify the language into math notations is more important. 
+
+The idea of having question answer bots that can answer quora questions reliably will be a fun project
+to take on. What I have found is that the ecosystem surrounding the Natural language processing, the 
+amount of data available, the number of trained models available. All have increased exponentially and 
+doing so everyday. 
+
+What I am intending to do by learning above technologies? 
+
+Not just to get a job as a Data Scientist. To build something that is useful and contributes to the 
+society. So 
+
+What I will do if I have all the time?
+
+Will start building the data pipeline for collecting the information from the internet sources like
+	messari, amazon, matrimony sites, and even the mails 
+	find ways to use the text data in unique ways to automate the work
+	free the need of rote work in using the data that is already available, but unreachable due to memory
+	master the use of sql in storing and reaching the data
+	improve profieciency in using the ML/ DL model generation from the data. 
+	generate new ideas for products that can be implemented in this NLP 
+
+Project 1: Create a bot that can answer any question about the stock market, crypto market by learning about the 
+data scraped from the internet.
+
+Project 2: Convert the picture shown into description of the picture. Not just classification, but 
+see the picture and write about it. 
+
+Project 3: Next step is take the video, and explain what is seen in the video. 
+
+Project 4: Include the speec recognition libraries, and convert the speech into text. Then find the 
+intention, inference. Use that data to create dashboard to show information that might be helpful to 
+the conversation. 
