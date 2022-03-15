@@ -96,3 +96,107 @@ around you, and how you can impact the future
 Javascript language is showing a different route to the treasure trove of information that is on the 
 internet. Learning this language will help in getting data, that may not be easily accessible from 
 regular html pages
+
+With the recent learnings taken from NLP notebooks, the language, entity and meaning representation is 
+made more interesting the with Spacy and Transformers libraries. Need to understand how these fit in 
+and start utilising them effectively. 
+Important is using the pytorch to run the learning models. The tensors represented in pytorch is different
+from the Numpy / Pandas representation. In order to reach that, first the basic understanding of the 
+libraries, and how they modify the language into math notations is more important. 
+
+The idea of having question answer bots that can answer quora questions reliably will be a fun project
+to take on. What I have found is that the ecosystem surrounding the Natural language processing, the 
+amount of data available, the number of trained models available. All have increased exponentially and 
+doing so everyday. 
+
+What I am intending to do by learning above technologies? 
+
+Not just to get a job as a Data Scientist. To build something that is useful and contributes to the 
+society. So 
+
+What I will do if I have all the time?
+
+Will start building the data pipeline for collecting the information from the internet sources like
+	messari, amazon, matrimony sites, and even the mails 
+	find ways to use the text data in unique ways to automate the work
+	free the need of rote work in using the data that is already available, but unreachable due to memory
+	master the use of sql in storing and reaching the data
+	improve profieciency in using the ML/ DL model generation from the data. 
+	generate new ideas for products that can be implemented in this NLP 
+
+Project 1: Create a bot that can answer any question about the stock market, crypto market by learning about the 
+data scraped from the internet.
+
+Project 2: Convert the picture shown into description of the picture. Not just classification, but 
+see the picture and write about it.
+
+There is existing library to find the description of the picture, called clarifai. This library needs 
+API key authentication. Similarly for the idea of answering the questions about particular product or 
+scrip in the market, and directly do the web search. 
+
+My idea was to use the entire corpus of data, learn from that. Then use sequence generator that is 
+created using Neural networks and use them. 
+
+Project 3: Next step is take the video, and explain what is seen in the video. 
+
+Project 4: Include the speech recognition libraries, and convert the speech into text. Then find the 
+intention, inference. Use that data to create dashboard to show information that might be helpful to 
+the conversation. 
+
+Before learning about the neural networks, and their impmlementation I think it is better to understand 
+the traditional NLP more clearly. The choice of NN is pytorch. In of traditional NLP, the word embedding
+the dependencies and the POS tagging was done manually, using the libraries like spaCy. These libraries
+where already having various language models that are built into them, for different purposes. 
+
+Starting with POS, dependencies, entities the list continues. Knowing this, the sentences can be split
+into constituents, and analysis can be carried out. The patterns in these sentences can be used to 
+classify the type, intent and to some extent meaning in the sentence. 
+
+Ability to predict the answer for a question, using the training on the model seems less intuitive. How 
+a model with set of numbers, that take in the question, made of words converted to numbers that provide
+it embedding and position can come up with new words. Under the hood, the numbers are being predicted, 
+which are then parsed into positions and word embedding that become the words.
+
+Timeseries forecasting is powering underneath the language transformers and neural nets. After all only
+numbers can be predicted. Once predicted, it again depends on the embedding that numbers have to get 
+back into words. NNs have to modify not only the numbers, but learn the embeddings dynamically for the 
+given corpus, in parallel work on predicting the next work. Multi-layered problem. 
+Training in NLP, a plan: 
+
+Project 4: Take the notes that is written with specific tags, then automatically parse it into separate
+rows or columns of data. 
+
+Project 5: Scrape the websites of companies, get all their annual reports and extract the multiple data 
+from different format reports. How might I do that? 
+
+Project 6: Program should take a question or subject line of the mail , and create summary of activities 
+that has been done in the subject line, by reading the mails and summarising the following. 
+	from: , to: , date: followed by summary of the mail: 
+
+Take atleast 5 NLP related competition and complete it till submission, apart from the introductory 
+tweets classification competition. 
+	TREC-COVID Information Retrieval
+	Google QUEST Q&A Labeling
+	Youtube Review text Analytics
+	Bag of Words Meets Bags of Popcorn... Significant progress has been 
+	Feedback Prize for the Children summary
+	Quora Questions classification
+
+The challenges that needs to be addressed. 
+	Improve the time experiments take and the validation done in creating the language models. 
+	Target improving the prediction accuracy as result of identifying the correct model. 
+	Learning ways to extract information from the corpus. 
+		Intent recognition using pattern matching of Entities, POS 
+		Identifying entities and their roles in summarising.
+		Learn algorithms to answer questions. Transformers seem to be best choice here. RNN had been 
+		used in the past. 
+
+Real question is how to contribute with the NLP knowledge of information extraction and use it real 
+world project. Using the topic modelin, classification, and text generation what can be created? 
+
+If the topics are important points that are filtered from the bigger corpus, can a corpus be created 
+from the set of topics, like number, date, actions/ intents. How about taking the numerical data 
+and convert them into explanation and then to voice. Three steps 
+
+Text analysis using the depth of options in creating new pipe for identifying, classifying needs to be 
+practiced. 
