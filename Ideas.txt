@@ -168,6 +168,7 @@ rows or columns of data.
 
 Project 5: Scrape the websites of companies, get all their annual reports and extract the multiple data 
 from different format reports. How might I do that? 
+	Need to work on the 
 
 Project 6: Program should take a question or subject line of the mail , and create summary of activities 
 that has been done in the subject line, by reading the mails and summarising the following. 
