@@ -2,9 +2,8 @@ The app developers can have access to the apps that are being used on the phones
 
 How about an application that always keeps you connected, at the background. The application can have a list of people whom you regularly come in connection on daily basis. When you want to wake some one, you need to be part of their list. 
 Like how you wake up google with OK google, the same phrase can be used to send a trigger to person you want to get in touch. The application will have access to the phone lock screen of those who have installed. If the application finds the lock screen is closed, then will inform that the call trigger has been sent and ask us to leave a voice message.
-Converting the complete messages to emoticons by using simple classification and showing it without even opening the messages recieved. 
 
-Objective is to have a calm brain and be creative by connecting to my mind on frequent basis. Meeting my basic needs will keep me calm. While thinking about the goals, future the calmness gets shattered. Realising that 
+Objective is to have a calm brain and be creative by connecting to my mind on frequent basis. Meeting my basic needs will keep me calm. While thinking about the goals, future the calmness gets shattered. Realising the source of impatience, anxiety has given me strength.
 
 App whose purpose is to bet on the success or failure of the daily activities, done by the friends and family. How much would you stake yourself in getting something, or completing a task.
 Create it in DAO, so the stakes are the Tokens that are earned and bought. 
@@ -124,8 +123,7 @@ Will start building the data pipeline for collecting the information from the in
 	improve profieciency in using the ML/ DL model generation from the data. 
 	generate new ideas for products that can be implemented in this NLP 
 
-Project 1: Create a bot that can answer any question about the stock market, crypto market by learning about the 
-data scraped from the internet.
+Project 1: Create a bot that can answer any question about the stock market, crypto market by learning about the data scraped from the internet.
 
 Project 2: Convert the picture shown into description of the picture. Not just classification, but 
 see the picture and write about it.
@@ -168,11 +166,27 @@ rows or columns of data.
 
 Project 5: Scrape the websites of companies, get all their annual reports and extract the multiple data 
 from different format reports. How might I do that? 
-	Need to work on the 
+	Messari website researched, and the data location is understood...
+	Need to work on different websites, and get a feel of the challenges
 
 Project 6: Program should take a question or subject line of the mail , and create summary of activities 
 that has been done in the subject line, by reading the mails and summarising the following. 
 	from: , to: , date: followed by summary of the mail: 
+
+Project 7: Take a PDF and convert it to text, then send it through spacy and get the following.
+	The people the book talks about, and their background introduction.
+		* Couple of ways to do this. Feel both Transformers and Spacy's NERs will be required
+		* Locating quotes from the book
+
+Project 8: Work on automating salesforce!!! 
+	Getting the price. It seems there is a report that can list all the price registered till date. Crucial point is selectin the correct option to generate the report.
+    
+Project 9: Converting the complete messages to emoticons by using simple classification and showing it without even opening the messages recieved. (This heuristic will link the words uttered by the bot/avatar and link with the range of emotions. Automate the emotions to bring the avatar to life, artificially. Because, there might be a possibility to program personality in the 
+same way. Afterall personality is way of reacting to the stimuli coming from the world. Being non-challant under onslaught of fire or danger, or even in rapid reply meetings.
+
+Project 10: Automated resume change tool. Tool that can read your existing resume, add the new experience on the existing points 
+you have. Simple cut and replace of the existing skills with new skills, and in other cases complete revamp of the resume is 
+automated. 
 
 Take atleast 5 NLP related competition and complete it till submission, apart from the introductory 
 tweets classification competition. 
@@ -201,3 +215,43 @@ and convert them into explanation and then to voice. Three steps
 
 Text analysis using the depth of options in creating new pipe for identifying, classifying needs to be 
 practiced. 
+
+Reflect the problems that I have come across and solved either by using web or myself. Hold on.. If I am going 
+to see how others have solved the problems, then wouldn't be easier to read, understand the curated problems, and then make notes of it, like I do for other libraries?
+
+Challenge here is the time spent on searching for the solution myself, using creativity and experience. Lets say, I spend 15 mins on each of 57 problems that are curated. Which means, 16 approx hours are required with a time constraint. If I try my best for 15 mins, and unable to solve then I check the solution. All I am asking is 15 mins per problem....
+
+Concentration required on the mastering problem solving and programming the solution:
+    The time involved is considered as the exercise or practice with intention of feeling the mastery over the 
+    majority of problems that I might come across in real world conditions.
+    Write a lot of code.. solve a lot of problems from leet code and learn from others.
+    Target to solve 1 problem per day. Learn about the problem in the morning. Work on it in breaks, and then 
+    write the code in the evening.
+    Once the problem is solved, reflect the directions taken to solve the problem. Record them 
+    Solving problems using code, and try creating functions for the same.
+    Understand the real world ML application
+
+If one thing I have learnt more in-depth is, how the classes, and its objects are created. Then using it with the tests that can 
+be automated given me a new superpower. To check my program without breaking a sweat. I am struggling to prioritize the next steps.
+
+Attempt the coding challenges of Python the hard way 
+	The usage of class as a container to hold data is interesting lesson I learnt.
+	Implementing the Dash card game using lists, needs to be explored. 
+Attempt the coding challenges of 57 problems 
+	Implementing the GUI for examples can help me learn TKinter
+	
+Work on parsing text. In fact, need to take special 	
+
+Attempt the Coding challenge of the Turning.com
+
+Attempt the coding challenge of the leetcode.com
+
+Attempt to complete the Data Science from Scratch book.
+	Will create DS_fromScratch Repo, and make notebooks 
+	Try out all the exercises in the same way as Learn Python the Hardway.
+
+Attempt to complete the More python the hard way. The book gives high level of confidence. 
+
+Thinking about it, the reason I want to code is to improve my life and those surrounding me with the code. So I should attempt the 
+challenges, exactly as listed above. May be I can work on the 1st two and the next 2 together. Data Science from Scratch needs to 
+wait. Improving my coding skills will provide me with the confidence, and any new project I can start with clear process.  
