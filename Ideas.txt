@@ -255,3 +255,8 @@ Attempt to complete the More python the hard way. The book gives high level of c
 Thinking about it, the reason I want to code is to improve my life and those surrounding me with the code. So I should attempt the 
 challenges, exactly as listed above. May be I can work on the 1st two and the next 2 together. Data Science from Scratch needs to 
 wait. Improving my coding skills will provide me with the confidence, and any new project I can start with clear process.  
+
+project 10: How about an idea for micro_community surrounding the books, on programming
+like in good reads there are many books. Or another way is to take the books from 
+zlib, create a site where programmers can collaborate on the ideas about using the 
+book
