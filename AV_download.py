@@ -21,10 +21,10 @@ if Channel Link:
     -List the 
 2. List the choices for 
 """
-
-
-link = input('Provide the link of the youtube video:')
-kind = input('Select V for Video else A for Audio')
+linkType = input("Enter the type of link you have[Video\Channel\Playlist])
+if lower(linkType) == "video":
+    link = input('Provide the link of the youtube video:')
+    kind = input('Select V for Video else A for Audio')
 def dload_vid(link):
     vid = YouTube(link)
     stream = vid.streams
