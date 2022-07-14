@@ -1,8 +1,28 @@
 from pytube import YouTube
 from pytube import Channel
 from pytube import Search
+from pytube import Playlist
 
-#get the link from the user
+#Easing the download process using Pytube from anywhere
+
+"""
+1. Ask what is the type of link you are having 
+- Video Link
+- Channel Link
+- Playlist Link
+
+What you want to do with the Link?
+
+if Video Link:
+    -download Video
+    -download Audio
+
+if Channel Link:
+    -List the 
+2. List the choices for 
+"""
+
+
 link = input('Provide the link of the youtube video:')
 kind = input('Select V for Video else A for Audio')
 def dload_vid(link):
