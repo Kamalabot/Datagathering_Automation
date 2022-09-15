@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Axes | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Axes" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How to create chart axes using D3’s axis module. This article covers axis orientation, transitions, number of ticks, custom tick values, tick formatting and tick size." />
+<meta property="og:description" content="How to create chart axes using D3’s axis module. This article covers axis orientation, transitions, number of ticks, custom tick values, tick formatting and tick size." />
+<link rel="canonical" href="https://www.d3indepth.com/axes/" />
+<meta property="og:url" content="https://www.d3indepth.com/axes/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-16T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Axes" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-06-16T00:00:00+01:00","datePublished":"2021-06-16T00:00:00+01:00","description":"How to create chart axes using D3’s axis module. This article covers axis orientation, transitions, number of ticks, custom tick values, tick formatting and tick size.","headline":"D3 Axes","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/axes/"},"url":"https://www.d3indepth.com/axes/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Axes</h2>
+
+  <div class="page-content">
+  	<p><em>How to create chart axes using D3’s axis module. This article covers axis orientation, transitions, number of ticks, custom tick values, tick formatting and tick size.</em></p>
+
+<p>One of the most useful D3 modules (especially when creating bar, line and scatter charts) is the <strong>axis module</strong> which draws axes:</p>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g transform=\&quot;translate(20, 50)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale);\n\nd3.select(&apos;svg g&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="how-to-create-an-axis">How to create an axis</h2>
+
+<p>You need two things to create a D3 axis:</p>
+
+<ul>
+  <li>an SVG element to contain the axis (usually a <code class="language-plaintext highlighter-rouge">g</code> element)</li>
+  <li>a D3 <a href="/scales">scale function</a></li>
+</ul>
+
+<p>A D3 scale function has a domain and range (see the <a href="/scales">scales</a> chapter). The domain specifies the input extent (for example <code class="language-plaintext highlighter-rouge">[0, 100]</code>) and the range defines the output extent (for example <code class="language-plaintext highlighter-rouge">[0, 1000]</code>) of the scale.</p>
+
+<p>When a D3 scale function is used to define an axis, the scale domain determines the minimum and maximum tick values and the range determines the length of the axis.</p>
+
+<p>To create an axis:</p>
+
+<ul>
+  <li>make an axis generator function using <code class="language-plaintext highlighter-rouge">d3.axisBottom</code>, <code class="language-plaintext highlighter-rouge">d3.axisTop</code>, <code class="language-plaintext highlighter-rouge">d3.axisLeft</code> or <code class="language-plaintext highlighter-rouge">d3.axisRight</code> (and pass in your scale function)</li>
+  <li>select the container element and pass the axis generator into <code class="language-plaintext highlighter-rouge">.call</code></li>
+</ul>
+
+<p>Here’s a basic example:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">"600"</span> <span class="na">height=</span><span class="s">"100"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">"translate(20, 50)"</span><span class="nt">&gt;&lt;/g&gt;</span>
+<span class="nt">&lt;/svg&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]);</span>
+
+<span class="kd">let</span> <span class="nx">axis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisBottom</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g transform=\&quot;translate(20, 50)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale);\n\nd3.select(&apos;svg g&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>We cover <code class="language-plaintext highlighter-rouge">.call</code> in the <a href="/selections">selections</a> chapter. In brief you pass a function into <code class="language-plaintext highlighter-rouge">.call</code>. The function’s first parameter is a selection with which the function can operate on. An axis generator (the <code class="language-plaintext highlighter-rouge">axis</code> variable in the above example) appends <code class="language-plaintext highlighter-rouge">path</code>, <code class="language-plaintext highlighter-rouge">line</code> and <code class="language-plaintext highlighter-rouge">text</code> elements (that represent the axis) to the selection.</p>
+</blockquote>
+
+<blockquote>
+  <p>The axis can be positioned by transforming the axis’s container. In the above example, the <code class="language-plaintext highlighter-rouge">g</code> element that contains the axis is translated by <code class="language-plaintext highlighter-rouge">(20, 50)</code>.</p>
+</blockquote>
+
+<h3 id="axis-orientation">Axis orientation</h3>
+
+<p><code class="language-plaintext highlighter-rouge">d3.axisBottom</code>, <code class="language-plaintext highlighter-rouge">d3.axisTop</code>, <code class="language-plaintext highlighter-rouge">d3.axisLeft</code> and <code class="language-plaintext highlighter-rouge">d3.axisRight</code> are used to generate axes that are suitable for the bottom, top, left and right of a chart, respectively:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">"500"</span> <span class="na">height=</span><span class="s">"500"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">id=</span><span class="s">"left"</span> <span class="na">transform=</span><span class="s">"translate(30, 40)"</span><span class="nt">&gt;&lt;/g&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">id=</span><span class="s">"right"</span> <span class="na">transform=</span><span class="s">"translate(450, 40)"</span><span class="nt">&gt;&lt;/g&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">id=</span><span class="s">"top"</span> <span class="na">transform=</span><span class="s">"translate(40, 30)"</span><span class="nt">&gt;&lt;/g&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">id=</span><span class="s">"bottom"</span> <span class="na">transform=</span><span class="s">"translate(40, 450)"</span><span class="nt">&gt;&lt;/g&gt;</span>
+<span class="nt">&lt;/svg&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">400</span><span class="p">]);</span>
+
+<span class="kd">let</span> <span class="nx">axisLeft</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisLeft</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">axisRight</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisRight</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">axisTop</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisTop</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">axisBottom</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisBottom</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#left</span><span class="dl">'</span><span class="p">).</span><span class="nx">call</span><span class="p">(</span><span class="nx">axisLeft</span><span class="p">);</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#right</span><span class="dl">'</span><span class="p">).</span><span class="nx">call</span><span class="p">(</span><span class="nx">axisRight</span><span class="p">);</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#top</span><span class="dl">'</span><span class="p">).</span><span class="nx">call</span><span class="p">(</span><span class="nx">axisTop</span><span class="p">);</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#bottom</span><span class="dl">'</span><span class="p">).</span><span class="nx">call</span><span class="p">(</span><span class="nx">axisBottom</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-orientation/" marginwidth="0" marginheight="0" style="width: 100%; height: 510px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-orientation/" marginwidth="0" marginheight="0" style="width: 100%; height: 510px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;500\&quot; height=\&quot;500\&quot;&gt;\n  &lt;g id=\&quot;left\&quot; transform=\&quot;translate(30, 40)\&quot;&gt;&lt;/g&gt;\n  &lt;g id=\&quot;right\&quot; transform=\&quot;translate(450, 40)\&quot;&gt;&lt;/g&gt;\n  &lt;g id=\&quot;top\&quot; transform=\&quot;translate(40, 30)\&quot;&gt;&lt;/g&gt;\n  &lt;g id=\&quot;bottom\&quot; transform=\&quot;translate(40, 450)\&quot;&gt;&lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 400]);\n\nlet axisLeft = d3.axisLeft(scale);\nlet axisRight = d3.axisRight(scale);\nlet axisTop = d3.axisTop(scale);\nlet axisBottom = d3.axisBottom(scale);\n\nd3.select(&apos;#left&apos;)\n\t.call(axisLeft);\n\nd3.select(&apos;#right&apos;)\n\t.call(axisRight);\n\nd3.select(&apos;#top&apos;)\n\t.call(axisTop);\n\nd3.select(&apos;#bottom&apos;)\n\t.call(axisBottom);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="scale-types">Scale types</h3>
+
+<p>You can pass in any scale function that has numeric output. This includes <code class="language-plaintext highlighter-rouge">scaleLinear</code>, <code class="language-plaintext highlighter-rouge">scaleSqrt</code>, <code class="language-plaintext highlighter-rouge">scaleLog</code>, <code class="language-plaintext highlighter-rouge">scaleTime</code>, <code class="language-plaintext highlighter-rouge">scaleBand</code> and <code class="language-plaintext highlighter-rouge">scalePoint</code>.</p>
+
+<p>Here’s an example using each scale type:</p>
+
+<!-- <iframe class="db center" src="/blocks/axes/scale-types/" marginwidth="0" marginheight="0" style="width: 100%; height: 310px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/scale-types/" marginwidth="0" marginheight="0" style="width: 100%; height: 310px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;650\&quot; height=\&quot;300\&quot;&gt;\n  &lt;text x=\&quot;70\&quot; y=\&quot;30\&quot;&gt;scaleLinear&lt;/text&gt;\n  &lt;g id=\&quot;linear\&quot; transform=\&quot;translate(120, 20)\&quot;&gt;&lt;/g&gt;\n\n  &lt;text x=\&quot;70\&quot; y=\&quot;80\&quot;&gt;scaleSqrt&lt;/text&gt;\n  &lt;g id=\&quot;sqrt\&quot; transform=\&quot;translate(120, 70)\&quot;&gt;&lt;/g&gt;\n\n  &lt;text x=\&quot;70\&quot; y=\&quot;130\&quot;&gt;scaleLog&lt;/text&gt;\n  &lt;g id=\&quot;log\&quot; transform=\&quot;translate(120, 120)\&quot;&gt;&lt;/g&gt;\n\n  &lt;text x=\&quot;70\&quot; y=\&quot;180\&quot;&gt;scaleTime&lt;/text&gt;\n  &lt;g id=\&quot;time\&quot; transform=\&quot;translate(120, 170)\&quot;&gt;&lt;/g&gt;\n\n  &lt;text x=\&quot;70\&quot; y=\&quot;230\&quot;&gt;scaleBand&lt;/text&gt;\n  &lt;g id=\&quot;band\&quot; transform=\&quot;translate(120, 220)\&quot;&gt;&lt;/g&gt;\n\n  &lt;text x=\&quot;70\&quot; y=\&quot;280\&quot;&gt;scalePoint&lt;/text&gt;\n  &lt;g id=\&quot;point\&quot; transform=\&quot;translate(120, 270)\&quot;&gt;&lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;svg &gt; text {\n\tfont-size: 12px;\n\tfont-family: sans-serif;\n\ttext-anchor: end;\n\tfill: #333;\n}\n&quot;,&quot;js&quot;:&quot;let linearScale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet sqrtScale = d3.scaleSqrt().domain([0, 100]).range([0, 500]);\n\nlet logScale = d3.scaleLog().domain([10, 1000]).range([0, 500]);\n\nlet timeScale = d3.scaleTime()\n\t.domain([new Date(2020, 0, 1), new Date(2020, 5, 1)])\n\t.range([0, 500]);\n\nlet bandScale = d3.scaleBand()\n\t.domain([&apos;Mon&apos;, &apos;Tue&apos;, &apos;Wed&apos;, &apos;Thu&apos;, &apos;Fri&apos;])\n\t.range([0, 500]);\n\nlet pointScale = d3.scalePoint()\n\t.domain([&apos;Mon&apos;, &apos;Tue&apos;, &apos;Wed&apos;, &apos;Thu&apos;, &apos;Fri&apos;])\n\t.range([0, 500]);\n\nlet axis = d3.axisBottom();\n\naxis.scale(linearScale);\nd3.select(&apos;#linear&apos;).call(axis);\n\naxis.scale(sqrtScale);\nd3.select(&apos;#sqrt&apos;).call(axis);\n\naxis.scale(logScale);\nd3.select(&apos;#log&apos;).call(axis);\n\naxis.scale(timeScale);\nd3.select(&apos;#time&apos;).call(axis);\n\naxis.scale(bandScale);\nd3.select(&apos;#band&apos;).call(axis);\n\naxis.scale(pointScale);\nd3.select(&apos;#point&apos;).call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">scaleBand</code> is useful for bar charts. Read more <a href="/scales/#scaleband">here</a>.</p>
+</blockquote>
+
+<h3 id="transitions">Transitions</h3>
+
+<p>If the scale’s domain changes, the axis can be updated by calling <code class="language-plaintext highlighter-rouge">.call(axis)</code> again:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<p>You can also add a call to <code class="language-plaintext highlighter-rouge">.transition</code> to make the axis animate:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-transition/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-transition/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n\t&lt;g transform=\&quot;translate(20, 50)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;button onClick=\&quot;updateScaleDomain()\&quot;&gt;Change scale domain&lt;/button&gt;\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale);\n\nfunction updateScaleDomain() {\n\tlet min = Math.random() * 100;\n\tlet max = min + Math.random() * 100;\n\tscale.domain([min, max]);\n\tupdate();\n}\n\nfunction update() {\n\td3.select(&apos;svg g&apos;)\n\t\t.transition()\n\t\t.call(axis);\n}\n\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="axis-configuration">Axis configuration</h2>
+
+<p>You can configure axes in the following ways:</p>
+
+<ul>
+  <li>specify the number of ticks OR specify the tick values</li>
+  <li>specify the format of the tick label (for example, add a percentage sign)</li>
+  <li>specify the tick size</li>
+</ul>
+
+<h3 id="number-of-ticks">Number of ticks</h3>
+
+<p>You can use the <code class="language-plaintext highlighter-rouge">.ticks</code> method to specify how many ticks the axis has:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]);</span>
+
+<span class="kd">let</span> <span class="nx">axis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisBottom</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+
+<span class="nx">axis</span><span class="p">.</span><span class="nx">ticks</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-number-ticks/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-number-ticks/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g transform=\&quot;translate(20, 50)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale);\n\naxis.ticks(20);\n\nd3.select(&apos;svg g&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>D3 tries to use as many ticks as requested, but in some cases it’ll use more or less in order for the tick values to be round numbers.</p>
+</blockquote>
+
+<blockquote>
+  <p>The axis uses its scale function’s <code class="language-plaintext highlighter-rouge">.ticks</code> method to generate an array of tick values.</p>
+</blockquote>
+
+<h3 id="tick-values">Tick values</h3>
+
+<p>You can specify the axis’s tick values by passing an array of tick values into the <code class="language-plaintext highlighter-rouge">.tickValues</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]);</span>
+
+<span class="kd">let</span> <span class="nx">axis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisBottom</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+
+<span class="nx">axis</span><span class="p">.</span><span class="nx">tickValues</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="p">]);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-tick-values/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-tick-values/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g transform=\&quot;translate(20, 50)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale);\n\naxis.tickValues([0, 25, 50, 75, 100]);\n\nd3.select(&apos;svg g&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="tick-label-formatting">Tick label formatting</h3>
+
+<p>You can format the tick label in two ways.</p>
+
+<p>The first is to use the <code class="language-plaintext highlighter-rouge">.ticks</code> method and pass in a format string as the second argument:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]);</span>
+
+<span class="kd">let</span> <span class="nx">axis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisBottom</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+
+<span class="nx">axis</span><span class="p">.</span><span class="nx">ticks</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="dl">"</span><span class="s2">$.2f</span><span class="dl">"</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-ticks/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-ticks/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g transform=\&quot;translate(20, 50)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale);\n\naxis.ticks(4, \&quot;$.2f\&quot;);\n\nd3.select(&apos;svg g&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>We’ve already seen that the first argument of <code class="language-plaintext highlighter-rouge">.ticks</code> is the number of ticks. You can pass in <code class="language-plaintext highlighter-rouge">null</code> if you want to use the default number of ticks.</p>
+</blockquote>
+
+<p>The format string is powerful and is described in depth in the <a href="https://github.com/d3/d3-format#locale_format">d3-format section of the official documentation</a>.</p>
+
+<p>The second approach is to pass a formatting function into the <code class="language-plaintext highlighter-rouge">.tickFormat</code> method. The function accepts a value and outputs a formatted value.</p>
+
+<p>In this example we add a % symbol to each tick value:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]);</span>
+
+<span class="kd">let</span> <span class="nx">axis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisBottom</span><span class="p">(</span><span class="nx">scale</span><span class="p">);</span>
+
+<span class="nx">axis</span><span class="p">.</span><span class="nx">ticks</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">tickFormat</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">%</span><span class="dl">"</span><span class="p">;</span>
+  <span class="p">});</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-tick-format/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-tick-format/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g transform=\&quot;translate(20, 50)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale);\n\naxis.ticks(4)\n\t.tickFormat(function(d) {\n\t\treturn d + \&quot;%\&quot;;\n\t});\n\nd3.select(&apos;svg g&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="tick-size">Tick size</h3>
+
+<p>The length of the ticks can be set using the <code class="language-plaintext highlighter-rouge">.tickSize</code> method. You can also set the distance between the tick and the tick label using <code class="language-plaintext highlighter-rouge">.tickPadding</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">]);</span>
+
+<span class="kd">let</span> <span class="nx">axis</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">axisBottom</span><span class="p">(</span><span class="nx">scale</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">tickPadding</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">tickSize</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+	<span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">axis</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-tick-size/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-tick-size/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g transform=\&quot;translate(20, 50)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 500]);\n\nlet axis = d3.axisBottom(scale)\n\t.tickPadding(10)\n\t.tickSize(10);\n\nd3.select(&apos;svg g&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The axis is made up of a <code class="language-plaintext highlighter-rouge">path</code> element (that looks like a long square bracket and represents two end ticks and the main axis line) and <code class="language-plaintext highlighter-rouge">line</code> elements that represent each tick (including the end ticks).</p>
+
+<p>You can set the length of the end ticks of the <code class="language-plaintext highlighter-rouge">path</code> element using <code class="language-plaintext highlighter-rouge">.tickSizeOuter</code> and the length of the <code class="language-plaintext highlighter-rouge">line</code> elements using <code class="language-plaintext highlighter-rouge">.tickSizeInner</code>. (I’m not sure of when this might be used.)</p>
+
+<p>You can also create grid lines by setting the tick size to your chart width (or height). In this example we use <code class="language-plaintext highlighter-rouge">axisLeft</code> and set the tick size to 500. The axis also has a transform of <code class="language-plaintext highlighter-rouge">translate(520, 20)</code> and it’s <code class="language-plaintext highlighter-rouge">path</code> element that represents the main axis is hidden. (If the main axis was visible, you’d see it to the right of the grid lines.)</p>
+
+<!-- <iframe class="db center" src="/blocks/axes/axis-long-ticks/" marginwidth="0" marginheight="0" style="width: 100%; height: 350px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/axes/axis-long-ticks/" marginwidth="0" marginheight="0" style="width: 100%; height: 350px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;340\&quot;&gt;\n  &lt;g class=\&quot;axis\&quot; transform=\&quot;translate(520, 20)\&quot;&gt;&lt;/g&gt;\n&lt;/svg&gt;\n\n&quot;,&quot;css&quot;:&quot;g.axis path {\n\tdisplay: none;\n}\n\ng.axis line {\n\tstroke-dasharray: 1 1;\n}\n\n&quot;,&quot;js&quot;:&quot;let scale = d3.scaleLinear().domain([0, 100]).range([0, 300]);\n\nlet axis = d3.axisLeft(scale)\n\t.tickSize(500);\n\nd3.select(&apos;svg g.axis&apos;)\n\t.call(axis);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

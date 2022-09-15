@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Getting Started | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Getting Started" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Getting started with D3.js. Assumes familiarity with HTML, SVG, CSS and JavaScript. Many code examples on CodePen." />
+<meta property="og:description" content="Getting started with D3.js. Assumes familiarity with HTML, SVG, CSS and JavaScript. Many code examples on CodePen." />
+<link rel="canonical" href="https://www.d3indepth.com/gettingstarted/" />
+<meta property="og:url" content="https://www.d3indepth.com/gettingstarted/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-05T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Getting Started" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-05T00:00:00+01:00","datePublished":"2021-05-05T00:00:00+01:00","description":"Getting started with D3.js. Assumes familiarity with HTML, SVG, CSS and JavaScript. Many code examples on CodePen.","headline":"Getting Started","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/gettingstarted/"},"url":"https://www.d3indepth.com/gettingstarted/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">Getting Started</h2>
+
+  <div class="page-content">
+  	<p><em>Getting started with D3.js. This article assumes familiarity with HTML, SVG, CSS and JavaScript.</em></p>
+
+<p>D3 in Depth assumes you’re familiar with HTML, SVG, CSS and JavaScript. If not, I recommend reading <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation/">Fundamentals of HTML, SVG, CSS and JavaScript for Data Visualisation</a>.</p>
+
+<p>If you’re familiar with libraries such as React and Vue.js (or even jQuery) you should be fine.</p>
+
+<p>There are many code examples hosted on CodePen. For example:</p>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/example/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/example/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot; transform=\&quot;translate(50, 0)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(myData)\n  .join(&apos;circle&apos;)\n  .attr(&apos;cx&apos;, function(d, i) {\n    return i * 100;\n  })\n  .attr(&apos;cy&apos;, 50)\n  .attr(&apos;r&apos;, function(d) {\n    return 0.5 * d;\n  })\n  .style(&apos;fill&apos;, &apos;orange&apos;);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>Clicking on the ‘Edit in CodePen’ button opens the example in CodePen.</p>
+
+<p>Each example consists of three or more files:</p>
+
+<ul>
+  <li>index.html</li>
+  <li>index.js</li>
+  <li>style.css</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">index.html</code> will usually look something like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;svg width="760" height="140"&gt;
+  &lt;g transform="translate(70, 70)"&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;
+</code></pre></div></div>
+
+<p>(CodePen hides the usual boilerplate that starts <code class="language-plaintext highlighter-rouge">&lt;!DOCTYPE html&gt;</code> and ends <code class="language-plaintext highlighter-rouge">&lt;/html&gt;</code>.)</p>
+
+<p><code class="language-plaintext highlighter-rouge">index.js</code> contains your JavaScript code and is automatically included into <code class="language-plaintext highlighter-rouge">index.html</code> by CodePen. (I’ve also configured the examples to include D3.js.)</p>
+
+<p><code class="language-plaintext highlighter-rouge">style.css</code> contains your CSS code and is also automatically included into <code class="language-plaintext highlighter-rouge">index.html</code> by CodePen.</p>
+
+<h2 id="exporting-from-codepen">Exporting from CodePen</h2>
+
+<p>CodePen has a nice feature where you can download the pen and work on it in your own code editor. You first need to save the pen then some buttons will appear in the bottom right. Click on Export and choose the Export as .zip option. This will result in a folder containing your code.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">src</code> directory contains the code as it appears in the pen and is perhaps not so useful. The <code class="language-plaintext highlighter-rouge">dist</code> directory however has the complete code and can be edited locally, served locally (or uploaded to the web).</p>
+
+<p>If any of this doesn’t make sense to you I suggest reading <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation/">Fundamentals of HTML, SVG, CSS and JavaScript for Data Visualisation</a> course which goes into more detail.</p>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Making maps with D3 | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Making maps with D3" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="D3’s geo module helps you create maps from GeoJSON data. This article explains GeoJSON, projections and path generators. It also shows how to use these three concepts to create maps." />
+<meta property="og:description" content="D3’s geo module helps you create maps from GeoJSON data. This article explains GeoJSON, projections and path generators. It also shows how to use these three concepts to create maps." />
+<link rel="canonical" href="https://www.d3indepth.com/geographic/" />
+<meta property="og:url" content="https://www.d3indepth.com/geographic/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-15T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Making maps with D3" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-15T00:00:00+01:00","datePublished":"2021-05-15T00:00:00+01:00","description":"D3’s geo module helps you create maps from GeoJSON data. This article explains GeoJSON, projections and path generators. It also shows how to use these three concepts to create maps.","headline":"Making maps with D3","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/geographic/"},"url":"https://www.d3indepth.com/geographic/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">Making maps with D3</h2>
+
+  <div class="page-content">
+  	<p><em>D3’s geo module helps you create maps from GeoJSON data. This article explains GeoJSON, projections and path generators. It also shows how to use these three concepts to create maps.</em></p>
+
+<p>This chapter looks at D3’s approach to rendering geographic information.</p>
+
+<p>As an example, the globe below is drawn using D3. A GeoJSON file is loaded and D3 is used to project the geographic data and draw it on a Canvas element:</p>
+
+<!-- <iframe class="db center" src="/blocks/geo/spinning/" marginwidth="0" marginheight="0" style="width: 100%; height: 460px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/spinning/" marginwidth="0" marginheight="0" style="width: 100%; height: 460px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;canvas width=\&quot;800\&quot; height=\&quot;400\&quot;&gt;&lt;/canvas&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n&quot;,&quot;js&quot;:&quot;let geojson = {}\n\nlet context = d3.select(&apos;#content canvas&apos;)\n  .node()\n  .getContext(&apos;2d&apos;);\n\nlet projection = d3.geoOrthographic()\n  .scale(300);\n\nlet geoGenerator = d3.geoPath()\n  .projection(projection)\n  .pointRadius(4)\n  .context(context);\n\nlet yaw = 300;\n\nfunction update() {\n  projection.rotate([yaw, -45])\n\n  context.clearRect(0, 0, 800, 600);\n\n  context.lineWidth = 0.5;\n  context.strokeStyle = &apos;#333&apos;;\n\n  context.beginPath();\n  geoGenerator({type: &apos;FeatureCollection&apos;, features: geojson.features})\n  context.stroke();\n\n  // Graticule\n  let graticule = d3.geoGraticule();\n  context.beginPath();\n  context.strokeStyle = &apos;#ccc&apos;;\n  geoGenerator(graticule());\n  context.stroke();\n\n  yaw -= 0.2\n}\n\n\n\n// REQUEST DATA\nd3.json(&apos;https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json&apos;)\n\t.then(function(json) {\n  geojson = json;\n  window.setInterval(update, 100);\n})\n\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=f28e1c3a99ea6d84986f35ac8646fac7" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>D3’s approach differs to so called raster methods such as <a href="http://leafletjs.com/">Leaflet</a> and Google Maps. These <strong>pre-render map features as image tiles</strong> and these are loaded from a web server and pieced together in the browser to form a map.</p>
+
+<p>Typically D3 requests <strong>vector geographic information</strong> in the form of GeoJSON and <strong>renders this to SVG or Canvas</strong> in the browser.</p>
+
+<p>Raster maps often look more like traditional print maps where a lot of detail (e.g. place names, roads, rivers etc.) can be shown without an impact on performance. However, dynamic content such as animation and interaction is more easily implemented using a vector approach. (It’s also quite common to combine the two approaches.)</p>
+
+<h3 id="d3-mapping-concepts">D3 mapping concepts</h3>
+
+<p>The 3 concepts that are key to understanding map creation using D3 are:</p>
+
+<ul>
+  <li><strong>GeoJSON</strong> (a JSON-based format for specifying geographic data)</li>
+  <li><strong>projections</strong> (functions that convert from latitude/longitude co-ordinates to x &amp; y co-ordinates)</li>
+  <li><strong>geographic path generators</strong> (functions that convert GeoJSON shapes into SVG or Canvas paths)</li>
+</ul>
+
+<h4 id="geojson">GeoJSON</h4>
+
+<p>GeoJSON is a standard for representing geographic data using the JSON format and the full specification is at <a href="http://geojson.org/">geojson.org</a>.</p>
+
+<p>Here’s a typical GeoJSON object:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FeatureCollection"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"features"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Feature"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Africa"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"geometry"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Polygon"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"coordinates"</span><span class="p">:</span><span class="w"> </span><span class="p">[[[</span><span class="mi">-6</span><span class="p">,</span><span class="w"> </span><span class="mi">36</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">33</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">-6</span><span class="p">,</span><span class="w"> </span><span class="mi">36</span><span class="p">]]]</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Feature"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Australia"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"geometry"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Polygon"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"coordinates"</span><span class="p">:</span><span class="w"> </span><span class="p">[[[</span><span class="mi">143</span><span class="p">,</span><span class="w"> </span><span class="mi">-11</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">153</span><span class="p">,</span><span class="w"> </span><span class="mi">-28</span><span class="p">],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">143</span><span class="p">,</span><span class="w"> </span><span class="mi">-11</span><span class="p">]]]</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Feature"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Timbuktu"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"geometry"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Point"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"coordinates"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">-3.0026</span><span class="p">,</span><span class="w"> </span><span class="mf">16.7666</span><span class="p">]</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<p>In the above object there’s a FeatureCollection containing an array of 3 features:</p>
+
+<ul>
+  <li>Africa</li>
+  <li>Australia</li>
+  <li>the city of Timbuktu</li>
+</ul>
+
+<p>Each feature consists of <strong>geometry</strong> (simple polygons in the case of the countries and a point for Timbuktu) and <strong>properties</strong>.</p>
+
+<p>Properties can contain any information about the feature such as name, id, and other data such as population, GDP etc.</p>
+
+<p>D3 takes care of most of the detail when rendering GeoJSON so you only need a basic understanding of GeoJSON to get started with D3 mapping.</p>
+
+<h4 id="projections">Projections</h4>
+
+<p>A projection function takes a longitude and latitude co-ordinate (in the form of an array <code class="language-plaintext highlighter-rouge">[lon, lat]</code>) and transforms it into an x and y co-ordinate:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">projection</span><span class="p">(</span> <span class="nx">lonLat</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">x</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// some formula here to calculate x</span>
+  <span class="kd">let</span> <span class="nx">y</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// some formula here to calculate y</span>
+  <span class="k">return</span> <span class="p">[</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="nx">projection</span><span class="p">(</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.0026</span><span class="p">,</span> <span class="mf">16.7666</span><span class="p">]</span> <span class="p">)</span>
+<span class="c1">// returns [474.7594743879618, 220.7367625635119]</span></code></pre></figure>
+
+<p>Projection mathematics can get quite complex but fortunately D3 provides a large number of projection functions.</p>
+
+<p>For example you can create an equi-rectangular projection function using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoEquirectangular</span><span class="p">();</span>
+
+<span class="nx">projection</span><span class="p">(</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.0026</span><span class="p">,</span> <span class="mf">16.7666</span><span class="p">]</span> <span class="p">)</span>
+<span class="c1">// returns [474.7594743879618, 220.7367625635119]</span></code></pre></figure>
+
+<p>We’ll look at projections in more detail later.</p>
+
+<h4 id="geographic-path-generators">Geographic path generators</h4>
+<p>A geographic path generator is a function that takes a GeoJSON object and converts it into an SVG path string. (In fact, it’s just another type of <a href="/shapes">shape generator</a>.)</p>
+
+<p>You can create a generator using the method <code class="language-plaintext highlighter-rouge">.geoPath</code> and configure it with a projection function:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoEquirectangular</span><span class="p">();</span>
+
+<span class="kd">let</span> <span class="nx">geoGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoPath</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">projection</span><span class="p">(</span><span class="nx">projection</span><span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">geoJson</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Feature</span><span class="dl">"</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">properties</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Africa</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="dl">"</span><span class="s2">geometry</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Polygon</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">coordinates</span><span class="dl">"</span><span class="p">:</span> <span class="p">[[[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">],</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">...</span> <span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">]]]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">geoGenerator</span><span class="p">(</span><span class="nx">geoJson</span><span class="p">);</span>
+<span class="c1">// returns "M464.0166237760863,154.09974265651798L491.1506253268278,154.8895088551978 ... L448.03311471280136,183.1346693994119Z"</span></code></pre></figure>
+
+<p>As usual with <a href="/shapes">shape generators</a> the generated path string is used to set the <code class="language-plaintext highlighter-rouge">d</code> attribute on an SVG <code class="language-plaintext highlighter-rouge">path</code> element.</p>
+
+<h4 id="putting-it-all-together">Putting it all together</h4>
+
+<p>Given some <strong>GeoJSON</strong>, a <strong>projection function</strong> and a <strong>geographic path generator</strong> you can create a basic map:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">geoJson</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">FeatureCollection</span><span class="dl">"</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">features</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Feature</span><span class="dl">"</span><span class="p">,</span>
+      <span class="dl">"</span><span class="s2">properties</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Africa</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="dl">"</span><span class="s2">geometry</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Polygon</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">coordinates</span><span class="dl">"</span><span class="p">:</span> <span class="p">[[[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">],</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">...</span> <span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">]]]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">...</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoEquirectangular</span><span class="p">();</span>
+
+<span class="kd">let</span> <span class="nx">geoGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoPath</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">projection</span><span class="p">(</span><span class="nx">projection</span><span class="p">);</span>
+
+<span class="c1">// Join the FeatureCollection's features array to path elements</span>
+<span class="kd">let</span> <span class="nx">u</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#content g.map</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">geojson</span><span class="p">.</span><span class="nx">features</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">d</span><span class="dl">'</span><span class="p">,</span> <span class="nx">geoGenerator</span><span class="p">);</span></code></pre></figure>
+
+<p><code class="language-plaintext highlighter-rouge">geoJson.features</code> is an array of features. This array is joined to <code class="language-plaintext highlighter-rouge">path</code> elements. The <code class="language-plaintext highlighter-rouge">d</code> attribute is set using the function <code class="language-plaintext highlighter-rouge">geoGenerator</code>. This receives a feature as its first parameter and outputs a path string.</p>
+
+<p>The last line may look like magic but is the equivalent of:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  .attr('d', function(d) {
+    return geoGenerator(d);
+  });
+</code></pre></div></div>
+
+<p>In this case the parameter <code class="language-plaintext highlighter-rouge">d</code> is a GeoJSON feature.</p>
+
+<!-- <iframe class="db center" src="/blocks/geo/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;svg width=\&quot;800px\&quot; height=\&quot;400px\&quot;&gt;\n      &lt;g class=\&quot;map\&quot;&gt;&lt;/g&gt;\n    &lt;/svg&gt;\n  &lt;/div&gt;\n\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\n#content .map path {\n  fill: #ddd;\n  stroke: #aaa;\n}\n&quot;,&quot;js&quot;:&quot;let geojson = {\n  \&quot;type\&quot;: \&quot;FeatureCollection\&quot;,\n  \&quot;features\&quot;: [\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Africa\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Polygon\&quot;,\n        \&quot;coordinates\&quot;: [[[-6, 36], [33, 30], [43, 11], [51, 12], [29, -33], [18, -35], [7, 5], [-17, 14], [-6, 36]]]\n      }\n    },\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Australia\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Polygon\&quot;,\n        \&quot;coordinates\&quot;: [[[143, -11], [153, -28], [144, -38], [131, -31], [116, -35], [114, -22], [136, -12], [140, -17], [143, -11]]]\n      }\n    },\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Timbuktu\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Point\&quot;,\n        \&quot;coordinates\&quot;: [-3.0026, 16.7666]\n      }\n    }\n  ]\n};\n\nlet projection = d3.geoEquirectangular()\n  .scale(200)\n  .translate([200, 150]);\n\nlet geoGenerator = d3.geoPath()\n  .projection(projection);\n\nfunction update(geojson) {\n  let u = d3.select(&apos;#content g.map&apos;)\n    .selectAll(&apos;path&apos;)\n    .data(geojson.features);\n\n  u.enter()\n    .append(&apos;path&apos;)\n    .attr(&apos;d&apos;, geoGenerator);\n}\n\nupdate(geojson);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/c6df643a689ce9278b3341f87b6fcf04" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/c6df643a689ce9278b3341f87b6fcf04?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=c6df643a689ce9278b3341f87b6fcf04" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<blockquote>
+  <p>To keep things simple the GeoJSON in the above example uses just a few co-ordinates to define the country boundaries.</p>
+</blockquote>
+
+<p>The above example shows the essence of creating maps using D3 and I recommend spending time to understand each concept (GeoJSON, projections and geo generators) and how they fit together.</p>
+
+<p>Now that we’ve covered the basics we’ll look at each concept in more detail.</p>
+
+<h3 id="geojson-1">GeoJSON</h3>
+
+<p>GeoJSON is a JSON-based structure for specifying geographic data. More often than not it’s converted from shapefile data (a geospatial vector data format widely used in the GIS field) using tools such as <a href="http://mapshaper.org/">mapshaper</a>, <a href="http://www.gdal.org/ogr2ogr.html">ogr2ogr</a>, <a href="https://github.com/mbostock/shapefile">shp2json</a> or <a href="http://www.qgis.org/en/site/">QGIS</a>.</p>
+
+<p>A popular source of world map shapefiles is <a href="http://www.naturalearthdata.com/">Natural Earth</a> and if starting out I recommend trying out <a href="http://mapshaper.org/">mapshaper</a> for importing shapefiles and exporting as GeoJSON. It can also filter by properties (e.g. if you wanted to filter countries by continent). For a more in depth look at conversion look at Mike Bostock’s <a href="https://bost.ocks.org/mike/map/">Let’s Make a Map</a> tutorial.</p>
+
+<p>You can create maps without understanding the GeoJSON specification in minute detail because tools such as mapshaper and D3 do such a good job of abstracting away the detail. However, if you did want to understand GeoJSON in greater depth I recommend checking out the <a href="http://geojson.org/">official specification</a>.</p>
+
+<p>So far we’ve embedded a GeoJSON object in our example files. In practice the GeoJSON would be in a separate file and loaded using an ajax request. We cover requests in more detail in the <a href="/requests">requests chapter</a> but for the remainder of this chapter we’ll load a GeoJSON file using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">json</span><span class="p">(</span><span class="dl">'</span><span class="s1">ne_110m_land.json</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">createMap</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+<span class="p">})</span></code></pre></figure>
+
+<p>It’s worth mentioning TopoJSON which is another JSON based standard for describing geographic data and tends to result in significantly smaller file sizes. It requires a bit more work to use, and we don’t cover it in this chapter. However for further information check out the <a href="https://github.com/topojson/topojson">documentation</a>.</p>
+
+<h3 id="projections-1">Projections</h3>
+
+<p>There are numerous (if not infinite) ways of converting (or ‘projecting’) a point on a sphere (e.g. the earth) to a point on a flat surface (e.g. a screen) and people have written countless articles (such as <a href="http://www.progonos.com/furuti/MapProj/Normal/TOC/cartTOC.html">this</a> one) on the pros and cons of different projections.</p>
+
+<p>In short there is no perfect projection as every projection will distort shape, area, distance and/or direction. Choosing a projection is a case of choosing which property you don’t want to be distorted and accepting that there’ll be distortion in the other properties (or choose a projection that strives for a balanced approach). For example, if it’s important that the size of countries are represented accurately then  choose a projection that strives to preserve area (probably to the cost of shape, distance and direction).</p>
+
+<p>D3 has a number of core projections that should cover most use cases:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">geoAzimuthalEqualArea</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoAzimuthalEquidistant</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoGnomonic</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoOrthographic</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoStereographic</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoAlbers</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoConicConformal</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoConicEqualArea</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoConicEquidistant</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoEquirectangular</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoMercator</code></li>
+  <li><code class="language-plaintext highlighter-rouge">geoTransverseMercator</code></li>
+</ul>
+
+<p>Some projections preserve area (e.g. <code class="language-plaintext highlighter-rouge">geoAzimuthalEqualArea</code> &amp; <code class="language-plaintext highlighter-rouge">geoConicEqualArea</code>), others distance (e.g. <code class="language-plaintext highlighter-rouge">geoAzimuthalEquidistant</code> &amp; <code class="language-plaintext highlighter-rouge">geoConicEquidistant</code>) and others relative angles (e.g. <code class="language-plaintext highlighter-rouge">geoEquirectangular</code> &amp; <code class="language-plaintext highlighter-rouge">geoMercator</code>). For a more in depth discussion of the pros and cons of each projection try resources such as Carlos A. Furuti’s <a href="http://www.progonos.com/furuti/MapProj/Normal/TOC/cartTOC.html">Map Projection Pages</a>.</p>
+
+<p>The grid below shows each core projection on a world map together with a longitude/latitude grid and equal radius circles.</p>
+
+<!-- <iframe class="db center" src="/blocks/geo/projection-types/" marginwidth="0" marginheight="0" style="width: 900px; height: 660px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/projection-types/" marginwidth="0" marginheight="0" style="width: 900px; height: 660px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;&lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n  width: 900px;\n}\n\ncanvas {\n  border: 1px solid #eee;\n  margin: 5px;\n}\n\n.description {\n  margin: 10px 0;\n}\n&quot;,&quot;js&quot;:&quot;let geojson = {};\n\nlet projections = [\n  {type: &apos;AzimuthalEqualArea&apos;, scale: 100},\n  {type: &apos;AzimuthalEquidistant&apos;, scale: 80},\n  {type: &apos;Gnomonic&apos;, scale: 100},\n  {type: &apos;Orthographic&apos;, scale: 160},\n  {type: &apos;Stereographic&apos;, scale: 100},\n  {type: &apos;Albers&apos;, scale: 120},\n  {type: &apos;ConicConformal&apos;, scale: 100},\n  {type: &apos;ConicEqualArea&apos;, scale: 100},\n  {type: &apos;ConicEquidistant&apos;, scale: 100},\n  {type: &apos;Equirectangular&apos;, scale: 80},\n  {type: &apos;Mercator&apos;, scale: 70},\n  {type: &apos;TransverseMercator&apos;, scale: 70},\n];\n\nlet circles = [[0, 0], [-90, 0], [-45, 0], [45, 0], [90, 0], [0, -70], [0, -35], [0, 35], [0, 70]];\nlet geoCircle = d3.geoCircle().radius(10).precision(1);\nlet geoGraticule = d3.geoGraticule();\n\nlet width = 200, height = 200, globalScale = 0.5;\n\n\nfunction updateCanvas(d) {\n  let context = this.getContext(&apos;2d&apos;);\n\n  let projection = d3[&apos;geo&apos; + d.type]()\n    .scale(globalScale * d.scale)\n    .center([0, 0])\n    .rotate([0.1, 0, 0])\n    .translate([0.5 * width, 0.5 * height]);\n\n  let geoGenerator = d3.geoPath()\n    .projection(projection)\n    .context(context);\n\n  context.lineWidth = 0.5;\n\n  // Graticule\n  context.strokeStyle = &apos;#ccc&apos;;\n  context.fillStyle = &apos;none&apos;;\n  context.setLineDash([1,1]);\n  context.beginPath();\n  geoGenerator(geoGraticule());\n  context.stroke();\n\n\n  // World\n  context.fillStyle = &apos;#eee&apos;;\n  context.setLineDash([]);\n  context.beginPath();\n  geoGenerator({type: &apos;FeatureCollection&apos;, features: geojson.features})\n  context.fill();\n  context.stroke();\n\n  // Circles\n  context.strokeStyle = &apos;#888&apos;;\n  context.fillStyle = &apos;none&apos;;\n  circles.forEach(function(center) {\n    geoCircle.center(center);\n    context.beginPath();\n    geoGenerator(geoCircle());\n    context.stroke();\n  });\n\n  // Projection label\n  context.fillStyle = &apos;#333&apos;;\n  context.font = &apos;14px sans-serif&apos;;\n  context.fillText(&apos;geo&apos; + d.type, 6, 17);\n}\n\nfunction update() {\n  let u = d3.select(&apos;#content&apos;)\n    .selectAll(&apos;canvas&apos;)\n    .data(projections);\n\n  u.enter()\n    .append(&apos;canvas&apos;)\n    .attr(&apos;width&apos;, width + &apos;px&apos;)\n    .attr(&apos;height&apos;, height + &apos;px&apos;)\n    .merge(u)\n    .each(updateCanvas);\n\n  u.exit().remove();\n}\n\n\n\n// REQUEST DATA\nd3.json(&apos;https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json&apos;)\n\t.then(function(json) {\n\t\tgeojson = json;\n\t\tupdate();\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/8fe422f6d5f6999c931f942d93035aba" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/8fe422f6d5f6999c931f942d93035aba?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=8fe422f6d5f6999c931f942d93035aba" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="projection-functions">Projection functions</h4>
+
+<p>A projection function takes input <code class="language-plaintext highlighter-rouge">[longitude, latitude]</code> and outputs a pixel co-ordinate <code class="language-plaintext highlighter-rouge">[x, y]</code>.</p>
+
+<blockquote>
+  <p>Be careful to note the order of longitude and latitude in the above array!</p>
+</blockquote>
+
+<p>You’re free to write your own projection functions but much easier is to ask D3 to make one for you. To do this  choose a projection method (e.g. <code class="language-plaintext highlighter-rouge">d3.geoAzimuthalEqualArea</code>), call it and it’ll return a projection function:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoAzimuthalEqualArea</span><span class="p">();</span>
+
+<span class="nx">projection</span><span class="p">(</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.0026</span><span class="p">,</span> <span class="mf">16.7666</span><span class="p">]</span> <span class="p">);</span>
+<span class="c1">// returns [473.67353385539417, 213.6120079887163]</span></code></pre></figure>
+
+<p>The core projections have configuration functions for setting the following parameters:</p>
+
+<table class="table table-bordered">
+  <tr><td><a href="#scale">scale</a></td><td>Scale factor of the projection</td></tr>
+  <tr><td><a href="#center">center</a></td><td>Projection center [longitude, latitude]</td></tr>
+  <tr><td><a href="#translate">translate</a></td><td>Pixel [x,y] location of the projection center</td></tr>
+  <tr><td><a href="#rotate">rotate</a></td><td>Rotation of the projection [lambda, phi, gamma] (or [yaw, pitch, roll])</td></tr>
+</table>
+
+<p>The precise meaning of each parameter is dependent on the mathematics behind each projection but broadly speaking:</p>
+
+<ul>
+  <li>scale specifies the <strong>scale factor</strong> of the projection. The higher the number the larger the map.</li>
+  <li>center specifies the <strong>center of projection</strong> (with a <code class="language-plaintext highlighter-rouge">[lon, lat]</code> array)</li>
+  <li>translate specifies where the <strong>center of projection is located on the screen</strong> (with a <code class="language-plaintext highlighter-rouge">[x, y]</code> array)</li>
+  <li>rotate specifies the <strong>rotation of the projection</strong> (with a <code class="language-plaintext highlighter-rouge">[λ, φ, γ]</code> array)  where the parameters correspond to yaw, pitch and roll, respectively:</li>
+</ul>
+
+<p><img width="300px" src="/img/geo/projection-rotation.svg" /></p>
+
+<p>For example you can create and configure a projection function such that Timbuktu is centred in a 960x500 map using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoAzimuthalEqualArea</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">scale</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">center</span><span class="p">([</span><span class="o">-</span><span class="mf">3.0026</span><span class="p">,</span> <span class="mf">16.7666</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">translate</span><span class="p">([</span><span class="mi">480</span><span class="p">,</span> <span class="mi">250</span><span class="p">]);</span></code></pre></figure>
+
+<p>To get a feel for how each parameter behaves use the projection explorer below. The (equal radius) circles and grid allow you to assess the projection’s distortion of area and angle.</p>
+
+<!-- <iframe class="db center" src="/blocks/geo/projection-configuration/" marginwidth="0" marginheight="0" style="width: 1000px; height: 560px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/projection-configuration/" marginwidth="0" marginheight="0" style="width: 1000px; height: 560px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;menu\&quot;&gt;\n    &lt;div class=\&quot;projection-type item\&quot;&gt;\n      &lt;div&gt;&lt;select name=\&quot;type\&quot; value=\&quot;150\&quot;&gt;&lt;/select&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;scale (&lt;span class=\&quot;value\&quot;&gt;120&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;0&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;scale\&quot; min=\&quot;0\&quot; max=\&quot;400\&quot; value=\&quot;120\&quot;&gt; &lt;span&gt;400&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;center (lon) (&lt;span class=\&quot;value\&quot;&gt;0&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;-180&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;centerLon\&quot; min=\&quot;-180\&quot; max=\&quot;180\&quot; value=\&quot;0\&quot;&gt; &lt;span&gt;180&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;center (lat) (&lt;span class=\&quot;value\&quot;&gt;0&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;-90&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;centerLat\&quot; min=\&quot;-90\&quot; max=\&quot;90\&quot; value=\&quot;0\&quot;&gt; &lt;span&gt;90&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;translate (x) (&lt;span class=\&quot;value\&quot;&gt;480&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;0&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;translateX\&quot; min=\&quot;0\&quot; max=\&quot;960\&quot; value=\&quot;480\&quot;&gt; &lt;span&gt;960&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;translate (y) (&lt;span class=\&quot;value\&quot;&gt;250&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;0&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;translateY\&quot; min=\&quot;0\&quot; max=\&quot;500\&quot; value=\&quot;250\&quot;&gt; &lt;span&gt;500&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;rotate (&lambda;) (&lt;span class=\&quot;value\&quot;&gt;0&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;-180&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;rotateLambda\&quot; min=\&quot;-180\&quot; max=\&quot;180\&quot; value=\&quot;0\&quot;&gt; &lt;span&gt;180&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;rotate (&phi;) (&lt;span class=\&quot;value\&quot;&gt;0&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;-180&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;rotatePhi\&quot; min=\&quot;-180\&quot; max=\&quot;180\&quot; value=\&quot;0\&quot;&gt; &lt;span&gt;180&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n    &lt;div class=\&quot;slider item\&quot;&gt;\n      &lt;div class=\&quot;label\&quot;&gt;rotate (&gamma;) (&lt;span class=\&quot;value\&quot;&gt;0&lt;/span&gt;)&lt;/div&gt;\n      &lt;div&gt;&lt;span class=\&quot;low\&quot;&gt;-180&lt;/span&gt; &lt;input type=\&quot;range\&quot; name=\&quot;rotateGamma\&quot; min=\&quot;-180\&quot; max=\&quot;180\&quot; value=\&quot;0\&quot;&gt; &lt;span&gt;180&lt;/span&gt;&lt;/div&gt;\n    &lt;/div&gt;\n  &lt;/div&gt;\n\n  &lt;svg width=\&quot;900px\&quot; height=\&quot;500px\&quot;&gt;\n    &lt;g class=\&quot;graticule\&quot;&gt;&lt;path&gt;&lt;/path&gt;&lt;/g&gt;\n    &lt;g class=\&quot;circles\&quot;&gt;&lt;/g&gt;\n    &lt;g class=\&quot;map\&quot;&gt;&lt;/g&gt;\n    &lt;circle class=\&quot;projection-center\&quot; r=\&quot;4\&quot;&gt;&lt;/circle&gt;\n  &lt;/svg&gt;\n\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 12px;\n  color: #333;\n  margin: 10px;\n}\n\n#menu {\n  position: absolute;\n  top: 20px;\n  left: 30px;\n}\n\n#menu .item {\n  margin-bottom: 12px;\n}\n\n#menu .item input {\n  width: 100px;\n}\n\n#menu select {\n  margin-top: 4px;\n}\n\n#menu .item .value {\n  font-weight: bold;\n}\n\n#menu .item span, #menu .item input {\n  vertical-align: middle;\n}\n\n#menu .item .low {\n  display: inline-block;\n  width: 30px;\n  text-align: right;\n}\n\nsvg {\n  border: 1px solid #eee;\n}\n\n.map path {\n  fill: #87B687;\n  stroke: #777;\n}\n\n.projection-center {\n  fill: red;\n}\n\n.graticule path {\n  fill: none;\n  stroke: #eee;\n}\n\n.circles path {\n  fill: none;\n  stroke: #aaa;\n}\n&quot;,&quot;js&quot;:&quot;let geojson;\nlet projectionTypes = [\n  &apos;AzimuthalEqualArea&apos;,\n  &apos;AzimuthalEquidistant&apos;,\n  &apos;Gnomonic&apos;,\n  &apos;Orthographic&apos;,\n  &apos;Stereographic&apos;,\n  &apos;Albers&apos;,\n  &apos;ConicConformal&apos;,\n  &apos;ConicEqualArea&apos;,\n  &apos;ConicEquidistant&apos;,\n  &apos;Equirectangular&apos;,\n  &apos;Mercator&apos;,\n  &apos;TransverseMercator&apos;\n];\n\nlet projection;\nlet geoGenerator = d3.geoPath()\n  .projection(projection);\n\nlet graticule = d3.geoGraticule();\n\nlet circles = [\n  [-135, 0], [-90, 0], [-45, 0], [0, 0], [45, 0], [90, 0], [135, 0], [180, 0],\n  [0, -70], [0, -35], [0, 35], [0, 70],\n  [180, -70], [180, -35], [180, 35], [180, 70],\n];\nlet geoCircle = d3.geoCircle().radius(10).precision(1);\n\nlet state = {\n  type: &apos;AzimuthalEqualArea&apos;,\n  scale: 120,\n  translateX: 450,\n  translateY: 250,\n  centerLon: 0,\n  centerLat: 0,\n  rotateLambda: 0.1,\n  rotatePhi: 0,\n  rotateGamma: 0\n}\n\nfunction initMenu() {\n  d3.select(&apos;#menu&apos;)\n    .selectAll(&apos;.slider.item input&apos;)\n    .on(&apos;input&apos;, function(d) {\n      let attr = d3.select(this).attr(&apos;name&apos;);\n      state[attr] = this.value;\n      d3.select(this.parentNode.parentNode).select(&apos;.value&apos;).text(this.value);\n      update()\n    });\n\n  d3.select(&apos;#menu .projection-type select&apos;)\n    .on(&apos;change&apos;, function(d) {\n      state.type = this.options[this.selectedIndex].value;\n      update()\n    })\n    .selectAll(&apos;option&apos;)\n    .data(projectionTypes)\n    .enter()\n    .append(&apos;option&apos;)\n    .attr(&apos;value&apos;, function(d) {return d;})\n    .text(function(d) {return d;});\n}\n\nfunction update() {\n  // Update projection\n  projection = d3[&apos;geo&apos; + state.type]()\n  geoGenerator.projection(projection);\n\n  projection\n    .scale(state.scale)\n    .translate([state.translateX, state.translateY])\n    .center([state.centerLon, state.centerLat])\n    .rotate([state.rotateLambda, state.rotatePhi, state.rotateGamma])\n\n  // Update world map\n  let u = d3.select(&apos;g.map&apos;)\n    .selectAll(&apos;path&apos;)\n    .data(geojson.features)\n\n  u.enter()\n    .append(&apos;path&apos;)\n    .merge(u)\n    .attr(&apos;d&apos;, geoGenerator)\n\n  // Update projection center\n  let projectedCenter = projection([state.centerLon, state.centerLat]);\n  d3.select(&apos;.projection-center&apos;)\n    .attr(&apos;cx&apos;, projectedCenter[0])\n    .attr(&apos;cy&apos;, projectedCenter[1]);\n\n  // Update graticule\n  d3.select(&apos;.graticule path&apos;)\n    .datum(graticule())\n    .attr(&apos;d&apos;, geoGenerator);\n\n  // Update circles\n  u = d3.select(&apos;.circles&apos;)\n    .selectAll(&apos;path&apos;)\n    .data(circles.map(function(d) {\n      geoCircle.center(d);\n      return geoCircle();\n    }));\n\n  u.enter()\n    .append(&apos;path&apos;)\n    .merge(u)\n    .attr(&apos;d&apos;, geoGenerator);\n}\n\n\nd3.json(&apos;https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json&apos;)\n\t.then(function(json) {\n\t\tgeojson = json;\n\t\tinitMenu();\n\t\tupdate();\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/f7ece0ab9a3df06a8cecd2c0e33e54ef" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/f7ece0ab9a3df06a8cecd2c0e33e54ef?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=f7ece0ab9a3df06a8cecd2c0e33e54ef" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="invert">.invert()</h4>
+
+<p>You can convert a pixel co-ordinate <code class="language-plaintext highlighter-rouge">[x, y]</code> to a longitude/latitude array using the projection’s <code class="language-plaintext highlighter-rouge">.invert()</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoAzimuthalEqualArea</span><span class="p">();</span>
+
+<span class="nx">projection</span><span class="p">(</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.0026</span><span class="p">,</span> <span class="mf">16.7666</span><span class="p">]</span> <span class="p">)</span>
+<span class="c1">// returns [473.67353385539417, 213.6120079887163]</span>
+
+<span class="nx">projection</span><span class="p">.</span><span class="nx">invert</span><span class="p">(</span> <span class="p">[</span><span class="mf">473.67353385539417</span><span class="p">,</span> <span class="mf">213.6120079887163</span><span class="p">]</span> <span class="p">)</span>
+<span class="c1">// returns [-3.0026, 16.766]</span></code></pre></figure>
+
+<h4 id="fitting">Fitting</h4>
+
+<p>Given a GeoJSON object, a projection’s <code class="language-plaintext highlighter-rouge">.fitExtent()</code> method sets the projection’s <strong>scale</strong> and <strong>translate</strong> such that the geometry fits within a given bounding box:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">projection</span><span class="p">.</span><span class="nx">fitExtent</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">900</span><span class="p">,</span> <span class="mi">500</span><span class="p">]],</span> <span class="nx">geojson</span><span class="p">);</span></code></pre></figure>
+
+<p>The first argument of <code class="language-plaintext highlighter-rouge">.fitExtent</code> is an array containing two coordinates: the top left point (<code class="language-plaintext highlighter-rouge">[x, y]</code>) of the bounding box and the size (<code class="language-plaintext highlighter-rouge">[width, height]</code>) of the bounding box. The second argument is a GeoJSON object.</p>
+
+<p>In the example below the canvas element has a light grey background and the bounding box into which we’re fitting the geoJSON is shown as a dotted outline. The following code is used to fit the geometry within the bounding box:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">projection</span><span class="p">.</span><span class="nx">fitExtent</span><span class="p">([[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="p">[</span><span class="mi">620</span><span class="p">,</span> <span class="mi">420</span><span class="p">]],</span> <span class="nx">geojson</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/geo/fit-extent/" marginwidth="0" marginheight="0" style="width: 100%; height: 480px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/fit-extent/" marginwidth="0" marginheight="0" style="width: 100%; height: 480px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;canvas width=\&quot;640\&quot; height=\&quot;440\&quot;&gt;&lt;/canvas&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\ncanvas {\n  margin: 10px;\n  background-color: #eee;\n}\n&quot;,&quot;js&quot;:&quot;let context = d3.select(&apos;#content canvas&apos;)\n  .node()\n  .getContext(&apos;2d&apos;);\n\nlet projection = d3.geoEquirectangular();\n\nlet geoGenerator = d3.geoPath()\n  .projection(projection)\n  .context(context);\n\nfunction update(geojson) {\n  projection.fitExtent([[20, 20], [620, 420]], geojson);\n\n  context.lineWidth = 0.5;\n  context.strokeStyle = &apos;#888&apos;;\n\n  context.beginPath();\n  geoGenerator({type: &apos;FeatureCollection&apos;, features: geojson.features})\n  context.stroke();\n\n  // extent border\n  context.beginPath();\n  context.setLineDash([2, 2]);\n  context.rect(20, 20, 600, 400);\n  context.stroke();\n}\n\n\n\n// REQUEST DATA\nd3.json(&apos;https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json&apos;)\n\t.then(function(json) {\n\t\tupdate(json)\n\t});\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/73dc5ae176b2268563526cf4acdf1df7" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/73dc5ae176b2268563526cf4acdf1df7?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=73dc5ae176b2268563526cf4acdf1df7" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>If your bounding box’s top left corner is at <code class="language-plaintext highlighter-rouge">[0, 0]</code> you can omit the top left coordinate and just supply the width and height:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">projection</span><span class="p">.</span><span class="nx">fitSize</span><span class="p">([</span><span class="mi">900</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span> <span class="nx">geojson</span><span class="p">);</span></code></pre></figure>
+
+<h3 id="geographic-path-generators-1">Geographic path generators</h3>
+
+<p>A geographic path generator is a function that transforms <strong>GeoJSON into an SVG path string</strong> (or into canvas element calls):</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">geoGenerator</span><span class="p">(</span><span class="nx">geoJson</span><span class="p">);</span>
+<span class="c1">// e.g. returns a SVG path string "M464.01,154.09L491.15,154.88 ... L448.03,183.13Z"</span></code></pre></figure>
+
+<p>You create the generator using <code class="language-plaintext highlighter-rouge">d3.geoPath()</code> and must configure it’s projection type:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoEquirectangular</span><span class="p">();</span>
+
+<span class="kd">let</span> <span class="nx">geoGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoPath</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">projection</span><span class="p">(</span><span class="nx">projection</span><span class="p">);</span></code></pre></figure>
+
+<p>You can now use the generator to help create an SVG or canvas map. The SVG option is a bit easier to implement, especially when it comes to user interaction (because event handlers and hover states can be added).</p>
+
+<p>The canvas approach requires a bit more work but is typically faster to render (and more memory efficient).</p>
+
+<h4 id="rendering-svg">Rendering SVG</h4>
+<p>To render an SVG map you:</p>
+
+<ul>
+  <li><a href="/datajoins">join</a> a GeoJSON features array to SVG <code class="language-plaintext highlighter-rouge">path</code> elements</li>
+  <li>update each <code class="language-plaintext highlighter-rouge">path</code> element’s <code class="language-plaintext highlighter-rouge">d</code> attribute using the geographic path generator</li>
+</ul>
+
+<p>For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">geoJson</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">FeatureCollection</span><span class="dl">"</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">features</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Feature</span><span class="dl">"</span><span class="p">,</span>
+      <span class="dl">"</span><span class="s2">properties</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Africa</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="dl">"</span><span class="s2">geometry</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Polygon</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">coordinates</span><span class="dl">"</span><span class="p">:</span> <span class="p">[[[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">],</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">...</span> <span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">]]]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Feature</span><span class="dl">"</span><span class="p">,</span>
+      <span class="dl">"</span><span class="s2">properties</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Australia</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="dl">"</span><span class="s2">geometry</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Polygon</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">coordinates</span><span class="dl">"</span><span class="p">:</span> <span class="p">[[[</span><span class="mi">143</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">],</span> <span class="p">[</span><span class="mi">153</span><span class="p">,</span> <span class="o">-</span><span class="mi">28</span><span class="p">],</span> <span class="p">...</span> <span class="p">,</span> <span class="p">[</span><span class="mi">143</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">]]]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Feature</span><span class="dl">"</span><span class="p">,</span>
+      <span class="dl">"</span><span class="s2">properties</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Timbuktu</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="dl">"</span><span class="s2">geometry</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">type</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Point</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">coordinates</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.0026</span><span class="p">,</span> <span class="mf">16.7666</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">projection</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoEquirectangular</span><span class="p">();</span>
+
+<span class="kd">let</span> <span class="nx">geoGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoPath</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">projection</span><span class="p">(</span><span class="nx">projection</span><span class="p">);</span>
+
+<span class="c1">// Join the FeatureCollection's features array to path elements</span>
+<span class="kd">let</span> <span class="nx">u</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#content g.map</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">geojson</span><span class="p">.</span><span class="nx">features</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">d</span><span class="dl">'</span><span class="p">,</span> <span class="nx">geoGenerator</span><span class="p">);</span></code></pre></figure>
+
+<p><code class="language-plaintext highlighter-rouge">geoJson.features</code> is an array of features. This array is joined to <code class="language-plaintext highlighter-rouge">path</code> elements. The <code class="language-plaintext highlighter-rouge">d</code> attribute is set using the function <code class="language-plaintext highlighter-rouge">geoGenerator</code>. This receives a feature as its first parameter and outputs a path string.</p>
+
+<!-- <iframe class="db center" src="/blocks/geo/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;svg width=\&quot;800px\&quot; height=\&quot;400px\&quot;&gt;\n      &lt;g class=\&quot;map\&quot;&gt;&lt;/g&gt;\n    &lt;/svg&gt;\n  &lt;/div&gt;\n\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\n#content .map path {\n  fill: #ddd;\n  stroke: #aaa;\n}\n&quot;,&quot;js&quot;:&quot;let geojson = {\n  \&quot;type\&quot;: \&quot;FeatureCollection\&quot;,\n  \&quot;features\&quot;: [\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Africa\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Polygon\&quot;,\n        \&quot;coordinates\&quot;: [[[-6, 36], [33, 30], [43, 11], [51, 12], [29, -33], [18, -35], [7, 5], [-17, 14], [-6, 36]]]\n      }\n    },\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Australia\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Polygon\&quot;,\n        \&quot;coordinates\&quot;: [[[143, -11], [153, -28], [144, -38], [131, -31], [116, -35], [114, -22], [136, -12], [140, -17], [143, -11]]]\n      }\n    },\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Timbuktu\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Point\&quot;,\n        \&quot;coordinates\&quot;: [-3.0026, 16.7666]\n      }\n    }\n  ]\n};\n\nlet projection = d3.geoEquirectangular()\n  .scale(200)\n  .translate([200, 150]);\n\nlet geoGenerator = d3.geoPath()\n  .projection(projection);\n\nfunction update(geojson) {\n  let u = d3.select(&apos;#content g.map&apos;)\n    .selectAll(&apos;path&apos;)\n    .data(geojson.features);\n\n  u.enter()\n    .append(&apos;path&apos;)\n    .attr(&apos;d&apos;, geoGenerator);\n}\n\nupdate(geojson);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/c6df643a689ce9278b3341f87b6fcf04" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/c6df643a689ce9278b3341f87b6fcf04?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=c6df643a689ce9278b3341f87b6fcf04" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="rendering-to-canvas">Rendering to canvas</h4>
+
+<p>To render to a canvas element you pass the <code class="language-plaintext highlighter-rouge">canvas</code> DOM element into the generator’s <code class="language-plaintext highlighter-rouge">context</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#content canvas</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">node</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="dl">'</span><span class="s1">2d</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">geoGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoPath</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">projection</span><span class="p">(</span><span class="nx">projection</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="nx">context</span><span class="p">);</span></code></pre></figure>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">.node</code> method returns the first DOM element of a selection.</p>
+</blockquote>
+
+<p>You then begin a canvas path (using <code class="language-plaintext highlighter-rouge">context.beginPath()</code>) and call <code class="language-plaintext highlighter-rouge">geoGenerator</code> which will produce the necessary canvas calls:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">context</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+<span class="nx">geoGenerator</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">FeatureCollection</span><span class="dl">'</span><span class="p">,</span> <span class="na">features</span><span class="p">:</span> <span class="nx">geojson</span><span class="p">.</span><span class="nx">features</span><span class="p">})</span>
+<span class="nx">context</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/geo/basic-canvas/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/basic-canvas/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;canvas width=\&quot;800\&quot; height=\&quot;400\&quot;&gt;&lt;/canvas&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\n#content .map path {\n  fill: #ddd;\n  stroke: #aaa;\n}\n&quot;,&quot;js&quot;:&quot;let geojson = {\n  \&quot;type\&quot;: \&quot;FeatureCollection\&quot;,\n  \&quot;features\&quot;: [\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Africa\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Polygon\&quot;,\n        \&quot;coordinates\&quot;: [[[-6, 36], [33, 30], [43, 11], [51, 12], [29, -33], [18, -35], [7, 5], [-17, 14], [-6, 36]]]\n      }\n    },\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Australia\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Polygon\&quot;,\n        \&quot;coordinates\&quot;: [[[143, -11], [153, -28], [144, -38], [131, -31], [116, -35], [114, -22], [136, -12], [140, -17], [143, -11]]]\n      }\n    },\n    {\n      \&quot;type\&quot;: \&quot;Feature\&quot;,\n      \&quot;properties\&quot;: {\n        \&quot;name\&quot;: \&quot;Timbuktu\&quot;\n      },\n      \&quot;geometry\&quot;: {\n        \&quot;type\&quot;: \&quot;Point\&quot;,\n        \&quot;coordinates\&quot;: [-3.0026, 16.7666]\n      }\n    }\n  ]\n};\n\nlet context = d3.select(&apos;#content canvas&apos;)\n  .node()\n  .getContext(&apos;2d&apos;);\n\nlet projection = d3.geoEquirectangular()\n  .scale(200)\n  .translate([200, 150]);\n\nlet geoGenerator = d3.geoPath()\n  .projection(projection)\n  .context(context);\n\nfunction update(geojson) {\n  context.lineWidth = 0.5;\n  context.strokeStyle = &apos;#aaa&apos;;\n\n  context.beginPath();\n  geoGenerator({type: &apos;FeatureCollection&apos;, features: geojson.features})\n  context.stroke();\n}\n\nupdate(geojson);\n\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/c62b6ce6625b69f6007cea5fccdd4599" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/c62b6ce6625b69f6007cea5fccdd4599?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=c62b6ce6625b69f6007cea5fccdd4599" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="lines-and-arcs">Lines and arcs</h4>
+
+<p>The geographic path generator is clever enough to distinguish between polygonal (typically for geographic areas) and point (typically for lon/lat locations) features. As can be seen in the above examples it renders polygons as line segments and points as arcs.</p>
+
+<p>You can set the radius of the circles using <code class="language-plaintext highlighter-rouge">.pointRadius()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">geoGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoPath</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">pointRadius</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">projection</span><span class="p">(</span><span class="nx">projection</span><span class="p">);</span></code></pre></figure>
+
+<h4 id="path-geometry">Path geometry</h4>
+
+<p>The geographic path generator can also be used to compute the <strong>area</strong> (in pixels), <strong>centroid</strong>, <strong>bounding box</strong> and <strong>path length</strong> (in pixels) of a projected GeoJSON feature:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">feature</span> <span class="o">=</span> <span class="nx">geojson</span><span class="p">.</span><span class="nx">features</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+
+<span class="c1">// Compute the feature's area (in pixels)</span>
+<span class="nx">geoGenerator</span><span class="p">.</span><span class="nx">area</span><span class="p">(</span><span class="nx">feature</span><span class="p">);</span>
+<span class="c1">// returns 30324.86518469876</span>
+
+<span class="c1">// Compute the feature's centroid (in pixel co-ordinates)</span>
+<span class="nx">geoGenerator</span><span class="p">.</span><span class="nx">centroid</span><span class="p">(</span><span class="nx">feature</span><span class="p">);</span>
+<span class="c1">// returns [266.9510120424504, 127.35819206325564]</span>
+
+<span class="c1">// Compute the feature's bounds (in pixel co-ordinates)</span>
+<span class="nx">geoGenerator</span><span class="p">.</span><span class="nx">bounds</span><span class="p">(</span><span class="nx">feature</span><span class="p">);</span>
+<span class="c1">// returns [[140.6588054321928, 24.336293856408275], [378.02358370342165, 272.17304763960306]]</span>
+
+<span class="c1">// Compute the path length (in pixels)</span>
+<span class="nx">geoGenerator</span><span class="p">.</span><span class="nx">measure</span><span class="p">(</span><span class="nx">feature</span><span class="p">);</span>
+<span class="c1">// returns 775.7895349902461</span></code></pre></figure>
+
+<p>This example shows the area and length of a hovered path. It also draws the path’s centroid and bounding box:</p>
+
+<!-- <iframe class="db center" src="/blocks/geo/geopath-measures/" marginwidth="0" marginheight="0" style="width: 100%; height: 650px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/geopath-measures/" marginwidth="0" marginheight="0" style="width: 100%; height: 650px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;div class=\&quot;info\&quot;&gt;Hover over a country&lt;/div&gt;\n    &lt;svg width=\&quot;620px\&quot; height=\&quot;600px\&quot;&gt;\n      &lt;g class=\&quot;map\&quot;&gt;&lt;/g&gt;\n      &lt;g class=\&quot;bounding-box\&quot;&gt;&lt;rect&gt;&lt;/rect&gt;&lt;/g&gt;\n      &lt;g class=\&quot;centroid\&quot;&gt;&lt;circle r=\&quot;4\&quot;&gt;&lt;/circle&gt;&lt;/g&gt;\n    &lt;/svg&gt;\n  &lt;/div&gt;\n\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\n#content .info {\n  height: 20px;\n}\n\n#content .map path {\n  fill: #aaa;\n  stroke: #fff;\n}\n\n#content .bounding-box rect {\n  fill: none;\n  stroke: #333;\n  stroke-dasharray: 2,1;\n}\n\n#content .centroid {\n  display: none;\n}\n\n#content .centroid circle {\n  fill: red;\n}\n\n&quot;,&quot;js&quot;:&quot;let projection = d3.geoMercator()\n\t.scale(400)\n\t.translate([200, 280])\n\t.center([0, 5]);\n\nlet geoGenerator = d3.geoPath()\n\t.projection(projection);\n\nfunction handleMouseover(e, d) {\n\tlet pixelArea = geoGenerator.area(d);\n\tlet bounds = geoGenerator.bounds(d);\n\tlet centroid = geoGenerator.centroid(d);\n\tlet measure = geoGenerator.measure(d);\n\n\td3.select(&apos;#content .info&apos;)\n\t\t.text(d.properties.name + &apos; (path.area = &apos; + pixelArea.toFixed(1) + &apos; path.measure = &apos; + measure.toFixed(1) + &apos;)&apos;);\n\n\td3.select(&apos;#content .bounding-box rect&apos;)\n\t\t.attr(&apos;x&apos;, bounds[0][0])\n\t\t.attr(&apos;y&apos;, bounds[0][1])\n\t\t.attr(&apos;width&apos;, bounds[1][0] - bounds[0][0])\n\t\t.attr(&apos;height&apos;, bounds[1][1] - bounds[0][1]);\n\n\td3.select(&apos;#content .centroid&apos;)\n\t\t.style(&apos;display&apos;, &apos;inline&apos;)\n\t\t.attr(&apos;transform&apos;, &apos;translate(&apos; + centroid + &apos;)&apos;);\n}\n\nfunction update(geojson) {\n\tlet u = d3.select(&apos;#content g.map&apos;)\n\t\t.selectAll(&apos;path&apos;)\n\t\t.data(geojson.features);\n\n\tu.enter()\n\t\t.append(&apos;path&apos;)\n\t\t.attr(&apos;d&apos;, geoGenerator)\n\t\t.on(&apos;mouseover&apos;, handleMouseover);\n}\n\n\n\n// REQUEST DATA\nd3.json(&apos;https://assets.codepen.io/2814973/africa.json&apos;)\n\t.then(function(json) {\n\t\tupdate(json)\n\t});\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/3ccd770923a61f26f55156657e2f51e8" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/3ccd770923a61f26f55156657e2f51e8?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=3ccd770923a61f26f55156657e2f51e8" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="shapes">Shapes</h3>
+
+<p>If you need to add lines and/or circles to a map you can add features to the GeoJSON.</p>
+
+<p>Lines can be added as a LineString feature and will be projected into great-arcs (i.e. the shortest distance across the surface of the globe).</p>
+
+<p>Here’s an example where a line is added between London and New York:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">geoGenerator</span><span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Feature</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">geometry</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">LineString</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">coordinates</span><span class="p">:</span> <span class="p">[[</span><span class="mf">0.1278</span><span class="p">,</span> <span class="mf">51.5074</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">74.0059</span><span class="p">,</span> <span class="mf">40.7128</span><span class="p">]]</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></figure>
+
+<p>Circle features can be generated using <code class="language-plaintext highlighter-rouge">d3.geoCircle()</code>. This creates a circle generator which returns a GeoJSON object representing a circle.</p>
+
+<p>Typically the center (<code class="language-plaintext highlighter-rouge">[lon, lat]</code>) and the radius (in degrees) are set:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">circleGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoCircle</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">center</span><span class="p">([</span><span class="mf">0.1278</span><span class="p">,</span> <span class="mf">51.5074</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">radius</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">circle</span> <span class="o">=</span> <span class="nx">circleGenerator</span><span class="p">();</span>
+<span class="c1">// returns a GeoJSON object representing a circle</span>
+
+<span class="nx">geoGenerator</span><span class="p">(</span><span class="nx">circle</span><span class="p">);</span>
+<span class="c1">// returns a path string representing the projected circle</span></code></pre></figure>
+
+<p>A GeoJSON grid of longitude and latitude lines (known as a graticule) can be generated using <code class="language-plaintext highlighter-rouge">d3.graticule()</code>. This creates a graticule generator which returns a GeoJSON object representing the graticules:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">graticuleGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoGraticule</span><span class="p">();</span>
+
+<span class="kd">let</span> <span class="nx">graticules</span> <span class="o">=</span> <span class="nx">graticuleGenerator</span><span class="p">();</span>
+<span class="c1">// returns a GeoJSON object representing the graticule</span>
+
+<span class="nx">geoGenerator</span><span class="p">(</span><span class="nx">graticules</span><span class="p">);</span>
+<span class="c1">// returns a path string representing the projected graticule</span></code></pre></figure>
+
+<p>(See the <a href="https://github.com/d3/d3-geo#geoGraticule">official documentation</a> for detailed information on graticule configuration.)</p>
+
+<p>Here’s an example where a line, a circle and graticules are added to a map:</p>
+
+<!-- <iframe class="db center" src="/blocks/geo/geo-shapes/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/geo-shapes/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;canvas width=\&quot;800\&quot; height=\&quot;400\&quot;&gt;&lt;/canvas&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n&quot;,&quot;js&quot;:&quot;let context = d3.select(&apos;#content canvas&apos;)\n\t.node()\n\t.getContext(&apos;2d&apos;);\n\nlet projection = d3.geoOrthographic()\n\t.scale(500)\n\t.rotate([30, -45]);\n\nlet geoGenerator = d3.geoPath()\n\t.projection(projection)\n\t.context(context);\n\nfunction update(geojson) {\n\tcontext.lineWidth = 0.5;\n\tcontext.strokeStyle = &apos;#333&apos;;\n\n\tcontext.beginPath();\n\tgeoGenerator({type: &apos;FeatureCollection&apos;, features: geojson.features})\n\tcontext.stroke();\n\n\t// Graticule\n\tlet graticule = d3.geoGraticule();\n\tcontext.beginPath();\n\tcontext.strokeStyle = &apos;#ccc&apos;;\n\tgeoGenerator(graticule());\n\tcontext.stroke();\n\n\t// London - New York\n\tcontext.beginPath();\n\tcontext.strokeStyle = &apos;red&apos;;\n\tgeoGenerator({type: &apos;Feature&apos;, geometry: {type: &apos;LineString&apos;, coordinates: [[0.1278, 51.5074], [-74.0059, 40.7128]]}});\n\tcontext.stroke();\n\n\t// Circle\n\tlet circle = d3.geoCircle().center([0.1278, 51.5074]).radius(5)\n\tcontext.beginPath();\n\tcontext.strokeStyle = &apos;red&apos;;\n\tgeoGenerator(circle());\n\tcontext.stroke();\n}\n\n// REQUEST DATA\nd3.json(&apos;https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json&apos;)\n\t.then(function(json) {\n\t\tupdate(json)\n\t});\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/60f490c6abd7be53d4aa39818e11d273" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/60f490c6abd7be53d4aa39818e11d273?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=60f490c6abd7be53d4aa39818e11d273" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="spherical-geometry">Spherical geometry</h3>
+
+<p>There’s a handful of D3 methods that may come in useful from time to time. The first of these <code class="language-plaintext highlighter-rouge">.geoArea()</code>, <code class="language-plaintext highlighter-rouge">.geoBounds()</code>, <code class="language-plaintext highlighter-rouge">.geoCentroid()</code>, <code class="language-plaintext highlighter-rouge">.geoDistance()</code> and <code class="language-plaintext highlighter-rouge">geoLength()</code> are similar to the path geometry methods described above but operate in spherical space.</p>
+
+<h4 id="interpolation">Interpolation</h4>
+
+<p>The <code class="language-plaintext highlighter-rouge">d3.geoInterpolate()</code> method creates a function that accepts input between 0 and 1 and interpolates between two <code class="language-plaintext highlighter-rouge">[lon, lat]</code> locations:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">londonLonLat</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1278</span><span class="p">,</span> <span class="mf">51.5074</span><span class="p">];</span>
+<span class="kd">let</span> <span class="nx">newYorkLonLat</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">74.0059</span><span class="p">,</span> <span class="mf">40.7128</span><span class="p">];</span>
+<span class="kd">let</span> <span class="nx">geoInterpolator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">geoInterpolate</span><span class="p">(</span><span class="nx">londonLonLat</span><span class="p">,</span> <span class="nx">newYorkLonLat</span><span class="p">);</span>
+
+<span class="nx">geoInterpolator</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="c1">// returns [0.1278, 51.5074]</span>
+
+<span class="nx">geoInterpolator</span><span class="p">(</span><span class="mf">0.5</span><span class="p">);</span>
+<span class="c1">// returns [-41.182023242967695, 52.41428456719971] (halfway between the two locations)</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/geo/geo-interpolator/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/geo-interpolator/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;canvas width=\&quot;800\&quot; height=\&quot;400\&quot;&gt;&lt;/canvas&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n&quot;,&quot;js&quot;:&quot;let geojson = {}\n\nlet context = d3.select(&apos;#content canvas&apos;)\n\t.node()\n\t.getContext(&apos;2d&apos;);\n\nlet projection = d3.geoOrthographic()\n\t.scale(500)\n\t.rotate([30, -45]);\n\nlet geoGenerator = d3.geoPath()\n\t.projection(projection)\n\t.pointRadius(4)\n\t.context(context);\n\nlet londonLonLat = [0.1278, 51.5074];\nlet newYorkLonLat = [-74.0059, 40.7128];\nlet geoInterpolator = d3.geoInterpolate(londonLonLat, newYorkLonLat);\nlet u = 0;\n\nfunction update() {\n\tcontext.clearRect(0, 0, 800, 600);\n\n\tcontext.lineWidth = 0.5;\n\tcontext.strokeStyle = &apos;#333&apos;;\n\n\tcontext.beginPath();\n\tgeoGenerator({type: &apos;FeatureCollection&apos;, features: geojson.features})\n\tcontext.stroke();\n\n\t// Graticule\n\tlet graticule = d3.geoGraticule();\n\tcontext.beginPath();\n\tcontext.strokeStyle = &apos;#ccc&apos;;\n\tgeoGenerator(graticule());\n\tcontext.stroke();\n\n\t// London - New York\n\tcontext.beginPath();\n\tcontext.strokeStyle = &apos;red&apos;;\n\tgeoGenerator({type: &apos;Feature&apos;, geometry: {type: &apos;LineString&apos;, coordinates: [londonLonLat, newYorkLonLat]}});\n\tcontext.stroke();\n\n\t// Point\n\tcontext.beginPath();\n\tcontext.fillStyle = &apos;red&apos;;\n\tgeoGenerator({type: &apos;Feature&apos;, geometry: {type: &apos;Point&apos;, coordinates: geoInterpolator(u)}});\n\tcontext.fill();\n\n\tu += 0.01\n\tif(u &gt; 1) u = 0\n}\n\n\n\n// REQUEST DATA\nd3.json(&apos;https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json&apos;)\n\t.then(function(json) {\n\t\tgeojson = json;\n\t\twindow.setInterval(update, 50);\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/aa1f036f6a0356cb1152c4b836e93990" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/aa1f036f6a0356cb1152c4b836e93990?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=aa1f036f6a0356cb1152c4b836e93990" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="geocontains">geoContains</h4>
+
+<p>If you’re using a <code class="language-plaintext highlighter-rouge">canvas</code> element to render your geometry you don’t have the luxury of being able to add event handlers onto SVG <code class="language-plaintext highlighter-rouge">path</code> elements. Instead you can check whether mouse or touch events occur inside the boundary of a feature. You can do this using <code class="language-plaintext highlighter-rouge">d3.geoContains</code> which accepts a GeoJSON feature and a <code class="language-plaintext highlighter-rouge">[lon, lat]</code> array and returns a boolean:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">geoContains</span><span class="p">(</span><span class="nx">ukFeature</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1278</span><span class="p">,</span> <span class="mf">51.5074</span><span class="p">]);</span>
+<span class="c1">// returns true</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/geo/geo-contains/" marginwidth="0" marginheight="0" style="width: 100%; height: 430px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/geo/geo-contains/" marginwidth="0" marginheight="0" style="width: 100%; height: 430px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;\n    &lt;div&gt;Click an area to highlight&lt;/div&gt;\n    &lt;canvas width=\&quot;800\&quot; height=\&quot;400\&quot;&gt;&lt;/canvas&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n&quot;,&quot;js&quot;:&quot;let geojson = {};\n\nlet context = d3.select(&apos;#content canvas&apos;)\n\t.node()\n\t.getContext(&apos;2d&apos;);\n\nlet projection = d3.geoOrthographic()\n\t.scale(300)\n\t.rotate([30, -45]);\n\nlet geoGenerator = d3.geoPath()\n\t.projection(projection)\n\t.context(context);\n\nlet state = {\n\tclickedLocation: null\n}\n\nfunction handleClick(e) {\n\tlet pos = d3.pointer(e, this)\n\tstate.clickedLocation = projection.invert(pos)\n\tupdate();\n}\n\nfunction initialise() {\n\td3.select(&apos;canvas&apos;)\n\t\t.on(&apos;click&apos;, handleClick);\n}\n\nfunction update() {\n\tcontext.clearRect(0, 0, 800, 400);\n\n\tgeojson.features.forEach(function(d) {\n\t\tcontext.beginPath();\n\t\tcontext.fillStyle = state.clickedLocation &amp;&amp; d3.geoContains(d, state.clickedLocation) ? &apos;red&apos; : &apos;#aaa&apos;;\n\t\tgeoGenerator(d);\n\t\tcontext.fill();\n\t})\n}\n\n// REQUEST DATA\nd3.json(&apos;https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json&apos;)\n\t.then(function(json) {\n\t\tgeojson = json;\n\t\tinitialise();\n\t\tupdate();\n\t});\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/c7dabcad61f8c4398130305a2035decd" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/c7dabcad61f8c4398130305a2035decd?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=c7dabcad61f8c4398130305a2035decd" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

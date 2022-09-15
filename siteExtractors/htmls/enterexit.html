@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Enter, Exit and Update | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Enter, Exit and Update" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How D3’s enter and exit methods can be used to achieve fine grained control over the behaviour of entering and exiting elements. This is particularly useful when dealing with transitioning elements." />
+<meta property="og:description" content="How D3’s enter and exit methods can be used to achieve fine grained control over the behaviour of entering and exiting elements. This is particularly useful when dealing with transitioning elements." />
+<link rel="canonical" href="https://www.d3indepth.com/enterexit/" />
+<meta property="og:url" content="https://www.d3indepth.com/enterexit/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-12T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Enter, Exit and Update" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-12T00:00:00+01:00","datePublished":"2021-05-12T00:00:00+01:00","description":"How D3’s enter and exit methods can be used to achieve fine grained control over the behaviour of entering and exiting elements. This is particularly useful when dealing with transitioning elements.","headline":"D3 Enter, Exit and Update","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/enterexit/"},"url":"https://www.d3indepth.com/enterexit/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Enter, Exit and Update</h2>
+
+  <div class="page-content">
+  	<p><em>This article shows how D3’s enter and exit methods can be used to achieve fine grained control over the behaviour of entering and exiting elements. This is particularly useful when dealing with transitioning elements.</em></p>
+
+<p>This chapter explains how you can gain extra control over how HTML and SVG elements behave when they are created, updated or removed. It’s particularly relevant when you’re using <a href="/transitions">transitions</a> and want particular effects (such as elements fading in and out).</p>
+
+<p>If you’re new to D3 you can safely skip this chapter!</p>
+
+<p>The examples in the <a href="/datajoins">data joins</a> chapter update the HTML/SVG elements in the same manner, regardless of whether they’ve just been created, are already on the page or are about to be removed.</p>
+
+<p>(HTML/SVG elements that have just been created are known as <strong>entering</strong> elements and ones that are about to be removed are known as <strong>exiting</strong> elements.)</p>
+
+<p>In some instances it’s useful to treat entering and exiting elements differently. This is especially the case when dealing with transitions. For example, if you’d like new elements to fade in you need to set their initial opacity to zero. Likewise if you’d like them to fade out before being removed, you need to set up a transition on each exiting element so that their opacity gradually reduces to zero.</p>
+
+<blockquote>
+  <p>Version 4 and below of D3 required you use a selection’s <code class="language-plaintext highlighter-rouge">.enter</code> and <code class="language-plaintext highlighter-rouge">.exit</code> methods. However from version 5 the <code class="language-plaintext highlighter-rouge">.join</code> method hides the intricacies of enter and exit from you. If you’re still working with version 4 you can still view the <a href="/v4/enterexit/">original chapter on enter and exit</a>.</p>
+</blockquote>
+
+<p>You can treat entering and exiting elements differently by passing functions into the <code class="language-plaintext highlighter-rouge">.join</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<p>The first, second and third functions are named the <strong>enter</strong>, <strong>update</strong> and <strong>exit</strong> functions, respectively.</p>
+
+<p>Each function has a single parameter::</p>
+
+<ul>
+  <li>the enter function’s parameter <code class="language-plaintext highlighter-rouge">enter</code> is the <strong>enter selection</strong> which represents the elements that need to be created</li>
+  <li>the update function’s parameter <code class="language-plaintext highlighter-rouge">update</code> is a selection containing the elements that are already in existence (and aren’t exiting)</li>
+  <li>the exit function’s parameter <code class="language-plaintext highlighter-rouge">exit</code> is the <strong>exit selection</strong> and contains elements that need to to be removed</li>
+</ul>
+
+<p>The <code class="language-plaintext highlighter-rouge">.join</code> method returns a selection containing the <strong>entering and existing elements</strong> (it doesn’t contain exiting elements). Typically most of your style and attribute updates will follow the <code class="language-plaintext highlighter-rouge">.join</code> method.</p>
+
+<p>Note that the enter, update and exit functions <strong>must return the selection</strong>.</p>
+
+<h3 id="enter-function">Enter function</h3>
+
+<p>In general the enter function must append an element to each element of the enter selection. (The enter selection consists of ‘placeholder’ elements that represent the elements that need to be added.)</p>
+
+<p>For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">enter</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<p>This is equivalent to <code class="language-plaintext highlighter-rouge">.join('circle')</code>.</p>
+
+<p>You can also call the usual selection methods such as <code class="language-plaintext highlighter-rouge">.style</code> and <code class="language-plaintext highlighter-rouge">.attr</code> on the enter selection. This allows you to modify style and attributes of the entering elements.</p>
+
+<p>For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">enter</span>
+      <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<h3 id="update-function">Update function</h3>
+
+<p>The update function is optional and lets you update elements that are <strong>already in existence</strong>. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">enter</span>
+      <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">update</span><span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<p>This will set the opacity of entering circles to zero and the opacity of existing circles to 1.</p>
+
+<h3 id="exit-function">Exit function</h3>
+<p>The exit function is optional and handles HTML/SVG elements that <strong>need to be removed</strong>. In general you need to remove the elements in the exit selection:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">enter</span>
+      <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">update</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">exit</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<h2 id="example">Example</h2>
+
+<p>If you’re not using transitions you rarely need to the above techniques. However if you are using transitions and you want to control how elements enter and exit the page, you will need the above techniques. See the <a href="/transitions">transitions</a> chapter for examples using transitions.</p>
+
+<p>For now, to help your understanding, here’s an example that sets the opacity of entering nodes to 0.25:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">getData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="kd">let</span> <span class="nx">numItems</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">5</span><span class="p">);</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">numItems</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">40</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+      <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">enter</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+          <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">update</span><span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nx">d</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">updateAll</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="nx">getData</span><span class="p">();</span>
+	<span class="nx">update</span><span class="p">(</span><span class="nx">myData</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateAll</span><span class="p">();</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">"</span><span class="s2">button</span><span class="dl">"</span><span class="p">)</span>
+	<span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">click</span><span class="dl">"</span><span class="p">,</span> <span class="nx">updateAll</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n\t&lt;g class=\&quot;chart\&quot;&gt;\n\t&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;button&gt;Update&lt;/button&gt;\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;function getData() {\n\tlet data = [];\n\tlet numItems = Math.ceil(Math.random() * 5);\n\n\tfor(let i=0; i&lt;numItems; i++) {\n\t\tdata.push(40);\n\t}\n\n\treturn data;\n}\n\nfunction update(data) {\n\td3.select(&apos;.chart&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(\n\t\t\tfunction(enter) {\n\t\t\t\treturn enter.append(&apos;circle&apos;)\n\t\t\t\t\t.style(&apos;opacity&apos;, 0.25);\n\t\t\t},\n\t\t\tfunction(update) {\n\t\t\t\treturn update.style(&apos;opacity&apos;, 1);\n\t\t\t}\n\t\t)\n\t\t.attr(&apos;cx&apos;, function(d, i) {\n\t\t\treturn i * 100;\n\t\t})\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn 0.5 * d;\n\t\t})\n\t\t.style(&apos;fill&apos;, &apos;orange&apos;);\n}\n\nfunction updateAll() {\n\tlet myData = getData();\n\tconsole.log(\&quot;myData\&quot;, myData);\n\tupdate(myData);\n}\n\nupdateAll();\n\nd3.select(\&quot;button\&quot;)\n\t.on(\&quot;click\&quot;, updateAll);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The enter function appends a <code class="language-plaintext highlighter-rouge">circle</code> to each element in the enter selection and sets their opacity to 0.25. The update function sets the opacity of existing circles to 1. The <code class="language-plaintext highlighter-rouge">.attr</code> and <code class="language-plaintext highlighter-rouge">.style</code> methods after the <code class="language-plaintext highlighter-rouge">.join</code> method apply to entering and existing elements.</p>
+
+<p>Now circles that have just entered the page are feint, while those that were already in existence are solid.</p>
+
+<p>The above example is not very representative of how you’d use enter, exit and update functions in practice. See the <a href="/transitions">transitions</a> for more representative examples.</p>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

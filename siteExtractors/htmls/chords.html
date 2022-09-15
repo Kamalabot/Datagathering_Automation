@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Chord Diagrams | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Chord Diagrams" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This article explains how to visualise links (or flows) between a group of nodes using D3.js." />
+<meta property="og:description" content="This article explains how to visualise links (or flows) between a group of nodes using D3.js." />
+<link rel="canonical" href="https://www.d3indepth.com/chords/" />
+<meta property="og:url" content="https://www.d3indepth.com/chords/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-14T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Chord Diagrams" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-14T00:00:00+01:00","datePublished":"2021-05-14T00:00:00+01:00","description":"This article explains how to visualise links (or flows) between a group of nodes using D3.js.","headline":"D3 Chord Diagrams","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/chords/"},"url":"https://www.d3indepth.com/chords/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Chord Diagrams</h2>
+
+  <div class="page-content">
+  	<p><em>This article explains how to visualise links (or flows) between a group of nodes using D3.js.</em></p>
+
+<p>Chord diagrams visualise links (or flows) between a group of nodes, where each flow has a numeric value. For example, they can show <a href="http://www.global-migration.info/">migration flows</a> between countries. (Personally I find them difficult to interpret!)</p>
+
+<p>The data needs to be in the form of an n x n matrix (where n is the number of items):</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">]</span>
+<span class="p">];</span></code></pre></figure>
+
+<p>The first row represents flows from the 1st item to the 1st, 2nd and 3rd items etc.</p>
+
+<p>You create the layout using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">chordGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">chord</span><span class="p">();</span></code></pre></figure>
+
+<p>and you configure it using <code class="language-plaintext highlighter-rouge">.padAngle()</code> (to set the angle between adjacent groups in radians), <code class="language-plaintext highlighter-rouge">.sortGroups()</code> (to specify the order of the groups), <code class="language-plaintext highlighter-rouge">.sortSubgroups()</code> (to sort within each group) and <code class="language-plaintext highlighter-rouge">.sortChords()</code> to determine the z order of the chords.</p>
+
+<p>Apply the layout using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">chords</span> <span class="o">=</span> <span class="nx">chordGenerator</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span></code></pre></figure>
+
+<p>which returns an array of chords. Each element of the array is an object with <code class="language-plaintext highlighter-rouge">source</code> and <code class="language-plaintext highlighter-rouge">target</code> properties. Each <code class="language-plaintext highlighter-rouge">source</code> and <code class="language-plaintext highlighter-rouge">target</code> has <code class="language-plaintext highlighter-rouge">startAngle</code> and <code class="language-plaintext highlighter-rouge">endAngle</code> properties which will define the shape of each chord.</p>
+
+<p>We use the <code class="language-plaintext highlighter-rouge">ribbon</code> shape generator which converts the chord properties into path data (see the <a href="/shapes">Shapes chapter</a> for more information on shape generators).</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">ribbonGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">ribbon</span><span class="p">().</span><span class="nx">radius</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">chords</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">d</span><span class="dl">'</span><span class="p">,</span> <span class="nx">ribbonGenerator</span><span class="p">)</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/chord/" marginwidth="0" marginheight="0" style="width: 100%; height: 520px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/chord/" marginwidth="0" marginheight="0" style="width: 100%; height: 520px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;500\&quot; height=\&quot;500\&quot;&gt;\n    &lt;g transform=\&quot;translate(250, 250)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nsvg path {\n  fill: #ddd;\n  stroke: #ccc;\n  opacity: 0.8;\n}\n&quot;,&quot;js&quot;:&quot;var chordGenerator = d3.chord()\n\t.sortSubgroups(d3.ascending)\n\t.padAngle(0.04);\n\nvar ribbonGenerator = d3.ribbon().radius(200);\n\nvar data = [\n\t[10, 20, 30],\n\t[40, 60, 80],\n\t[100, 200, 300]\n];\n\nvar chords = chordGenerator(data);\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(chords)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, ribbonGenerator)\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/d4eb9c450e955225900ed73606a13b25" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/d4eb9c450e955225900ed73606a13b25?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=d4eb9c450e955225900ed73606a13b25" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

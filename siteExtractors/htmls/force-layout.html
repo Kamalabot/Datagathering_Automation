@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Force layout | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Force layout" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="D3’s force layout uses physics based rules to position visual elements. This article shows how to use D3’s force layout and how to use it to create network visualisations and circle clusters." />
+<meta property="og:description" content="D3’s force layout uses physics based rules to position visual elements. This article shows how to use D3’s force layout and how to use it to create network visualisations and circle clusters." />
+<link rel="canonical" href="https://www.d3indepth.com/force-layout/" />
+<meta property="og:url" content="https://www.d3indepth.com/force-layout/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-15T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Force layout" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-15T00:00:00+01:00","datePublished":"2021-05-15T00:00:00+01:00","description":"D3’s force layout uses physics based rules to position visual elements. This article shows how to use D3’s force layout and how to use it to create network visualisations and circle clusters.","headline":"D3 Force layout","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/force-layout/"},"url":"https://www.d3indepth.com/force-layout/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Force layout</h2>
+
+  <div class="page-content">
+  	<p><em>D3’s force layout uses physics based rules to position visual elements. This article shows how to use D3’s force layout and how to use it to create network visualisations and circle clusters.</em></p>
+
+<p>D3’s force layout uses a <strong>physics based simulator</strong> for positioning visual elements.</p>
+
+<p>Forces can be set up between elements, for example:</p>
+
+<ul>
+  <li>all elements can be configured to repel one another</li>
+  <li>elements can be attracted to center(s) of gravity</li>
+  <li>linked elements can be set a fixed distance apart (e.g. for network visualisation)</li>
+  <li>elements can be configured to avoid intersecting one another (collision detection)</li>
+</ul>
+
+<p>The force layout allows us to position elements in a way that would be difficult to achieve using other means.</p>
+
+<p>Here’s an example of a force layout: we have a number of circles (each of which has a category <code class="language-plaintext highlighter-rouge">A</code>, <code class="language-plaintext highlighter-rouge">B</code> or <code class="language-plaintext highlighter-rouge">C</code>) and we add the following forces:</p>
+
+<ul>
+  <li>all circles attract one another (to clump circles together)</li>
+  <li>collision detection (to stop circles overlapping)</li>
+  <li>circles are attracted to one of three centers (<code class="language-plaintext highlighter-rouge">A</code>, <code class="language-plaintext highlighter-rouge">B</code> or <code class="language-plaintext highlighter-rouge">C</code>)</li>
+</ul>
+
+<!-- <iframe class="db center" src="/blocks/force/force-foci/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/force/force-foci/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;400\&quot;&gt;\n    &lt;g transform=\&quot;translate(50, 200)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;\n&quot;,&quot;js&quot;:&quot;var width = 600, height = 400;\n\nvar colorScale = [&apos;orange&apos;, &apos;lightblue&apos;, &apos;#B19CD9&apos;];\nvar xCenter = [100, 300, 500];\n\nvar numNodes = 100;\nvar nodes = d3.range(numNodes).map(function(d, i) {\n\treturn {\n\t\tradius: Math.random() * 25,\n\t\tcategory: i % 3\n\t}\n});\n\nvar simulation = d3.forceSimulation(nodes)\n\t.force(&apos;charge&apos;, d3.forceManyBody().strength(5))\n\t.force(&apos;x&apos;, d3.forceX().x(function(d) {\n\t\treturn xCenter[d.category];\n\t}))\n\t.force(&apos;collision&apos;, d3.forceCollide().radius(function(d) {\n\t\treturn d.radius;\n\t}))\n\t.on(&apos;tick&apos;, ticked);\n\nfunction ticked() {\n\tvar u = d3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(nodes)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn d.radius;\n\t\t})\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn colorScale[d.category];\n\t\t})\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x;\n\t\t})\n\t\t.attr(&apos;cy&apos;, function(d) {\n\t\t\treturn d.y;\n\t\t});\n}\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The force layout requires a larger amount of computation (typically requiring a few seconds of time) than other D3 layouts and and the solution is calculated in a <strong>step by step (iterative)</strong> manner. Usually the positions of the SVG/HTML elements are updated as the simulation iterates, which is why we see the circles jostling into position.</p>
+
+<h3 id="setting-up-a-force-simulation">Setting up a force simulation</h3>
+
+<p>Broadly speaking there are 4 steps to setting up a force simulation:</p>
+
+<ul>
+  <li>create an array of objects</li>
+  <li>call <code class="language-plaintext highlighter-rouge">forceSimulation</code>, passing in the array of objects</li>
+  <li>add one or more force functions (e.g. <code class="language-plaintext highlighter-rouge">forceManyBody</code>, <code class="language-plaintext highlighter-rouge">forceCenter</code>, <code class="language-plaintext highlighter-rouge">forceCollide</code>) to the system</li>
+  <li>set up a callback function to update the element positions after each tick</li>
+</ul>
+
+<p>Let’s start with a minimal example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="nx">height</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="p">[{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}]</span>
+
+<span class="kd">var</span> <span class="nx">simulation</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceSimulation</span><span class="p">(</span><span class="nx">nodes</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">charge</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceManyBody</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">center</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceCenter</span><span class="p">(</span><span class="nx">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">tick</span><span class="dl">'</span><span class="p">,</span> <span class="nx">ticked</span><span class="p">);</span></code></pre></figure>
+
+<p>Here we’ve created a simple array of 5 objects and have added two force functions <code class="language-plaintext highlighter-rouge">forceManyBody</code> and <code class="language-plaintext highlighter-rouge">forceCenter</code> to the system. (The first of these makes the elements repel each other while the second attracts the elements towards a centre point.)</p>
+
+<p>Each time the simulation iterates the function <code class="language-plaintext highlighter-rouge">ticked</code> will be called. This function joins the <code class="language-plaintext highlighter-rouge">nodes</code> array to <code class="language-plaintext highlighter-rouge">circle</code> elements and updates their positions:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">ticked</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">u</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">nodes</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span>
+    <span class="p">});</span>
+<span class="p">}</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/force/force/" marginwidth="0" marginheight="0" style="width: 100%; height: 320px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/force/force/" marginwidth="0" marginheight="0" style="width: 100%; height: 320px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;svg width=\&quot;300\&quot; height=\&quot;300\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: cadetblue;\n}\n&quot;,&quot;js&quot;:&quot;var width = 300, height = 300\nvar nodes = [{}, {}, {}, {}, {}]\n\nvar simulation = d3.forceSimulation(nodes)\n\t.force(&apos;charge&apos;, d3.forceManyBody().strength(-20))\n\t.force(&apos;center&apos;, d3.forceCenter(width / 2, height / 2))\n\t.on(&apos;tick&apos;, ticked);\n\nfunction ticked() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(nodes)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, 5)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x\n\t\t})\n\t\t.attr(&apos;cy&apos;, function(d) {\n\t\t\treturn d.y\n\t\t});\n}\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/181b398d5305cefcd10186617cb9250c" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/181b398d5305cefcd10186617cb9250c?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=181b398d5305cefcd10186617cb9250c" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>The power and flexibility of the force simulation is centred around <strong>force functions</strong> which adjust the position and velocity of elements to achieve a number of effects such as attraction, repulstion and collision detection.</p>
+
+<p>You can define your own force functions but D3 comes with a number of useful ones built in:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">forceCenter</code> (for setting the center of gravity of the system)</li>
+  <li><code class="language-plaintext highlighter-rouge">forceManyBody</code> (for making elements attract or repel one another)</li>
+  <li><code class="language-plaintext highlighter-rouge">forceCollide</code> (for preventing elements overlapping)</li>
+  <li><code class="language-plaintext highlighter-rouge">forceX</code> and <code class="language-plaintext highlighter-rouge">forceY</code> (for attracting elements to a given point)</li>
+  <li><code class="language-plaintext highlighter-rouge">forceLink</code> (for creating a fixed distance between connected elements)</li>
+</ul>
+
+<p>Force functions are added to the simulation using <code class="language-plaintext highlighter-rouge">.force()</code> where the first argument is a user defined id and the second argument the force function:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">simulation</span><span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">charge</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceManyBody</span><span class="p">())</span></code></pre></figure>
+
+<p>Let’s look at the built-in force functions one by one.</p>
+
+<h3 id="forcecenter">forceCenter</h3>
+
+<p><code class="language-plaintext highlighter-rouge">forceCenter</code> is useful (if not essential) for centering your elements as a whole about a center point. (Without it elements might disappear off the page.)</p>
+
+<p>It can either be initialised with a center position:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">forceCenter</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span></code></pre></figure>
+
+<p>or using the configuration functions <code class="language-plaintext highlighter-rouge">.x()</code> and <code class="language-plaintext highlighter-rouge">.y()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">forceCenter</span><span class="p">().</span><span class="nx">x</span><span class="p">(</span><span class="mi">100</span><span class="p">).</span><span class="nx">y</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span></code></pre></figure>
+
+<p>You can add it to the system using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">simulation</span><span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">center</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceCenter</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span></code></pre></figure>
+
+<p>See the next example (<code class="language-plaintext highlighter-rouge">forceManyBody</code>) for an example implementation.</p>
+
+<h3 id="forcemanybody">forceManyBody</h3>
+
+<p><code class="language-plaintext highlighter-rouge">forceManyBody</code> causes all elements to attract or repel one another. The strength of the attraction or repulsion can be set using <code class="language-plaintext highlighter-rouge">.strength()</code> where a positive value will cause elements to attract one another while a negative value causes elements to repel each other. The default value is <code class="language-plaintext highlighter-rouge">-30</code>.</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">simulation</span><span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">charge</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceManyBody</span><span class="p">().</span><span class="nx">strength</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">))</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/force/force/" marginwidth="0" marginheight="0" style="width: 100%; height: 320px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/force/force/" marginwidth="0" marginheight="0" style="width: 100%; height: 320px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;svg width=\&quot;300\&quot; height=\&quot;300\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: cadetblue;\n}\n&quot;,&quot;js&quot;:&quot;var width = 300, height = 300\nvar nodes = [{}, {}, {}, {}, {}]\n\nvar simulation = d3.forceSimulation(nodes)\n\t.force(&apos;charge&apos;, d3.forceManyBody().strength(-20))\n\t.force(&apos;center&apos;, d3.forceCenter(width / 2, height / 2))\n\t.on(&apos;tick&apos;, ticked);\n\nfunction ticked() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(nodes)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, 5)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x\n\t\t})\n\t\t.attr(&apos;cy&apos;, function(d) {\n\t\t\treturn d.y\n\t\t});\n}\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/181b398d5305cefcd10186617cb9250c" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/181b398d5305cefcd10186617cb9250c?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=181b398d5305cefcd10186617cb9250c" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<blockquote>
+  <p>When creating network diagrams we typically want the elements to repel one another but for visualisations where elements are clumped together, attractive forces are necessary.</p>
+</blockquote>
+
+<h3 id="forcecollide">forceCollide</h3>
+
+<p><code class="language-plaintext highlighter-rouge">forceCollide</code> is used to stop circular elements overlapping and is particularly useful when ‘clumping’ circles together.</p>
+
+<p>The radius of the elements is specified by passing an accessor function into <code class="language-plaintext highlighter-rouge">forceCollide</code>’s <code class="language-plaintext highlighter-rouge">.radius</code> method. This function’s first parameter <code class="language-plaintext highlighter-rouge">d</code> is the joined data from which you can derive the radius.</p>
+
+<p>For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">numNodes</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">range</span><span class="p">(</span><span class="nx">numNodes</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span><span class="na">radius</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">25</span><span class="p">}</span>
+<span class="p">})</span>
+
+<span class="kd">var</span> <span class="nx">simulation</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceSimulation</span><span class="p">(</span><span class="nx">nodes</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">charge</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceManyBody</span><span class="p">().</span><span class="nx">strength</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">center</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceCenter</span><span class="p">(</span><span class="nx">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">collision</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceCollide</span><span class="p">().</span><span class="nx">radius</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">radius</span>
+  <span class="p">}))</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/force/force-collision/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/force/force-collision/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;svg width=\&quot;400\&quot; height=\&quot;400\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: orange;\n}\n&quot;,&quot;js&quot;:&quot;var width = 400, height = 400\n\nvar numNodes = 100\nvar nodes = d3.range(numNodes).map(function(d) {\n\treturn {radius: Math.random() * 25}\n})\n\nvar simulation = d3.forceSimulation(nodes)\n\t.force(&apos;charge&apos;, d3.forceManyBody().strength(5))\n\t.force(&apos;center&apos;, d3.forceCenter(width / 2, height / 2))\n\t.force(&apos;collision&apos;, d3.forceCollide().radius(function(d) {\n\t\treturn d.radius\n\t}))\n\t.on(&apos;tick&apos;, ticked);\n\nfunction ticked() {\n\tvar u = d3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(nodes)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn d.radius\n\t\t})\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x\n\t\t})\n\t\t.attr(&apos;cy&apos;, function(d) {\n\t\t\treturn d.y\n\t\t})\n}\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/9d9f03a0016bc9df0f13b0d52978c02f" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/9d9f03a0016bc9df0f13b0d52978c02f?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=9d9f03a0016bc9df0f13b0d52978c02f" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>In this example, <code class="language-plaintext highlighter-rouge">forceManyBody</code> pushes all the nodes together, <code class="language-plaintext highlighter-rouge">forceCenter</code> helps keep the nodes in the center of the container and <code class="language-plaintext highlighter-rouge">forceCollide</code> stops the nodes intersecting.</p>
+
+<h3 id="forcex-and-forcey">forceX and forceY</h3>
+
+<p><code class="language-plaintext highlighter-rouge">forceX</code> and <code class="language-plaintext highlighter-rouge">forceY</code> cause elements <strong>to be attracted towards</strong> specified position(s). We can use a single center for all elements or apply the force on a per-element basis. The strength of attraction can be configured using <code class="language-plaintext highlighter-rouge">.strength()</code>.</p>
+
+<p>For example suppose you have a number of elements, each of which has a property <code class="language-plaintext highlighter-rouge">category</code> that has value <code class="language-plaintext highlighter-rouge">0</code>, <code class="language-plaintext highlighter-rouge">1</code> or <code class="language-plaintext highlighter-rouge">2</code>. You can add a <code class="language-plaintext highlighter-rouge">forceX</code> force function to attract the elements to an x-coordinate of <code class="language-plaintext highlighter-rouge">100</code>, <code class="language-plaintext highlighter-rouge">300</code> or <code class="language-plaintext highlighter-rouge">500</code> based on the element’s category:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">xCenter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">500</span><span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">simulation</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceSimulation</span><span class="p">(</span><span class="nx">nodes</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">charge</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceManyBody</span><span class="p">().</span><span class="nx">strength</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceX</span><span class="p">().</span><span class="nx">x</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">xCenter</span><span class="p">[</span><span class="nx">d</span><span class="p">.</span><span class="nx">category</span><span class="p">];</span>
+  <span class="p">}))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">collision</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceCollide</span><span class="p">().</span><span class="nx">radius</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">radius</span><span class="p">;</span>
+  <span class="p">}));</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/force/force-foci/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/force/force-foci/" marginwidth="0" marginheight="0" style="width: 100%; height: 420px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;400\&quot;&gt;\n    &lt;g transform=\&quot;translate(50, 200)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;\n&quot;,&quot;js&quot;:&quot;var width = 600, height = 400;\n\nvar colorScale = [&apos;orange&apos;, &apos;lightblue&apos;, &apos;#B19CD9&apos;];\nvar xCenter = [100, 300, 500];\n\nvar numNodes = 100;\nvar nodes = d3.range(numNodes).map(function(d, i) {\n\treturn {\n\t\tradius: Math.random() * 25,\n\t\tcategory: i % 3\n\t}\n});\n\nvar simulation = d3.forceSimulation(nodes)\n\t.force(&apos;charge&apos;, d3.forceManyBody().strength(5))\n\t.force(&apos;x&apos;, d3.forceX().x(function(d) {\n\t\treturn xCenter[d.category];\n\t}))\n\t.force(&apos;collision&apos;, d3.forceCollide().radius(function(d) {\n\t\treturn d.radius;\n\t}))\n\t.on(&apos;tick&apos;, ticked);\n\nfunction ticked() {\n\tvar u = d3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(nodes)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn d.radius;\n\t\t})\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn colorScale[d.category];\n\t\t})\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x;\n\t\t})\n\t\t.attr(&apos;cy&apos;, function(d) {\n\t\t\treturn d.y;\n\t\t});\n}\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/9491e05b23ca7a02fca8d4ddf12df5df" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/9491e05b23ca7a02fca8d4ddf12df5df?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=9491e05b23ca7a02fca8d4ddf12df5df" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>In this example, <code class="language-plaintext highlighter-rouge">forceManyBody</code> pushes all the nodes together, <code class="language-plaintext highlighter-rouge">forceX</code> attracts the nodes to particular x-coordinates and <code class="language-plaintext highlighter-rouge">forceCollide</code> stops the nodes intersecting.</p>
+
+<p>If our data has a numeric dimension we can use <code class="language-plaintext highlighter-rouge">forceX</code> or <code class="language-plaintext highlighter-rouge">forceY</code> to position elements along an axis:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">simulation</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceSimulation</span><span class="p">(</span><span class="nx">nodes</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">charge</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceManyBody</span><span class="p">().</span><span class="nx">strength</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceX</span><span class="p">().</span><span class="nx">x</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">xScale</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+  <span class="p">}))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">y</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceY</span><span class="p">().</span><span class="nx">y</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">collision</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceCollide</span><span class="p">().</span><span class="nx">radius</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">radius</span><span class="p">;</span>
+  <span class="p">}));</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/force/force-x/" marginwidth="0" marginheight="0" style="width: 100%; height: 220px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/force/force-x/" marginwidth="0" marginheight="0" style="width: 100%; height: 220px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;200\&quot;&gt;\n    &lt;g transform=\&quot;translate(50, 100)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: orange;\n}\n&quot;,&quot;js&quot;:&quot;var width = 600, height = 400;\n\nvar colorScale = [&apos;orange&apos;, &apos;lightblue&apos;, &apos;#B19CD9&apos;];\nvar xScale = d3.scaleLinear().domain([0, 1]).range([0, 600]);\n\nvar numNodes = 40;\nvar nodes = d3.range(numNodes).map(function(d, i) {\n\treturn {\n\t\tradius: Math.random() * 25,\n\t\tvalue: Math.random()\n\t}\n});\n\nvar simulation = d3.forceSimulation(nodes)\n\t.force(&apos;charge&apos;, d3.forceManyBody().strength(5))\n\t.force(&apos;x&apos;, d3.forceX().x(function(d) {\n\t\treturn xScale(d.value);\n\t}))\n\t.force(&apos;y&apos;, d3.forceY().y(function(d) {\n\t\treturn 0;\n\t}))\n\t.force(&apos;collision&apos;, d3.forceCollide().radius(function(d) {\n\t\treturn d.radius;\n\t}))\n\t.on(&apos;tick&apos;, ticked);\n\nfunction ticked() {\n\tvar u = d3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(nodes)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn d.radius;\n\t\t})\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn d.color;\n\t\t})\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x;\n\t\t})\n\t\t.attr(&apos;cy&apos;, function(d) {\n\t\t\treturn d.y;\n\t\t});\n}\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/fee5ce57c3fc3e94c3332577d1415df4" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/fee5ce57c3fc3e94c3332577d1415df4?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=fee5ce57c3fc3e94c3332577d1415df4" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<blockquote>
+  <p>Use the above with caution because the x position of the elements is not guaranteed to be exact.</p>
+</blockquote>
+
+<h3 id="forcelink">forceLink</h3>
+
+<p><code class="language-plaintext highlighter-rouge">forceLink</code> pushes linked elements to be a <strong>fixed distance apart</strong>. It requires an <strong>array of links</strong> that specify which elements you’d like to link together. Each link object specifies a source and target element, where the value is the element’s array index:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">links</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">7</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">source</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">target</span><span class="p">:</span> <span class="mi">7</span><span class="p">}</span>
+<span class="p">]</span></code></pre></figure>
+
+<p>You can then pass your links array into the <code class="language-plaintext highlighter-rouge">forceLink</code> function using <code class="language-plaintext highlighter-rouge">.links()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">simulation</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceSimulation</span><span class="p">(</span><span class="nx">nodes</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">charge</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceManyBody</span><span class="p">().</span><span class="nx">strength</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">center</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceCenter</span><span class="p">(</span><span class="nx">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">force</span><span class="p">(</span><span class="dl">'</span><span class="s1">link</span><span class="dl">'</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">forceLink</span><span class="p">().</span><span class="nx">links</span><span class="p">(</span><span class="nx">links</span><span class="p">));</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/force/force-links/" marginwidth="0" marginheight="0" style="width: 100%; height: 320px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/force/force-links/" marginwidth="0" marginheight="0" style="width: 100%; height: 320px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;svg width=\&quot;400\&quot; height=\&quot;300\&quot;&gt;\n    &lt;g class=\&quot;links\&quot;&gt;&lt;/g&gt;\n    &lt;g class=\&quot;nodes\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: cadetblue;\n}\nline {\n  stroke: #ccc;\n}\ntext {\n  text-anchor: middle;\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  fill: #666;\n  font-size: 16px;\n}\n&quot;,&quot;js&quot;:&quot;var width = 400, height = 300\n\nvar nodes = [\n\t{name: &apos;A&apos;},\n\t{name: &apos;B&apos;},\n\t{name: &apos;C&apos;},\n\t{name: &apos;D&apos;},\n\t{name: &apos;E&apos;},\n\t{name: &apos;F&apos;},\n\t{name: &apos;G&apos;},\n\t{name: &apos;H&apos;},\n]\n\nvar links = [\n\t{source: 0, target: 1},\n\t{source: 0, target: 2},\n\t{source: 0, target: 3},\n\t{source: 1, target: 6},\n\t{source: 3, target: 4},\n\t{source: 3, target: 7},\n\t{source: 4, target: 5},\n\t{source: 4, target: 7}\n]\n\nvar simulation = d3.forceSimulation(nodes)\n\t.force(&apos;charge&apos;, d3.forceManyBody().strength(-100))\n\t.force(&apos;center&apos;, d3.forceCenter(width / 2, height / 2))\n\t.force(&apos;link&apos;, d3.forceLink().links(links))\n\t.on(&apos;tick&apos;, ticked);\n\nfunction updateLinks() {\n\tvar u = d3.select(&apos;.links&apos;)\n\t\t.selectAll(&apos;line&apos;)\n\t\t.data(links)\n\t\t.join(&apos;line&apos;)\n\t\t.attr(&apos;x1&apos;, function(d) {\n\t\t\treturn d.source.x\n\t\t})\n\t\t.attr(&apos;y1&apos;, function(d) {\n\t\t\treturn d.source.y\n\t\t})\n\t\t.attr(&apos;x2&apos;, function(d) {\n\t\t\treturn d.target.x\n\t\t})\n\t\t.attr(&apos;y2&apos;, function(d) {\n\t\t\treturn d.target.y\n\t\t});\n}\n\nfunction updateNodes() {\n\tu = d3.select(&apos;.nodes&apos;)\n\t\t.selectAll(&apos;text&apos;)\n\t\t.data(nodes)\n\t\t.join(&apos;text&apos;)\n\t\t.text(function(d) {\n\t\t\treturn d.name\n\t\t})\n\t\t.attr(&apos;x&apos;, function(d) {\n\t\t\treturn d.x\n\t\t})\n\t\t.attr(&apos;y&apos;, function(d) {\n\t\t\treturn d.y\n\t\t})\n\t\t.attr(&apos;dy&apos;, function(d) {\n\t\t\treturn 5\n\t\t});\n}\n\nfunction ticked() {\n\tupdateLinks()\n\tupdateNodes()\n}\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/c48022f55ebc76e6adafa77cf466da35" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/c48022f55ebc76e6adafa77cf466da35?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=c48022f55ebc76e6adafa77cf466da35" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>In this example, <code class="language-plaintext highlighter-rouge">forceManyBody</code> pushes the nodes apart, <code class="language-plaintext highlighter-rouge">forceCenter</code> helps keep the nodes centered with the container and <code class="language-plaintext highlighter-rouge">forceLink</code> maintains a constant distance between linked nodes.</p>
+
+<p>The distance and strength of the linked elements can be configured using <code class="language-plaintext highlighter-rouge">.distance()</code> (default value is 30) and <code class="language-plaintext highlighter-rouge">.strength()</code>.</p>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

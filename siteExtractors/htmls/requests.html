@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Requesting data with D3 | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Requesting data with D3" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How to request and parse CSV and JSON data using D3 requests." />
+<meta property="og:description" content="How to request and parse CSV and JSON data using D3 requests." />
+<link rel="canonical" href="https://www.d3indepth.com/requests/" />
+<meta property="og:url" content="https://www.d3indepth.com/requests/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-19T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Requesting data with D3" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-19T00:00:00+01:00","datePublished":"2021-05-19T00:00:00+01:00","description":"How to request and parse CSV and JSON data using D3 requests.","headline":"Requesting data with D3","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/requests/"},"url":"https://www.d3indepth.com/requests/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 underline" href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">Requesting data with D3</h2>
+
+  <div class="page-content">
+  	<p><em>How to request and parse CSV and JSON data using D3 requests.</em></p>
+
+<p>Any time a web browser wishes to request a resource, be it an HTML file, a JPEG image or a CSV file, it uses an <strong>HTTP request</strong>.</p>
+
+<blockquote>
+  <p>For the purposes of this chapter you don’t need to understand HTTP requests in detail but if you wish to learn more I recommend <a href="https://www.codecademy.com/articles/http-requests">Codecademy’s guide</a>.</p>
+</blockquote>
+
+<p>Typically the data (or resource) you wish to request will have a <strong>URL</strong> (Uniform Resource Locator) such as <code class="language-plaintext highlighter-rouge">https://assets.codepen.io/2814973/my-csv.csv</code>.</p>
+
+<blockquote>
+  <p>The URL can also be relative to the <code class="language-plaintext highlighter-rouge">index.html</code> of your web application so it might look like <code class="language-plaintext highlighter-rouge">data/my-csv.csv</code></p>
+</blockquote>
+
+<h2 id="d3-requests">D3 requests</h2>
+
+<p>D3 makes requesting data relatively simple. It deals with the HTTP request and can also transform the incoming data into a useful format. For example it can request a CSV (comma separated value) file and transform it into an array of objects.</p>
+
+<p>This chapter will focus on requesting common data formats namely CSV, TSV and JSON. When building data visualisations these are the only formats I use.</p>
+
+<h3 id="requesting-csv-data">Requesting CSV data</h3>
+
+<p>CSV files are text files containing tabular data. For example:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rank,workers,company,state_l,city,growth,revenue,industry
+1,227,Fuhu,California,El Segundo,158956.9106,195640000,Consumer Products &amp; Services
+2,191,Quest Nutrition,California,El Segundo,57347.9246,82640563,Food &amp; Beverage
+3,145,Reliant Asset Management,Virginia,Arlington,55460.1646,85076502,Business Products &amp; Services
+4,62,Superfish,California,Palo Alto,26042.963,35293000,Software
+5,92,Acacia Communications,Massachusetts,Maynard,20690.4578,77652360,Telecommunications
+...
+</code></pre></div></div>
+
+<p>You typically export CSV files from spreadsheets and databases. Much of the open data you find on the web is also in CSV format.</p>
+
+<p>Typically (but not always) the first line contains the names of each field (<code class="language-plaintext highlighter-rouge">rank</code>, <code class="language-plaintext highlighter-rouge">workers</code>, <code class="language-plaintext highlighter-rouge">company</code> etc.). The remaining lines contain the data. Each value is separated by a comma.</p>
+
+<p>You can use <code class="language-plaintext highlighter-rouge">d3.csv</code> to request a CSV file:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">csv</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://assets.codepen.io/2814973/Inc5000+Company+List_2014-top250.csv</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p><code class="language-plaintext highlighter-rouge">d3.csv</code> accepts the URL as its first parameter and returns a <strong>promise</strong> object.</p>
+
+<p>A promise object represents an <strong>asynchronous</strong> operation. An asynchronous operation is an operation whose result is some time in the future. This means that your code can continue to run immediately after initiating the request.</p>
+
+<p>When the browser receives the requested data, the promise is <strong>fulfilled</strong> and the function that’s passed into the promise’s <code class="language-plaintext highlighter-rouge">.then</code> method is called.</p>
+
+<blockquote>
+  <p>You don’t need to fully understand promises to use <code class="language-plaintext highlighter-rouge">d3.csv</code>. The main thing to remember is to pass a callback function into the <code class="language-plaintext highlighter-rouge">.then</code> method. The callback method is called when the file arrives. Its first parameter is the data.</p>
+</blockquote>
+
+<p>When the request is fulfilled, D3 converts the incoming CSV file into an array of objects. Each object represents a row of data:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">rank</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">workers</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">227</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">company</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Fuhu</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">state_l</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">California</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">city</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">El Segundo</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">growth</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">158956.9106</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">revenue</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">195640000</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">industry</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Consumer Products &amp; Services</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">rank</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">2</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">workers</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">191</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">company</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Quest Nutrition</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">state_l</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">California</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">city</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">El Segundo</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">growth</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">57347.9246</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">revenue</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">82640563</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">industry</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Food &amp; Beverage</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">rank</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">3</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">workers</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">145</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">company</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Reliant Asset Management</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">state_l</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Virginia</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">city</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Arlington</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">growth</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">55460.1646</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">revenue</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">85076502</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">industry</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Business Products &amp; Services</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">]</span></code></pre></figure>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">d3.csv</code> assumes the first row contains field names.</p>
+
+  <p>Note that all the numbers are represented by strings. We’ll show how to convert these back to numbers later on.</p>
+</blockquote>
+
+<p>The above array can be joined to HTML or SVG elements. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#content tbody</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">tr</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">tr</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">let</span> <span class="nx">html</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;tr&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;td&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">company</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/td&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;td&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">industry</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/td&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;td&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">revenue</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/td&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;td&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">workers</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/td&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;/tr&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">html</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">csv</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://assets.codepen.io/2814973/Inc5000+Company+List_2014-top250.csv</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/requests/csv-with-join/" marginwidth="0" marginheight="0" style="width: 100%; height: 200px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/requests/csv-with-join/" marginwidth="0" marginheight="0" style="width: 100%; height: 200px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;table&gt;\n\t&lt;thead&gt;\n\t  &lt;td&gt;Company&lt;/td&gt;&lt;td&gt;Sector&lt;/td&gt;&lt;td&gt;Revenue ($)&lt;/td&gt;&lt;td&gt;Number of workers&lt;/td&gt;\n\t&lt;/thead&gt;\n\t&lt;tbody&gt;\n\t&lt;/tbody&gt;\n  &lt;/table&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;body {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\ntable thead {\n\tfont-weight: bold;\n}\n\ntable td {\n\tpadding: 0.5rem;\n\tborder-bottom: 1px solid #eee;\n}\n&quot;,&quot;js&quot;:&quot;function update(data) {\n\td3.select(&apos;#content tbody&apos;)\n\t\t.selectAll(&apos;tr&apos;)\n\t\t.data(data)\n\t\t.join(&apos;tr&apos;)\n\t\t.html(function(d) {\n\t\t\tlet html = &apos;&lt;tr&gt;&apos;;\n\t\t\thtml += &apos;&lt;td&gt;&apos; + d.company + &apos;&lt;/td&gt;&apos;;\n\t\t\thtml += &apos;&lt;td&gt;&apos; + d.industry + &apos;&lt;/td&gt;&apos;;\n\t\t\thtml += &apos;&lt;td&gt;&apos; + d.revenue + &apos;&lt;/td&gt;&apos;;\n\t\t\thtml += &apos;&lt;td&gt;&apos; + d.workers + &apos;&lt;/td&gt;&apos;;\n\t\t\thtml += &apos;&lt;/tr&gt;&apos;;\n\t\t\treturn html;\n\t\t});\n}\n\nd3.csv(&apos;https://assets.codepen.io/2814973/Inc5000+Company+List_2014-top250.csv&apos;)\n\t.then(function(data) {\n\t\tupdate(data);\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h4 id="row-conversion">Row conversion</h4>
+
+<p>As pointed out previously, D3 interprets numbers in the CSV file as <strong>strings</strong>.</p>
+
+<p>You can convert strings to numbers at any point in your code but I recommend doing the conversion straightaway. This can be done by passing a function into <code class="language-plaintext highlighter-rouge">d3.csv</code> as the second argument. The function is called on each row of data and you return a new object with any appropriate transformations.</p>
+
+<p>In this example we convert strings to numbers (where appropriate) and rename some of the variable names:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">convertRow</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">rank</span><span class="p">:</span> <span class="o">+</span><span class="nx">d</span><span class="p">.</span><span class="nx">rank</span><span class="p">,</span>
+    <span class="na">workers</span><span class="p">:</span> <span class="o">+</span><span class="nx">d</span><span class="p">.</span><span class="nx">workers</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span> <span class="nx">d</span><span class="p">.</span><span class="nx">company</span><span class="p">,</span>
+    <span class="na">state</span><span class="p">:</span> <span class="nx">d</span><span class="p">.</span><span class="nx">state_l</span><span class="p">,</span>
+    <span class="na">city</span><span class="p">:</span> <span class="nx">d</span><span class="p">.</span><span class="nx">city</span><span class="p">,</span>
+    <span class="na">growth</span><span class="p">:</span> <span class="o">+</span><span class="nx">d</span><span class="p">.</span><span class="nx">growth</span><span class="p">,</span>
+    <span class="na">revenue</span><span class="p">:</span> <span class="o">+</span><span class="nx">d</span><span class="p">.</span><span class="nx">revenue</span><span class="p">,</span>
+    <span class="na">sector</span><span class="p">:</span> <span class="nx">d</span><span class="p">.</span><span class="nx">industry</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">csv</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://assets.codepen.io/2814973/Inc5000+Company+List_2014-top250.csv</span><span class="dl">'</span><span class="p">,</span> <span class="nx">convertRow</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">+</code> operator converts a string to a number.</p>
+</blockquote>
+
+<p>Now the array of data looks like:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">rank</span><span class="dl">"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">workers</span><span class="dl">"</span><span class="p">:</span> <span class="mi">227</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Fuhu</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">state</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">California</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">city</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">El Segundo</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">growth</span><span class="dl">"</span><span class="p">:</span> <span class="mf">158956.9106</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">revenue</span><span class="dl">"</span><span class="p">:</span> <span class="mi">195640000</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">sector</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Consumer Products &amp; Services</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">rank</span><span class="dl">"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">workers</span><span class="dl">"</span><span class="p">:</span> <span class="mi">191</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Quest Nutrition</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">state</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">California</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">city</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">El Segundo</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">growth</span><span class="dl">"</span><span class="p">:</span> <span class="mf">57347.9246</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">revenue</span><span class="dl">"</span><span class="p">:</span> <span class="mi">82640563</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">sector</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Food &amp; Beverage</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">rank</span><span class="dl">"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">workers</span><span class="dl">"</span><span class="p">:</span> <span class="mi">145</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Reliant Asset Management</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">state</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Virginia</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">city</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Arlington</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">growth</span><span class="dl">"</span><span class="p">:</span> <span class="mf">55460.1646</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">revenue</span><span class="dl">"</span><span class="p">:</span> <span class="mi">85076502</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">sector</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Business Products &amp; Services</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">]</span></code></pre></figure>
+
+<h3 id="requesting-tsv-data">Requesting TSV data</h3>
+
+<p>TSV data is <strong>tab separated value</strong> data and is treated in a similar manner to CSV. Use <code class="language-plaintext highlighter-rouge">d3.tsv</code> to load TSV data.</p>
+
+<h3 id="requesting-json-data">Requesting JSON data</h3>
+
+<p>JSON is a file format that closely mirrors JavaScript arrays and objects. It allows for nested structures which gives it an edge over tabular file formats. JSON is commonly used as a file format by APIs.</p>
+
+<p>Here’s an example of a JSON file that’s located at <code class="language-plaintext highlighter-rouge">https://assets.codepen.io/2814973/my-json.json</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[
+  {
+    "name": "Paris",
+    "indicator1": 4030,
+    "indicator2": 13.45
+  },
+  {
+    "name": "Tokyo",
+    "indicator1": 3912,
+    "indicator2": 45.41
+  },
+  {
+    "name": "New York",
+    "indicator1": 19481,
+    "indicator2": 32.53
+  }
+]
+</code></pre></div></div>
+
+<p>You request a JSON file using <code class="language-plaintext highlighter-rouge">d3.json</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">json</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://assets.codepen.io/2814973/my-json.json</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p>When the JSON file arrives, D3 converts it into a JavaScript array or object:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Paris</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">indicator1</span><span class="dl">"</span><span class="p">:</span> <span class="mi">4030</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">indicator2</span><span class="dl">"</span><span class="p">:</span> <span class="mf">13.45</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Tokyo</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">indicator1</span><span class="dl">"</span><span class="p">:</span> <span class="mi">3912</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">indicator2</span><span class="dl">"</span><span class="p">:</span> <span class="mf">45.41</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">New York</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">indicator1</span><span class="dl">"</span><span class="p">:</span> <span class="mi">19481</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">indicator2</span><span class="dl">"</span><span class="p">:</span> <span class="mf">32.53</span>
+  <span class="p">}</span>
+<span class="p">]</span></code></pre></figure>
+
+<p>In this example, the JSON file represents an array, so you can join it to HTML or SVG elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">#content tbody</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">tr</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">tr</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">let</span> <span class="nx">html</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;tr&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;td&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/td&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;td&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">indicator1</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/td&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;td&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">indicator2</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/td&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;/tr&gt;</span><span class="dl">'</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">html</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">json</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://assets.codepen.io/2814973/my-json.json</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/requests/json-with-join/" marginwidth="0" marginheight="0" style="width: 100%; height: 150px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/requests/json-with-join/" marginwidth="0" marginheight="0" style="width: 100%; height: 150px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n  &lt;table&gt;\n\t&lt;thead&gt;\n\t  &lt;td&gt;Name&lt;/td&gt;&lt;td&gt;Indicator 1&lt;/td&gt;&lt;td&gt;Indicator 2&lt;/td&gt;\n\t&lt;/thead&gt;\n\t&lt;tbody&gt;\n\t&lt;/tbody&gt;\n  &lt;/table&gt;\n&lt;/div&gt;\n  \n&quot;,&quot;css&quot;:&quot;body {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\ntable thead {\n\tfont-weight: bold;\n}\n\ntable td {\n\tpadding: 0.5rem;\n\tborder-bottom: 1px solid #eee;\n}\n&quot;,&quot;js&quot;:&quot;function update(data) {\n\td3.select(&apos;#content tbody&apos;)\n\t\t.selectAll(&apos;tr&apos;)\n\t\t.data(data)\n\t\t.join(&apos;tr&apos;)\n\t\t.html(function(d) {\n\t\t\tlet html = &apos;&lt;tr&gt;&apos;;\n\t\t\thtml += &apos;&lt;td&gt;&apos; + d.name + &apos;&lt;/td&gt;&apos;;\n\t\t\thtml += &apos;&lt;td&gt;&apos; + d.indicator1 + &apos;&lt;/td&gt;&apos;;\n\t\t\thtml += &apos;&lt;td&gt;&apos; + d.indicator2 + &apos;&lt;/td&gt;&apos;;\n\t\t\thtml += &apos;&lt;/tr&gt;&apos;;\n\t\t\treturn html;\n\t\t});\n}\n\nd3.json(&apos;https://assets.codepen.io/2814973/my-json.json&apos;)\n\t.then(function(data) {\n\t\tupdate(data);\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>Unlike CSV data, JSON data isn’t necessarily an array of objects so <code class="language-plaintext highlighter-rouge">d3.json</code> doesn’t support row conversion functions.</p>
+</blockquote>
+
+<h3 id="further-notes">Further notes</h3>
+
+<p>If the resource has a different domain (e.g. the <code class="language-plaintext highlighter-rouge">https://assets.codepen.io</code> part) to your web application, the server might not be willing to fulfil the request due to <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS restrictions</a>. However in this chapter we request files that are free from CORS restrictions.</p>
+
+<p>Another thing to bear in mind is if you’re developing your code locally (rather than on CodePen or similar) you’ll need to have a local webserver running. If you’re not sure how to do this I recommend reading <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation/">Fundamentals of HTML, SVG, CSS and JavaScript for Data Visualization</a>.</p>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

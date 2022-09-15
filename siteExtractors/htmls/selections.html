@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Selections | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Selections" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How to select HTML and SVG elements using D3 selections. This article shows how to select, insert, remove and modify elements, how to add event handlers, how to apply a function to selections and how to filter and sort selections." />
+<meta property="og:description" content="How to select HTML and SVG elements using D3 selections. This article shows how to select, insert, remove and modify elements, how to add event handlers, how to apply a function to selections and how to filter and sort selections." />
+<link rel="canonical" href="https://www.d3indepth.com/selections/" />
+<meta property="og:url" content="https://www.d3indepth.com/selections/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:image" content="https://www.d3indepth.com/img/meta/selections.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-05T00:00:00+01:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://www.d3indepth.com/img/meta/selections.png" />
+<meta property="twitter:title" content="D3 Selections" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-05T00:00:00+01:00","datePublished":"2021-05-05T00:00:00+01:00","description":"How to select HTML and SVG elements using D3 selections. This article shows how to select, insert, remove and modify elements, how to add event handlers, how to apply a function to selections and how to filter and sort selections.","headline":"D3 Selections","image":"https://www.d3indepth.com/img/meta/selections.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/selections/"},"url":"https://www.d3indepth.com/selections/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Selections</h2>
+
+  <div class="page-content">
+  	<p><em>How to select HTML and SVG elements using D3 selections. This article shows how to select, insert, remove and modify elements, how to add event handlers, how to apply a function to selections and how to filter and sort selections.</em></p>
+
+<p>D3 selections let you choose some HTML or SVG elements and change their style and/or attributes.</p>
+
+<p>For example, if your <code class="language-plaintext highlighter-rouge">index.html</code> file contains 5 SVG circle elements:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">"760"</span> <span class="na">height=</span><span class="s">"140"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">"translate(70, 70)"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;circle/&gt;</span>
+    <span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">"120"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">"240"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">"360"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">"480"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;/svg&gt;</span></code></pre></figure>
+
+<p>you can use <code>d3.selectAll</code> to select the circles then <code>.style</code> to change their fill and <code>.attr</code> to change their radius:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">10</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">40</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/circles-2/" marginwidth="0" marginheight="0" style="width: 100%; height: 160px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/circles-2/" marginwidth="0" marginheight="0" style="width: 100%; height: 160px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n  &lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n    &lt;circle/&gt;\n    &lt;circle cx=\&quot;120\&quot; /&gt;\n    &lt;circle cx=\&quot;240\&quot; /&gt;\n    &lt;circle cx=\&quot;360\&quot; /&gt;\n    &lt;circle cx=\&quot;480\&quot; /&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;\ncircle {\n\tfill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;\nd3.selectAll(&apos;circle&apos;)\n\t.style(&apos;fill&apos;, &apos;orange&apos;)\n\t.attr(&apos;r&apos;, function() {\n\t\treturn 10 + Math.random() * 40;\n\t});\n\t&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>D3 selections also let you perform data joins (see the <a href="/datajoins">Data Joins</a> chapter).</p>
+
+<h3 id="making-selections"><a name="#making-selections"></a>Making selections</h3>
+
+<p>D3 has two functions to make selections <code>d3.select</code> and <code>d3.selectAll</code>.</p>
+
+<p><code>d3.select</code> selects the first matching element whilst <code>d3.selectAll</code> selects all matching elements.</p>
+
+<p>Both functions take a string as its only argument. The string specifies which elements to select and is in the form of a CSS selector string (e.g. <code class="language-plaintext highlighter-rouge">div.item</code>, <code class="language-plaintext highlighter-rouge">#my-chart</code> or <code class="language-plaintext highlighter-rouge">g:first-child</code>).</p>
+
+<p>For example to select all elements with class <code>item</code> use <code>d3.selectAll('.item')</code>.</p>
+
+<p>(If you’re not familiar with CSS selectors take a look at the CSS section in my free <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation/">Fundamentals of HTML, SVG, CSS and JavaScript for Data Visualization course</a>.)</p>
+
+<h3 id="modifying-elements">Modifying elements</h3>
+
+<p>Once you’ve made a selection you can modify the elements in it using the following functions:</p>
+
+<table class="table table-bordered">
+	<tr>
+		<th>Name</th><th>Behaviour</th><th>Example</th>
+	</tr>
+	<tr>
+		<td><code>.style</code></td><td>Update the style</td><td><code>d3.selectAll('circle').style('fill', 'red')</code></td>
+	</tr>
+	<tr>
+		<td><code>.attr</code></td><td>Update an attribute</td><td><code>d3.selectAll('rect').attr('width', 10)</code></td>
+	</tr>
+	<tr>
+		<td><code>.classed</code></td><td>Add/remove a class attribute</td><td><code>d3.select('.item').classed('selected', true)</code></td>
+	</tr>
+	<tr>
+		<td><code>.property</code></td><td>Update an element's property</td><td><code>d3.selectAll('.checkbox').property('checked', false)</code></td>
+	</tr>
+	<tr>
+		<td><code>.text</code></td><td>Update the text content</td><td><code>d3.select('div.title').text('My new book')</code></td>
+	</tr>
+	<tr>
+		<td><code>.html</code></td><td>Change the html content</td><td><code>d3.select('.legend').html('&lt;div class="block"&gt;&lt;/div&gt;&lt;div&gt;0 - 10&lt;/div&gt;')</code></td>
+	</tr>
+</table>
+
+<!-- <code>.style</code>, <code>.attr</code>, <code>.classed</code> and <code>.text</code> are probably the most commonly used selection functions. -->
+
+<p>Whether <code>.select</code> or <code>.selectAll</code> is used, all elements in the selection will be modified.</p>
+
+<p>Note that the second argument of <code class="language-plaintext highlighter-rouge">.classed</code> is a boolean. I often forget to include <code class="language-plaintext highlighter-rouge">true</code> or <code class="language-plaintext highlighter-rouge">false</code> and it raises an non-obvious error message!</p>
+
+<p>Here’s an example of all of these functions in use:</p>
+
+<!-- <iframe class="db center" src="/blocks/selections/properties/" marginwidth="0" marginheight="0" style="width: 100%; height: 190px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/properties/" marginwidth="0" marginheight="0" style="width: 100%; height: 190px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n\t&lt;div class=\&quot;title\&quot;&gt;&lt;/div&gt;\n\t&lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n\t\t&lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n\t\t\t&lt;circle r=\&quot;40\&quot; /&gt;\n\t\t\t&lt;circle r=\&quot;40\&quot; cx=\&quot;120\&quot; /&gt;\n\t\t\t&lt;circle r=\&quot;40\&quot; cx=\&quot;240\&quot; /&gt;\n\t\t\t&lt;circle r=\&quot;40\&quot; cx=\&quot;360\&quot; /&gt;\n\t\t\t&lt;circle r=\&quot;40\&quot; cx=\&quot;480\&quot; /&gt;\n\t\t&lt;/g&gt;\n\t&lt;/svg&gt;\n\n\t&lt;form&gt;\n\t\t&lt;input class=\&quot;robot-checkbox\&quot; type=\&quot;checkbox\&quot;&gt; A checkbox&lt;/input&gt;\n\t&lt;/form&gt;\n\n\t&quot;,&quot;css&quot;:&quot;\nbody {\n\tfont-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n\tfont-size: 14px;\n}\n\ncircle {\n\tfill: #ddd;\n}\n\ncircle.selected {\n\tstroke: #555;\n\tstroke-width: 2px;\n}\n&quot;,&quot;js&quot;:&quot;\n\n// Change colour of first circle\nd3.select(&apos;circle&apos;)\n\t.style(&apos;fill&apos;, &apos;orange&apos;)\n\n// Change radius of all circles\nd3.selectAll(&apos;circle&apos;)\n\t.attr(&apos;r&apos;, 20);\n\n// Add .selected class to 3rd circle\nd3.select(&apos;circle:nth-child(3)&apos;)\n\t.classed(&apos;selected&apos;, true);\n\n// Set checked property of checkbox\nd3.select(&apos;input.robot-checkbox&apos;)\n\t.property(&apos;checked&apos;, true);\n\n// Set text on .title element\nd3.select(&apos;.title&apos;)\n\t.text(&apos;D3 in Depth selection example&apos;)\n\t&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/3236a4658005ab78d60816b74830694b" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/3236a4658005ab78d60816b74830694b?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=3236a4658005ab78d60816b74830694b" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="updating-selections-with-functions">Updating selections with functions</h3>
+
+<p>In addition to passing constant values to <code>.style</code>, <code>.attr</code>, <code>.classed</code>, <code>.property</code>, <code>.text</code> and <code>.html</code> you can pass in a function. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p>The function accepts two arguments which are usually named <code>d</code> and <code>i</code>. The first argument <code>d</code> is the <strong>joined data</strong> (or ‘datum’) and will be covered in the <a href="/datajoins">data joins chapter</a>. <code>i</code> is the <strong>index</strong> of the element within the selection.</p>
+
+<p>If you want to update elements in a selection according to their position within the selection, you can use the <code>i</code> argument. For example to position some <code>rect</code> elements horizontally you can use:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">40</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/function-i/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/function-i/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n\t&lt;svg width=\&quot;760\&quot; height=\&quot;190\&quot;&gt;\n\t\t&lt;g transform=\&quot;translate(70, 20)\&quot;&gt;\n\t\t\t&lt;rect width=\&quot;30\&quot; height=\&quot;30\&quot; y=\&quot;0\&quot; /&gt;\n\t\t\t&lt;rect width=\&quot;30\&quot; height=\&quot;30\&quot; y=\&quot;40\&quot; /&gt;\n\t\t\t&lt;rect width=\&quot;30\&quot; height=\&quot;30\&quot; y=\&quot;80\&quot; /&gt;\n\t\t\t&lt;rect width=\&quot;30\&quot; height=\&quot;30\&quot; y=\&quot;120\&quot; /&gt;\n\t\t&lt;/g&gt;\n\t&lt;/svg&gt;\n\n\t&lt;div&gt;\n\t\t&lt;button onClick=\&quot;update();\&quot;&gt;Click to update rect elements using function(d, i)&lt;/button&gt;\n\t&lt;/div&gt;\n\n\t&quot;,&quot;css&quot;:&quot;\nrect {\n\tfill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;\nfunction update() {\n\td3.selectAll(&apos;rect&apos;)\n\t\t.attr(&apos;x&apos;, function(d, i) {\n\t\t\treturn i * 40;\n\t\t});\n}\n\t&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/9c59fb1fe6e914538341308340296885" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/9c59fb1fe6e914538341308340296885?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=9c59fb1fe6e914538341308340296885" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>In the majority of cases when functions are passed in, anonymous functions are used. However you can also use named functions. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">positionRects</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">40</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">,</span> <span class="nx">positionRects</span><span class="p">);</span></code></pre></figure>
+
+<h3 id="event-handling">Event handling</h3>
+
+<p>You can add event handlers to selected elements using the <code>.on</code> method.</p>
+
+<p>This method has two arguments:</p>
+
+<ul>
+  <li>
+    <p>the first is a string specifying the event type</p>
+  </li>
+  <li>
+    <p>the second is a function (a ‘callback function’) that’s called when the event is triggered. This callback function has two arguments that are usually named <code>e</code> and <code>d</code>. <code class="language-plaintext highlighter-rouge">e</code> is the DOM event object and <code>d</code> is the joined data (which will be covered in the <a href="/datajoins">data joins chapter</a>).</p>
+  </li>
+</ul>
+
+<p>Up to and including D3 version 5, the callback function was passed the datum <code class="language-plaintext highlighter-rouge">d</code> and index <code class="language-plaintext highlighter-rouge">i</code>. This is a <strong>breaking change</strong>.</p>
+
+<p>The most common events include (see <a href="https://developer.mozilla.org/en-US/docs/Web/Events#Standard_events">MDN event reference</a> for more details):</p>
+
+<table class="table table-bordered">
+	<tr>
+		<th>Event name</th><th>Description</th>
+	</tr>
+	<tr>
+		<td><code>click</code></td><td>Element has been clicked</td>
+	</tr>
+	<tr>
+		<td><code>mouseenter</code></td><td>Mouse pointer has moved onto the element</td>
+	</tr>
+	<tr>
+		<td><code>mouseover</code></td><td>Mouse pointer has moved onto the element or its children</td>
+	</tr>
+	<tr>
+		<td><code>mouseleave</code></td><td>Mouse pointer has moved off the element</td>
+	</tr>
+	<tr>
+		<td><code>mouseout</code></td><td>Mouse pointer has moved off the element or its children</td>
+	</tr>
+	<tr>
+		<td><code>mousemove</code></td><td>Mouse pointer has moved over the element</td>
+	</tr>
+</table>
+
+<p>In the event callback function the <code>this</code> variable is bound to the DOM element that triggered the event. This allows us to do things such as:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/events-this/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/events-this/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n    &lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n      &lt;circle r=\&quot;40\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;120\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;240\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;360\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;480\&quot; /&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n  &lt;div class=\&quot;status\&quot;&gt;Click on a circle&lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\ncircle {\n  fill: #ddd;\n  cursor: pointer;\n}\n&quot;,&quot;js&quot;:&quot;d3.selectAll(&apos;circle&apos;)\n    .on(&apos;click&apos;, function(e, d) {\n        d3.select(this)\n            .style(&apos;fill&apos;, &apos;orange&apos;);\n    });\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/b18879fe295375bb0e0b77cf21d11675" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/b18879fe295375bb0e0b77cf21d11675?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=b18879fe295375bb0e0b77cf21d11675" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>Note that <code>this</code> is a DOM element and not a D3 selection so if you wish to modify it using D3 you must first select it using <code>d3.select(this)</code>.</p>
+
+<h3 id="inserting-and-removing-elements">Inserting and removing elements</h3>
+
+<p>Elements can be added to a selection’s elements using D3’s <code>.append</code> and <code>.insert</code> methods. Elements can be removed using <code>.remove</code>.</p>
+
+<p><code>.append</code> appends an element to each element in a selection. If the elements already have children, the new element will become the last child. The first argument specifies the type of element.</p>
+
+<p>As an example let’s start with 3 <code>g</code> elements, each containing a <code>circle</code>:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(0, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(120, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(240, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/g&gt;</span></code></pre></figure>
+
+<p>You can append a <code>text</code> element to each using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">g.item</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">text</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">text</span><span class="p">(</span><span class="dl">'</span><span class="s1">A</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<p>resulting in a <code>text</code> element being added to each <code>g.item</code>:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(0, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;text&gt;</span>A<span class="nt">&lt;/text&gt;</span>
+<span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(120, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;text&gt;</span>A<span class="nt">&lt;/text&gt;</span>
+<span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(240, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;text&gt;</span>A<span class="nt">&lt;/text&gt;</span>
+<span class="nt">&lt;/g&gt;</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/append/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/append/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n\t&lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n\t\t&lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n\t\t\t&lt;g class=\&quot;item\&quot; transform=\&quot;translate(0, 0)\&quot;&gt;&lt;circle r=\&quot;40\&quot; /&gt;&lt;/g&gt;\n\t\t\t&lt;g class=\&quot;item\&quot; transform=\&quot;translate(120, 0)\&quot;&gt;&lt;circle r=\&quot;40\&quot; /&gt;&lt;/g&gt;\n\t\t\t&lt;g class=\&quot;item\&quot; transform=\&quot;translate(240, 0)\&quot;&gt;&lt;circle r=\&quot;40\&quot; /&gt;&lt;/g&gt;\n\t\t&lt;/g&gt;\n\t&lt;/svg&gt;\n\n\t&quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\ncircle {\n\tfill: orange;\n}\ng.item text {\n\tfill: #ddd;\n\tfont-size: 70px;\n\ttext-anchor: middle;\n\tfont-weight: bold;\n}\n&quot;,&quot;js&quot;:&quot;d3.selectAll(&apos;g.item&apos;)\n\t.append(&apos;text&apos;)\n\t.text(\&quot;A\&quot;)\n\t.attr(&apos;y&apos;, 50)\n\t.attr(&apos;x&apos;, 30);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/15daaf6e65f1937c890aab8a1b94ce3a" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/15daaf6e65f1937c890aab8a1b94ce3a?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=15daaf6e65f1937c890aab8a1b94ce3a" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p><code>.insert</code> is similar to <code>.append</code> but it allows us to specify a second argument which specifies (as a CSS selector) which element to insert the new element before.</p>
+
+<p>In this example, <code class="language-plaintext highlighter-rouge">.insert</code> is used and the second argument is <code class="language-plaintext highlighter-rouge">'circle'</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">g.item</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="dl">'</span><span class="s1">text</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">text</span><span class="p">(</span><span class="dl">'</span><span class="s1">A</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<p>This results in the text element being inserted before the circle:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(0, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;text&gt;</span>A<span class="nt">&lt;/text&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(120, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;text&gt;</span>A<span class="nt">&lt;/text&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"item"</span> <span class="na">transform=</span><span class="s">"translate(240, 0)"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;text&gt;</span>A<span class="nt">&lt;/text&gt;</span>
+  <span class="nt">&lt;circle</span> <span class="na">r=</span><span class="s">"40"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/g&gt;</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/insert/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/insert/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n\t&lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n\t\t&lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n\t\t\t&lt;g class=\&quot;item\&quot; transform=\&quot;translate(0, 0)\&quot;&gt;&lt;circle r=\&quot;40\&quot; /&gt;&lt;/g&gt;\n\t\t\t&lt;g class=\&quot;item\&quot; transform=\&quot;translate(120, 0)\&quot;&gt;&lt;circle r=\&quot;40\&quot; /&gt;&lt;/g&gt;\n\t\t\t&lt;g class=\&quot;item\&quot; transform=\&quot;translate(240, 0)\&quot;&gt;&lt;circle r=\&quot;40\&quot; /&gt;&lt;/g&gt;\n\t\t&lt;/g&gt;\n\t&lt;/svg&gt;\n\n\t&quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\ncircle {\n\tfill: orange;\n}\ng.item text {\n\tfill: #ddd;\n\tfont-size: 70px;\n\ttext-anchor: middle;\n\tfont-weight: bold;\n}\n&quot;,&quot;js&quot;:&quot;d3.selectAll(&apos;g.item&apos;)\n\t.insert(&apos;text&apos;, &apos;circle&apos;)\n\t.text(\&quot;A\&quot;)\n\t.attr(&apos;y&apos;, 50)\n\t.attr(&apos;x&apos;, 30);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/6e320e0fb89e5bc8bdde468d301880e5" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/6e320e0fb89e5bc8bdde468d301880e5?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=6e320e0fb89e5bc8bdde468d301880e5" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p><code>.remove</code> removes all the elements in a selection from the page. For example, given some circles, you can remove them using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">remove</span><span class="p">();</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/remove/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/remove/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n    &lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n      &lt;circle r=\&quot;40\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;120\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;240\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;360\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;480\&quot; /&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &lt;div&gt;\n    &lt;button onClick=\&quot;removeCircles();\&quot;&gt;Remove circles&lt;/button&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: orange;\n}\n&quot;,&quot;js&quot;:&quot;\nfunction removeCircles() {\n  d3.selectAll(&apos;circle&apos;)\n    .remove();\n}\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/cd21d0522fc6f48e3fb88c7f770eb008" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/cd21d0522fc6f48e3fb88c7f770eb008?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=cd21d0522fc6f48e3fb88c7f770eb008" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="chaining">Chaining</h3>
+
+<p>The return value of most selection methods is the selection itself. This means that selection methods such as <code>.style</code>, <code>.attr</code> and <code>.on</code> can be chained. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">#333</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/chaining/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/chaining/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n  &lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n    &lt;circle /&gt;\n    &lt;circle cx=\&quot;120\&quot; /&gt;\n    &lt;circle cx=\&quot;240\&quot; /&gt;\n    &lt;circle cx=\&quot;360\&quot; /&gt;\n    &lt;circle cx=\&quot;480\&quot; /&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n&lt;div class=\&quot;status\&quot;&gt;Click on a circle&lt;/div&gt;\n\n&quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\ncircle {\n  fill: #ddd;\n  cursor: pointer;\n}\n&quot;,&quot;js&quot;:&quot;d3.selectAll(&apos;circle&apos;)\n\t.style(&apos;fill&apos;, &apos;#333&apos;)\n\t.attr(&apos;r&apos;, 20)\n\t.on(&apos;click&apos;, function(e, d) {\n\t\td3.select(this)\n\t\t\t.style(&apos;fill&apos;, &apos;orange&apos;);\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/a8eb48f2add08e8f010c829863101773" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/a8eb48f2add08e8f010c829863101773?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=a8eb48f2add08e8f010c829863101773" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="each">.each()</h3>
+
+<p>The <code>.each</code> method lets you call a function for <strong>each element of a selection</strong>.</p>
+
+<p>The callback function has two arguments usually named <code class="language-plaintext highlighter-rouge">d</code> and <code class="language-plaintext highlighter-rouge">i</code>. The first argument <code>d</code> is the <strong>joined data</strong> (or ‘datum’) and will be covered in the <a href="/datajoins">data joins chapter</a>. <code>i</code> is the <strong>index</strong> of the element within the selection. The <code class="language-plaintext highlighter-rouge">this</code> keyword refers to the current HTML or SVG element in the selection.</p>
+
+<p>Here’s an example where <code>.each</code> is used to call a function for each of the selection’s elements. The function computes whether the index is odd or even and modifies the circle accordingly:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">odd</span> <span class="o">=</span> <span class="nx">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="nx">odd</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">#ddd</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="nx">odd</span> <span class="p">?</span> <span class="mi">40</span> <span class="p">:</span> <span class="mi">20</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/each-shared/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/each-shared/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n    &lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n      &lt;circle r=\&quot;40\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;120\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;240\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;360\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;480\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;620\&quot; /&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n\ncircle {\n  fill: #ddd;\n  cursor: pointer;\n}\n&quot;,&quot;js&quot;:&quot;\nd3.selectAll(&apos;circle&apos;)\n  .each(function(d, i) {\n    var odd = i % 2 === 1;\n\n    d3.select(this)\n      .style(&apos;fill&apos;, odd ? &apos;orange&apos; : &apos;#ddd&apos;)\n      .attr(&apos;r&apos;, odd ? 40 : 20);\n  });\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/7126f834e490b29c9cc26df71c1c1f69" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/7126f834e490b29c9cc26df71c1c1f69?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=7126f834e490b29c9cc26df71c1c1f69" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>Note that <code class="language-plaintext highlighter-rouge">this</code> refers to the current HTML or SVG element (or the <code class="language-plaintext highlighter-rouge">i</code>th element in the selection). If you wish to modify it using D3 you can select it using <code class="language-plaintext highlighter-rouge">d3.select(this)</code>.</p>
+
+<h3 id="call">.call()</h3>
+
+<p>The <code>.call</code> method allows a function to be called into which the <strong>selection itself</strong> is passed as the first argument.</p>
+
+<p><code class="language-plaintext highlighter-rouge">.call</code> is useful where you want a reusable function that operates on a selection.</p>
+
+<p>For example, <code class="language-plaintext highlighter-rouge">colorAll</code> takes a selection and sets the fill of the selection’s elements to orange:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">colorAll</span><span class="p">(</span><span class="nx">selection</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">selection</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">colorAll</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/call/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/call/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n    &lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n      &lt;circle r=\&quot;40\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;120\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;240\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;360\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;480\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;620\&quot; /&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;circle {\n  fill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;function colorAll(selection) {\n    selection\n        .style(&apos;fill&apos;, &apos;orange&apos;);\n}\n\nd3.selectAll(&apos;circle&apos;)\n    .call(colorAll);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="filtering-and-sorting-selections">Filtering and sorting selections</h3>
+
+<p>You can filter a selection using D3’s <code>.filter</code> method. The first argument is a function which returns <code>true</code> if the element should be included. The filtered selection is returned by the <code class="language-plaintext highlighter-rouge">filter</code> method so you can continue chaining selection methods.</p>
+
+<p>In this example you filter through even-numbered elements and colour them orange:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/filter/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/filter/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n    &lt;g transform=\&quot;translate(70, 70)\&quot;&gt;\n      &lt;circle r=\&quot;40\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;120\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;240\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;360\&quot; /&gt;\n      &lt;circle r=\&quot;40\&quot; cx=\&quot;480\&quot; /&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\ncircle {\n  fill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;\nd3.selectAll(&apos;circle&apos;)\n  .filter(function(d, i) {\n    return i % 2 === 0;\n  })\n  .style(&apos;fill&apos;, &apos;orange&apos;);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/57a3707ec2931ced16939000d113e8d4" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/57a3707ec2931ced16939000d113e8d4?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=57a3707ec2931ced16939000d113e8d4" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>Sorting only really makes sense if data has been joined to the selection, so please read up on <a href="/datajoins">data joins</a> first.</p>
+
+<p>You can sort elements in a selection by calling <code>.sort</code> and passing in a comparator function. The comparator function has two arguments, usually <code>a</code> and <code>b</code>, which represent the datums on the two elements being compared. If the comparator function returns a negative number, <code>a</code> will be placed before <code>b</code> and if positive, <code>a</code> will be placed after <code>b</code>.</p>
+
+<p>Thus if you have the following data joined to a selection:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Andy"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">37</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beth"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">39</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Craig"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">31</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Diane"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">35</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Evelyn"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">38</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">]</span></code></pre></figure>
+
+<p>you can sort by <code>score</code> using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="nx">d3</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.person</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">b</span><span class="p">.</span><span class="nx">score</span> <span class="o">-</span> <span class="nx">a</span><span class="p">.</span><span class="nx">score</span><span class="p">;</span>
+    <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/selections/sort/" marginwidth="0" marginheight="0" style="width: 100%; height: 150px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/selections/sort/" marginwidth="0" marginheight="0" style="width: 100%; height: 150px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n\n  &lt;div id=\&quot;wrapper\&quot;&gt;\n  &lt;/div&gt;\n\n  &lt;div class=\&quot;menu\&quot;&gt;\n    &lt;button onClick=\&quot;sort();\&quot;&gt;Sort&lt;/button&gt;\n  &lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n  body {\n    font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n    font-size: 14px;\n  }\n  .person {\n    height: 20px;\n    position: relative;\n  }\n  .person .label {\n    width: 90px;\n    text-align: right;\n  }\n  .person .bar {\n    height: 19px;\n    background-color: steelblue;\n    position: absolute;\n    left: 100px;\n  }\n  .person div {\n    display: inline-block;\n  }\n  .menu {\n    margin-top: 20px;\n  }\n&quot;,&quot;js&quot;:&quot;\n\nmyData = [\n  {\n    \&quot;name\&quot;: \&quot;Andy\&quot;,\n    \&quot;score\&quot;: 37\n  },\n  {\n    \&quot;name\&quot;: \&quot;Beth\&quot;,\n    \&quot;score\&quot;: 39\n  },\n  {\n    \&quot;name\&quot;: \&quot;Craig\&quot;,\n    \&quot;score\&quot;: 31\n  },\n  {\n    \&quot;name\&quot;: \&quot;Diane\&quot;,\n    \&quot;score\&quot;: 35\n  },\n  {\n    \&quot;name\&quot;: \&quot;Evelyn\&quot;,\n    \&quot;score\&quot;: 38\n  }\n];\n\nvar barWidth = 400;\nvar barScale = d3.scaleLinear().domain([0, 100]).range([0, barWidth]);\n\nvar u = d3.select(&apos;#wrapper&apos;)\n  .selectAll(&apos;.person&apos;)\n  .data(myData);\n\nvar entering = u.enter()\n  .append(&apos;div&apos;)\n  .classed(&apos;person&apos;, true);\n\nentering.append(&apos;div&apos;)\n  .classed(&apos;label&apos;, true)\n  .text(function(d) {\n    return d.name;\n  });\n\nentering.append(&apos;div&apos;)\n  .classed(&apos;bar&apos;, true)\n  .style(&apos;width&apos;, function(d) {\n    return barScale(d.score) + &apos;px&apos;;\n  });\n\nfunction sort() {\n  d3.selectAll(&apos;.person&apos;)\n    .sort(function(a, b) {\n      return b.score - a.score;\n    });\n}\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/961bb0efe94bde8b2b6fe2957ccb632f" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/961bb0efe94bde8b2b6fe2957ccb632f?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=961bb0efe94bde8b2b6fe2957ccb632f" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

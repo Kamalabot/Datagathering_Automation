@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Shapes | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Shapes" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How to create commonly used chart shapes such as multi-segment lines, areas, stacked bars, stacked areas, streamgraphs, pie segments and symbols using D3. Also covers rendering to canvas." />
+<meta property="og:description" content="How to create commonly used chart shapes such as multi-segment lines, areas, stacked bars, stacked areas, streamgraphs, pie segments and symbols using D3. Also covers rendering to canvas." />
+<link rel="canonical" href="https://www.d3indepth.com/shapes/" />
+<meta property="og:url" content="https://www.d3indepth.com/shapes/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-12T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Shapes" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-12T00:00:00+01:00","datePublished":"2021-05-12T00:00:00+01:00","description":"How to create commonly used chart shapes such as multi-segment lines, areas, stacked bars, stacked areas, streamgraphs, pie segments and symbols using D3. Also covers rendering to canvas.","headline":"D3 Shapes","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/shapes/"},"url":"https://www.d3indepth.com/shapes/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Shapes</h2>
+
+  <div class="page-content">
+  	<p><em>How to create commonly used chart shapes such as multi-segment lines, areas, stacked bars, stacked areas, streamgraphs, pie segments and symbols using D3. Also covers rendering to canvas.</em></p>
+
+<p>This chapter looks at the functions D3 provides for taking the effort out of drawing shapes such as lines:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/line-example/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/line-example/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;700\&quot; height=\&quot;100\&quot;&gt;\n  &lt;path&gt;&lt;/path&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;\npath {\n\tfill: none;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;var lineGenerator = d3.line();\n\nvar points = [];\nfor(var i = 0; i &lt; 200; i++)\n\tpoints.push([ i * 3, Math.random() * 100 ]);\n\nvar pathData = lineGenerator(points);\n\nd3.select(&apos;path&apos;)\n\t.attr(&apos;d&apos;, pathData);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>curves:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/curve-example/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/curve-example/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;100\&quot;&gt;\n  \t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: none;\n\tstroke: #555;\n}\n&quot;,&quot;js&quot;:&quot;\nvar lineGenerator = d3.line();\n\nvar betas = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];\n\nvar points = [[0, 100], [300, 100], [300, 0], [600, 0]];\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(betas)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, function(d) {\n\t\tvar bundleCurve = d3.curveBundle.beta(d);\n\t\tlineGenerator.curve(bundleCurve);\n\t\treturn lineGenerator(points);\n\t})\n\t.style(&apos;opacity&apos;, function(d, i) {\n\t\treturn i * 0.08;\n\t});\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>pie chart segments:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/pie-example/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/pie-example/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;130\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 65)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: orange;\n}\n&quot;,&quot;js&quot;:&quot;\n// Create an arc generator with configuration\nvar arcGenerator = d3.arc()\n\t.innerRadius(10)\n\t.outerRadius(60)\n\t.padAngle(.02)\n\t.padRadius(100)\n\t.cornerRadius(4);\n\nvar arcData = [\n\t{startAngle: 0, endAngle: 0.2},\n\t{startAngle: 0.2, endAngle: 0.6},\n\t{startAngle: 0.6, endAngle: 1.4},\n\t{startAngle: 1.4, endAngle: 3},\n\t{startAngle: 3, endAngle: 2* Math.PI}\n];\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(arcData)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>and symbols:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/symbol/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/symbol/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;120\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(20, 10)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: #ddd;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;var symbolGenerator = d3.symbol()\n\t.type(d3.symbolStar)\n\t.size(80);\n\nvar points = [\n\t[0, 80],\n\t[100, 100],\n\t[200, 30],\n\t[300, 50],\n\t[400, 40],\n\t[500, 80]\n];\n\nvar pathData = symbolGenerator();\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(points)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;transform&apos;, function(d) {\n\t\treturn &apos;translate(&apos; + d + &apos;)&apos;;\n\t})\n\t.attr(&apos;d&apos;, pathData);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="svg">SVG</h3>
+
+<p>The shapes in the above examples are made up of SVG <code class="language-plaintext highlighter-rouge">path</code> elements. Each of them has a <code class="language-plaintext highlighter-rouge">d</code> attribute (path data) which defines the shape of the path.</p>
+
+<p>The path data consists of a list of commands such as <code class="language-plaintext highlighter-rouge">M0,80L100,100L200,30L300,50L400,40L500,80</code> which describe the shape of the path. Each letter such as <code class="language-plaintext highlighter-rouge">M</code> or <code class="language-plaintext highlighter-rouge">L</code> describe a command such as ‘move to’ and ‘draw a line to’. See the <a href="https://www.w3.org/TR/SVG/paths.html">SVG specification</a> for more detail.</p>
+
+<p>You can create path data yourself but D3 provides generator functions that do the work for you. These come in various forms:</p>
+
+<table class="table table-bordered">
+  <tr><td><a href="#line-generator">line</a></td><td>Generates path data for a multi-segment line (typically for line charts)</td></tr>
+  <tr><td><a href="#area-generator">area</a></td><td>Generates path data for an area (typically for stacked line charts and streamgraphs)</td></tr>
+  <tr><td><a href="#stack-generator">stack</a></td><td>Generates stack data from multi-series data</td></tr>
+  <tr><td><a href="#arc-generator">arc</a></td><td>Generates path data for an arc (typically for pie charts)</td></tr>
+  <tr><td><a href="#pie-generator">pie</a></td><td>Generates pie angle data from array of data</td></tr>
+  <tr><td><a href="#symbols">symbol</a></td><td>Generates path data for symbols such as plus, star, diamond</td></tr>
+</table>
+
+<p>There’s also a generator for creating path data from GeoJSON. This is covered in the <a href="/geographic">geographic</a> section.</p>
+
+<h3 id="line-generator">Line generator</h3>
+
+<p>D3’s line generator produces a <strong>path data string</strong> given an <strong>array of co-ordinates</strong>.</p>
+
+<p>You create a line generator using <code class="language-plaintext highlighter-rouge">d3.line()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">lineGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">line</span><span class="p">();</span></code></pre></figure>
+
+<p><code class="language-plaintext highlighter-rouge">d3.line()</code> returns a function that accepts an array of co-ordinates and outputs a path data string.</p>
+
+<p>Let’s define an array of co-ordinates:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">80</span><span class="p">]</span>
+<span class="p">];</span></code></pre></figure>
+
+<p>and call <code class="language-plaintext highlighter-rouge">lineGenerator</code> with the array as the argument:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pathData</span> <span class="o">=</span> <span class="nx">lineGenerator</span><span class="p">(</span><span class="nx">points</span><span class="p">);</span> <span class="c1">// returns "M0,80L100,100L200,30L300,50L400,40L500,80"</span></code></pre></figure>
+
+<p><code class="language-plaintext highlighter-rouge">lineGenerator</code> creates a string of <code class="language-plaintext highlighter-rouge">M</code> (move to) and <code class="language-plaintext highlighter-rouge">L</code> (line to) commands from the array of points.</p>
+
+<p>You can use <code class="language-plaintext highlighter-rouge">pathData</code> to set the <code class="language-plaintext highlighter-rouge">d</code> attribute of a <code class="language-plaintext highlighter-rouge">path</code> element:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">d</span><span class="dl">'</span><span class="p">,</span> <span class="nx">pathData</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/line/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/line/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;110\&quot;&gt;\n  \t&lt;path&gt;&lt;/path&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: none;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;var lineGenerator = d3.line();\nvar points = [\n\t[0, 80],\n\t[100, 100],\n\t[200, 30],\n\t[300, 50],\n\t[400, 40],\n\t[500, 80]\n];\n\nvar pathData = lineGenerator(points);\n\n// Select the path element and set its d attribute\nd3.select(&apos;path&apos;)\n\t.attr(&apos;d&apos;, pathData);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/dd0e2e52b32f5c646b75acdfcb46864e" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/dd0e2e52b32f5c646b75acdfcb46864e?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=dd0e2e52b32f5c646b75acdfcb46864e" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="x-and-y-methods">.x and .y methods</h4>
+
+<p>By default each array element represents a co-ordinate defined by a 2-dimensional array (e.g. <code class="language-plaintext highlighter-rouge">[0, 100]</code>). However you can specify how the line generator interprets each array element using the methods <code class="language-plaintext highlighter-rouge">.x</code> and <code class="language-plaintext highlighter-rouge">.y</code>.</p>
+
+<p>For example suppose your data is an array of objects:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="mi">70</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
+<span class="p">];</span></code></pre></figure>
+
+<p>If you pass functions into the <code class="language-plaintext highlighter-rouge">.x</code> and <code class="language-plaintext highlighter-rouge">.y</code> methods of <code class="language-plaintext highlighter-rouge">lineGenerator</code> D3 will apply these functions to each array element:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">xScale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">600</span><span class="p">]);</span>
+<span class="kd">var</span> <span class="nx">yScale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">]);</span>
+
+<span class="nx">lineGenerator</span>
+  <span class="p">.</span><span class="nx">x</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">xScale</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">y</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">yScale</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p>The x coordinate is set using a linear scale function applied to the array index. This results in equidistant points in the x direction. The y coodinate is set using a linear scale applied to the <code class="language-plaintext highlighter-rouge">value</code> property:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/line-with-scales/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/line-with-scales/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;160\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(20, 0)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: none;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;\nvar xScale = d3.scaleLinear().domain([0, 6]).range([0, 600]);\nvar yScale = d3.scaleLinear().domain([0, 80]).range([150, 0]);\n\nvar lineGenerator = d3.line()\n\t.x(function(d, i) {\n\t\treturn xScale(i);\n\t})\n\t.y(function(d) {\n\t\treturn yScale(d.value);\n\t});\n\nvar data = [\n\t{value: 10}, \n\t{value: 50}, \n\t{value: 30}, \n\t{value: 40}, \n\t{value: 20}, \n\t{value: 70},\n\t{value: 50}\n];\n\nvar line = lineGenerator(data);\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.append(&apos;path&apos;)\n\t.attr(&apos;d&apos;, line);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/5df095dd1604b08541ac6bd62adce3a0" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/5df095dd1604b08541ac6bd62adce3a0?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=5df095dd1604b08541ac6bd62adce3a0" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<blockquote>
+  <p>The functions passed into the <code class="language-plaintext highlighter-rouge">.x</code> and <code class="language-plaintext highlighter-rouge">.y</code> methods (and other similar methods) are known as <strong>accessor functions</strong>.</p>
+</blockquote>
+
+<h4 id="defined">.defined()</h4>
+
+<p>You can configure the behaviour when there’s missing data. Suppose your data has a gap in it:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+  <span class="kc">null</span><span class="p">,</span>
+  <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">80</span><span class="p">]</span>
+<span class="p">];</span></code></pre></figure>
+
+<p>the line generator will raise an error.</p>
+
+<p>To overcome this you can use the <code class="language-plaintext highlighter-rouge">.defined</code> method. You pass in a function that returns <code class="language-plaintext highlighter-rouge">true</code> if the data is well defined. If the function returns <code class="language-plaintext highlighter-rouge">false</code> the line generator will skip over it:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">lineGenerator</span>
+  <span class="p">.</span><span class="nx">defined</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span> <span class="o">!==</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p>Now when you call <code class="language-plaintext highlighter-rouge">lineGenerator</code> it leaves a gap in the line:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/line-defined/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/line-defined/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;110\&quot;&gt;\n  \t&lt;path&gt;&lt;/path&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: none;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;\nvar lineGenerator = d3.line()\n\t.defined(function(d) {\n\t\treturn d !== null;\n\t});\n\nvar points = [\n\t[0, 80],\n\t[100, 100],\n\tnull,\n\t[300, 50],\n\t[400, 40],\n\t[500, 80]\n];\n\nvar pathData = lineGenerator(points);\n\n// Create a path element and set its d attribute\nd3.select(&apos;path&apos;)\n\t.attr(&apos;d&apos;, pathData);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/93903fe3ff9d31b7bbdd3f6b443aa8f6" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/93903fe3ff9d31b7bbdd3f6b443aa8f6?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=93903fe3ff9d31b7bbdd3f6b443aa8f6" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="curve">.curve()</h4>
+
+<p>You can configure how the points are interpolated. For example you can interpolate each data point with a B-spline:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">lineGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">line</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">curve</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">curveCardinal</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/line-curve/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/line-curve/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;110\&quot;&gt;\n  \t&lt;path&gt;&lt;/path&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: none;\n\tstroke: #999;\n}\ncircle {\n\tfill: none;\n\tstroke: #aaa;\n}\n&quot;,&quot;js&quot;:&quot;\nvar lineGenerator = d3.line()\n\t.curve(d3.curveCardinal);\n\nvar points = [\n\t[0, 80],\n\t[100, 100],\n\t[200, 30],\n\t[300, 50],\n\t[400, 40],\n\t[500, 80]\n];\n\nvar pathData = lineGenerator(points);\n\nd3.select(&apos;path&apos;)\n\t.attr(&apos;d&apos;, pathData);\n\n// Also draw points for reference\nd3.select(&apos;svg&apos;)\n\t.selectAll(&apos;circle&apos;)\n\t.data(points)\n\t.join(&apos;circle&apos;)\n\t.attr(&apos;cx&apos;, function(d) {\n\t\treturn d[0];\n\t})\n\t.attr(&apos;cy&apos;, function(d) {\n\t\treturn d[1];\n\t})\n\t.attr(&apos;r&apos;, 3);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/64be9fc39a92ef074034e9a8fb29dcce" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/64be9fc39a92ef074034e9a8fb29dcce?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=64be9fc39a92ef074034e9a8fb29dcce" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>Although there’s a multitude of different curve types available they can be divided into two camps: those which pass through the points (<code class="language-plaintext highlighter-rouge">curveLinear</code>, <code class="language-plaintext highlighter-rouge">curveCardinal</code>, <code class="language-plaintext highlighter-rouge">curveCatmullRom</code>, <code class="language-plaintext highlighter-rouge">curveMonotone</code>, <code class="language-plaintext highlighter-rouge">curveNatural</code> and <code class="language-plaintext highlighter-rouge">curveStep</code>) and those that don’t (<code class="language-plaintext highlighter-rouge">curveBasis</code> and <code class="language-plaintext highlighter-rouge">curveBundle</code>).</p>
+
+<p>See the <a href="/examples-merged/shapes/curve-explorer/" target="_blank">curve explorer</a> for more information.</p>
+
+<h4 id="rendering-to-canvas">Rendering to canvas</h4>
+
+<p>By default the shape generators output SVG path data. However they can be configured to draw to a canvas element using the <code class="language-plaintext highlighter-rouge">.context()</code> function:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">canvas</span><span class="dl">'</span><span class="p">).</span><span class="nx">node</span><span class="p">().</span><span class="nx">getContext</span><span class="p">(</span><span class="dl">'</span><span class="s1">2d</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">lineGenerator</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="nx">context</span><span class="p">);</span>
+
+<span class="nx">context</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">#999</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">context</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+<span class="nx">lineGenerator</span><span class="p">(</span><span class="nx">points</span><span class="p">);</span>
+<span class="nx">context</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span></code></pre></figure>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/90851f3bd602f17a7f32691819e2ed2e" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/90851f3bd602f17a7f32691819e2ed2e?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=90851f3bd602f17a7f32691819e2ed2e" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="radial-line">Radial line</h4>
+
+<p>The radial line generator is similar to the line generator but the points are transformed by <strong>angle</strong> (working clockwise from 12 o’clock) and <strong>radius</strong>, rather than <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">radialLineGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">radialLine</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">80</span><span class="p">]</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">pathData</span> <span class="o">=</span> <span class="nx">radialLineGenerator</span><span class="p">(</span><span class="nx">points</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/radial-line/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/radial-line/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;200\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(100,100)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: none;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;\nvar radialLineGenerator = d3.radialLine();\n\nvar points = [\n\t[0, 80],\n\t[Math.PI * 0.25, 80],\n\t[Math.PI * 0.5, 30],\n\t[Math.PI * 0.75, 80],\n\t[Math.PI, 80],\n\t[Math.PI * 1.25, 80],\n\t[Math.PI * 1.5, 80],\n\t[Math.PI * 1.75, 80],\n\t[Math.PI * 2, 80]\n];\n\nvar radialLine = radialLineGenerator(points);\n\nd3.select(&apos;g&apos;)\n\t.append(&apos;path&apos;)\n\t.attr(&apos;d&apos;, radialLine);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/39d798286a4bf92cee446add65290d70" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/39d798286a4bf92cee446add65290d70?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=39d798286a4bf92cee446add65290d70" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>The <code class="language-plaintext highlighter-rouge">radialLine</code> generator also has methods <code class="language-plaintext highlighter-rouge">.angle</code> and <code class="language-plaintext highlighter-rouge">.radius</code> into which you can pass accessor functions. These are handy if you’ve an array of objects:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">a</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">r</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">a</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">,</span> <span class="na">r</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">a</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="na">r</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">a</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.75</span><span class="p">,</span> <span class="na">r</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">];</span>
+
+<span class="nx">radialLineGenerator</span>
+  <span class="p">.</span><span class="nx">angle</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">a</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">radius</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span>
+  <span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">pathData</span> <span class="o">=</span> <span class="nx">radialLineGenerator</span><span class="p">(</span><span class="nx">points</span><span class="p">);</span></code></pre></figure>
+
+<h3 id="area-generator">Area generator</h3>
+
+<p>The area generator outputs path data that defines an area between two lines. By default it generates the area between <code class="language-plaintext highlighter-rouge">y=0</code> and a multi-segment line defined by an array of points:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">areaGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">area</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">80</span><span class="p">]</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">pathData</span> <span class="o">=</span> <span class="nx">areaGenerator</span><span class="p">(</span><span class="nx">points</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/area/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/area/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;100\&quot;&gt;\n  \t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;\nvar areaGenerator = d3.area();\nvar points = [\n\t[0, 80],\n\t[100, 100],\n\t[200, 30],\n\t[300, 50],\n\t[400, 40],\n\t[500, 80]\n];\n\nvar area = areaGenerator(points);\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.append(&apos;path&apos;)\n\t.attr(&apos;d&apos;, area);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/a87bb6104d85931611e2ec9bacf5ea3a" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/a87bb6104d85931611e2ec9bacf5ea3a?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=a87bb6104d85931611e2ec9bacf5ea3a" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>You can configure the baseline using the <code class="language-plaintext highlighter-rouge">.y0</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">areaGenerator</span><span class="p">.</span><span class="nx">y0</span><span class="p">(</span><span class="mi">150</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/area-baseline/" marginwidth="0" marginheight="0" style="width: 100%; height: 160px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/area-baseline/" marginwidth="0" marginheight="0" style="width: 100%; height: 160px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;150\&quot;&gt;\n  \t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;\nvar areaGenerator = d3.area().y0(150);\nvar points = [\n\t[0, 80],\n\t[100, 100],\n\t[200, 30],\n\t[300, 50],\n\t[400, 40],\n\t[500, 80]\n];\n\nvar area = areaGenerator(points);\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.append(&apos;path&apos;)\n\t.attr(&apos;d&apos;, area);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/1b232d99622717cc02794ffb3ff66ee8" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/1b232d99622717cc02794ffb3ff66ee8?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=1b232d99622717cc02794ffb3ff66ee8" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>You can also pass accessor functions into the <code class="language-plaintext highlighter-rouge">.y0</code> and <code class="language-plaintext highlighter-rouge">.y1</code> methods:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">yScale</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scaleLinear</span><span class="p">().</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]).</span><span class="nx">range</span><span class="p">([</span><span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">low</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">high</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">x</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="na">low</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="na">high</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">x</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="na">low</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="na">high</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">x</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span> <span class="na">low</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="na">high</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">x</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="na">low</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="na">high</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">x</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="na">low</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="na">high</span><span class="p">:</span> <span class="mi">80</span><span class="p">}</span>
+<span class="p">];</span>
+
+<span class="nx">areaGenerator</span>
+  <span class="p">.</span><span class="nx">x</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">y0</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">yScale</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">low</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">y1</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">yScale</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">high</span><span class="p">);</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/area-y0-and-y1-accessors/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/area-y0-and-y1-accessors/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;200\&quot;&gt;\n  \t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;\nvar yScale = d3.scaleLinear().domain([0, 100]).range([200, 0]);\n\nvar points = [\n\t{x: 0, low: 30, high: 80},\n\t{x: 100, low: 80, high: 100},\n\t{x: 200, low: 20, high: 30},\n\t{x: 300, low: 20, high: 50},\n\t{x: 400, low: 10, high: 40},\n\t{x: 500, low: 50, high: 80}\n];\n\nvar areaGenerator = d3.area()\n\t.x(function(d) {\n\t\treturn d.x;\n\t})\n\t.y0(function(d) {\n\t\treturn yScale(d.low);\n\t})\n\t.y1(function(d) {\n\t\treturn yScale(d.high);\n\t});\n\nvar area = areaGenerator(points);\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.append(&apos;path&apos;)\n\t.attr(&apos;d&apos;, area);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/f238d652d30f3fa2b8deda39e1a1eee4" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/f238d652d30f3fa2b8deda39e1a1eee4?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=f238d652d30f3fa2b8deda39e1a1eee4" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<blockquote>
+  <p>Typically <code class="language-plaintext highlighter-rouge">.y0</code> defines the baseline and <code class="language-plaintext highlighter-rouge">.y1</code> the top line.</p>
+</blockquote>
+
+<p>As with the line generator you can specify the way in which the points are interpolated using <code class="language-plaintext highlighter-rouge">.curve()</code>, handle missing data using <code class="language-plaintext highlighter-rouge">.defined()</code> and render to canvas using <code class="language-plaintext highlighter-rouge">.context()</code>.</p>
+
+<h4 id="radial-area">Radial area</h4>
+
+<p>The radial area generator is similar to the area generator but the points are transformed by <strong>angle</strong> (working clockwise from 12 o’clock) and <strong>radius</strong>, rather than <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">70</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">0.75</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">70</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">1.25</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">70</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mf">1.75</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">70</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">angle</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="na">r0</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">r1</span><span class="p">:</span> <span class="mi">80</span><span class="p">}</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">radialAreaGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">radialArea</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">angle</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">angle</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">innerRadius</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r0</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">outerRadius</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r1</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/radial-area/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/radial-area/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;200\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(100,100)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: #ddd;\n}\n&quot;,&quot;js&quot;:&quot;\nvar radialAreaGenerator = d3.radialArea()\n\t.angle(function(d) {\n\t\treturn d.angle;\n\t})\n\t.innerRadius(function(d) {\n\t\treturn d.r0;\n\t})\n\t.outerRadius(function(d) {\n\t\treturn d.r1;\n\t});\n\nvar points = [\n\t{angle: 0, r0: 20, r1: 80},\n\t{angle: Math.PI * 0.25, r0: 20, r1: 40},\n\t{angle: Math.PI * 0.5, r0: 20, r1: 80},\n\t{angle: Math.PI * 0.75, r0: 20, r1: 40},\n\t{angle: Math.PI, r0: 20, r1: 80},\n\t{angle: Math.PI * 1.25, r0: 20, r1: 40},\n\t{angle: Math.PI * 1.5, r0: 20, r1: 80},\n\t{angle: Math.PI * 1.75, r0: 20, r1: 40},\n\t{angle: Math.PI * 2, r0: 20, r1: 80}\n];\n\nvar pathData = radialAreaGenerator(points);\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.append(&apos;path&apos;)\n\t.attr(&apos;d&apos;, pathData);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/7bb7f2e389d0bf2ff1a622c4c7833a80" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/7bb7f2e389d0bf2ff1a622c4c7833a80?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=7bb7f2e389d0bf2ff1a622c4c7833a80" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="stack-generator">Stack generator</h3>
+
+<p>The stack generator takes an array of objects and generates an array for each object property. Each array contains <strong>lower and upper values</strong> for each data point. The lower and upper values are computed so that each series is stacked on top of the previous series.</p>
+
+<p>In this example we’ve an array of objects. We create a stack generator using <code class="language-plaintext highlighter-rouge">d3.stack</code>. We use its <code class="language-plaintext highlighter-rouge">.keys</code> method to pass in the property keys which we’d like to stack. In this case we’re stacking <code class="language-plaintext highlighter-rouge">apricots</code>, <code class="language-plaintext highlighter-rouge">blueberries</code> and <code class="language-plaintext highlighter-rouge">cherries</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">day</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Mon</span><span class="dl">'</span><span class="p">,</span> <span class="na">apricots</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span> <span class="na">blueberries</span><span class="p">:</span> <span class="mi">180</span><span class="p">,</span> <span class="na">cherries</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">day</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Tue</span><span class="dl">'</span><span class="p">,</span> <span class="na">apricots</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>  <span class="na">blueberries</span><span class="p">:</span> <span class="mi">185</span><span class="p">,</span> <span class="na">cherries</span><span class="p">:</span> <span class="mi">105</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">day</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Wed</span><span class="dl">'</span><span class="p">,</span> <span class="na">apricots</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="na">blueberries</span><span class="p">:</span> <span class="mi">215</span><span class="p">,</span> <span class="na">cherries</span><span class="p">:</span> <span class="mi">110</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">day</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Thu</span><span class="dl">'</span><span class="p">,</span> <span class="na">apricots</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>  <span class="na">blueberries</span><span class="p">:</span> <span class="mi">230</span><span class="p">,</span> <span class="na">cherries</span><span class="p">:</span> <span class="mi">105</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">day</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Fri</span><span class="dl">'</span><span class="p">,</span> <span class="na">apricots</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span> <span class="na">blueberries</span><span class="p">:</span> <span class="mi">240</span><span class="p">,</span> <span class="na">cherries</span><span class="p">:</span> <span class="mi">105</span><span class="p">}</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">stack</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">stack</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">keys</span><span class="p">([</span><span class="dl">'</span><span class="s1">apricots</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">blueberries</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">cherries</span><span class="dl">'</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">stackedSeries</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="c1">// stackedSeries = [</span>
+<span class="c1">//   [ [0, 120],   [0, 60],   [0, 100],    [0, 80],    [0, 120] ],   // Apricots</span>
+<span class="c1">//   [ [120, 300], [60, 245], [100, 315],  [80, 310],  [120, 360] ], // Blueberries</span>
+<span class="c1">//   [ [300, 400], [245, 350], [315, 425], [310, 415], [360, 465] ]  // Cherries</span>
+<span class="c1">// ]</span></code></pre></figure>
+
+<p>The data output by the stack generator can be used however you like, but typically it’ll be used to produce stacked bar charts:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/stack-bar/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/stack-bar/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;100\&quot;&gt;\n  \t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n&quot;,&quot;js&quot;:&quot;var colors = [&apos;#FBB65B&apos;, &apos;#513551&apos;, &apos;#de3163&apos;];\n\nvar data = [\n  {day: &apos;Mon&apos;, apricots: 120, blueberries: 180, cherries: 100},\n  {day: &apos;Tue&apos;, apricots: 60, blueberries: 185, cherries: 105},\n  {day: &apos;Wed&apos;, apricots: 100, blueberries: 215, cherries: 110},\n  {day: &apos;Thu&apos;, apricots: 80, blueberries: 230, cherries: 105},\n  {day: &apos;Fri&apos;, apricots: 120, blueberries: 240, cherries: 105}\n];\n\nvar stack = d3.stack()\n  .keys([&apos;apricots&apos;, &apos;blueberries&apos;, &apos;cherries&apos;]);\n\nvar stackedSeries = stack(data);\n\n// Create a g element for each series\nvar g = d3.select(&apos;g&apos;)\n\t.selectAll(&apos;g.series&apos;)\n\t.data(stackedSeries)\n\t.enter()\n\t.append(&apos;g&apos;)\n\t.classed(&apos;series&apos;, true)\n\t.style(&apos;fill&apos;, function(d, i) {\n\t\treturn colors[i];\n\t});\n\n// For each series create a rect element for each day\ng.selectAll(&apos;rect&apos;)\n\t.data(function(d) {\n\t\treturn d;\n\t})\n\t.join(&apos;rect&apos;)\n\t.attr(&apos;width&apos;, function(d) {\n\t\treturn d[1] - d[0];\n\t})\n\t.attr(&apos;x&apos;, function(d) {\n\t\treturn d[0];\n\t})\n\t.attr(&apos;y&apos;, function(d, i) {\n\t\treturn i * 20;\n\t})\n\t.attr(&apos;height&apos;, 19);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/30a7091e97b03eeba2a6a3ca1067ca92" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/30a7091e97b03eeba2a6a3ca1067ca92?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=30a7091e97b03eeba2a6a3ca1067ca92" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>or when used in conjunction with the area generator, stacked line charts:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/stack/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/stack/" marginwidth="0" marginheight="0" style="width: 100%; height: 210px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;200\&quot;&gt;\n  \t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n&quot;,&quot;js&quot;:&quot;\nvar yScale = d3.scaleLinear().domain([0, 600]).range([200, 0]);\n\nvar areaGenerator = d3.area()\n\t.x(function(d, i) {\n\t\treturn i * 100;\n\t})\n\t.y0(function(d) {\n\t\treturn yScale(d[0]);\n\t})\n\t.y1(function(d) {\n\t\treturn yScale(d[1]);\n\t});\n\nvar colors = [&apos;#FBB65B&apos;, &apos;#513551&apos;, &apos;#de3163&apos;];\n\nvar data = [\n\t{day: &apos;Mon&apos;, apricots: 120, blueberries: 180, cherries: 100},\n\t{day: &apos;Tue&apos;, apricots: 60, blueberries: 185, cherries: 105},\n\t{day: &apos;Wed&apos;, apricots: 100, blueberries: 215, cherries: 110},\n\t{day: &apos;Thu&apos;, apricots: 80, blueberries: 230, cherries: 105},\n\t{day: &apos;Fri&apos;, apricots: 120, blueberries: 240, cherries: 105}\n];\n\nvar stack = d3.stack()\n\t.keys([&apos;apricots&apos;, &apos;blueberries&apos;, &apos;cherries&apos;]);\n\nvar stackedSeries = stack(data);\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(stackedSeries)\n\t.join(&apos;path&apos;)\n\t.style(&apos;fill&apos;, function(d, i) {\n\t\treturn colors[i];\n\t})\n\t.attr(&apos;d&apos;, areaGenerator)\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/e4efd402b4d9fdb2088ccdf3135745c3" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/e4efd402b4d9fdb2088ccdf3135745c3?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=e4efd402b4d9fdb2088ccdf3135745c3" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="order">.order()</h4>
+
+<p>The order of the stacked series can be configured using <code class="language-plaintext highlighter-rouge">.order()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">stack</span><span class="p">.</span><span class="nx">order</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">stackOrderInsideOut</span><span class="p">);</span></code></pre></figure>
+
+<p>Each series is summed and then sorted according to the chosen order. The possible orders are:</p>
+
+<table class="table table-bordered">
+  <tr><td>stackOrderNone</td><td>(Default) Series in same order as specified in .keys()</td></tr>
+  <tr><td>stackOrderAscending</td><td>Smallest series at the bottom</td></tr>
+  <tr><td>stackOrderDescending</td><td>Largest series at the bottom</td></tr>
+  <tr><td>stackOrderInsideOut</td><td>Largest series in the middle</td></tr>
+  <tr><td>stackOrderReverse</td><td>Reverse of stackOrderNone</td></tr>
+</table>
+
+<h4 id="offset">.offset()</h4>
+
+<p>By default the stacked series have a baseline of zero. However you can configure the offset of the stack generator to achieve different effects. For example you can normalise the stacked series so that they fill the same height:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">stack</span><span class="p">.</span><span class="nx">offset</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">stackOffsetExpand</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/stack-offset-expand/" marginwidth="0" marginheight="0" style="width: 100%; height: 160px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/stack-offset-expand/" marginwidth="0" marginheight="0" style="width: 100%; height: 160px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;150\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(20, 0)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var yScale = d3.scaleLinear().domain([0, 1]).range([150, 0]);\n\nvar areaGenerator = d3.area()\n\t.x(function(d, i) {\n\t\treturn i * 100;\n\t})\n\t.y0(function(d) {\n\t\treturn yScale(d[0]);\n\t})\n\t.y1(function(d) {\n\t\treturn yScale(d[1]);\n\t});\n\nvar colors = [&apos;#FBB65B&apos;, &apos;#513551&apos;, &apos;#de3163&apos;];\n\nvar data = [\n\t{day: &apos;Mon&apos;, apricots: 120, blueberries: 180, cherries: 100},\n\t{day: &apos;Tue&apos;, apricots: 60, blueberries: 185, cherries: 105},\n\t{day: &apos;Wed&apos;, apricots: 100, blueberries: 215, cherries: 110},\n\t{day: &apos;Thu&apos;, apricots: 80, blueberries: 230, cherries: 105},\n\t{day: &apos;Fri&apos;, apricots: 120, blueberries: 240, cherries: 105}\n];\n\nvar stack = d3.stack()\n\t.keys([&apos;apricots&apos;, &apos;blueberries&apos;, &apos;cherries&apos;])\n\t.offset(d3.stackOffsetExpand);\n\nvar stackedSeries = stack(data);\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(stackedSeries)\n\t.join(&apos;path&apos;)\n\t.style(&apos;fill&apos;, function(d, i) {\n\t\treturn colors[i];\n\t})\n\t.attr(&apos;d&apos;, areaGenerator)\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/aef57694ac8f711ab2e8a5c96a349ea1" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/aef57694ac8f711ab2e8a5c96a349ea1?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=aef57694ac8f711ab2e8a5c96a349ea1" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>The available offsets are:</p>
+
+<table class="table table-bordered">
+  <tr><td>stackOffsetNone</td><td>(Default) No offset</td></tr>
+  <tr><td>stackOffsetExpand</td><td>Sum of series is normalised (to a value of 1)</td></tr>
+  <tr><td>stackOffsetSilhouette</td><td>Center of stacks is at y=0</td></tr>
+  <tr><td>stackOffsetWiggle</td><td>Wiggle of layers is minimised (typically used for streamgraphs)</td></tr>
+</table>
+
+<p>Here’s a streamgraph example using <code class="language-plaintext highlighter-rouge">stackOffsetWiggle</code>:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/stack-stream/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/stack-stream/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;170\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(20, -50)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var yScale = d3.scaleLinear().domain([0, 800]).range([200, 0]);\n\nvar areaGenerator = d3.area()\n\t.x(function(d, i) {\n\t\treturn i * 50;\n\t})\n\t.y0(function(d) {\n\t\treturn yScale(d[0]);\n\t})\n\t.y1(function(d) {\n\t\treturn yScale(d[1]);\n\t})\n\t.curve(d3.curveCatmullRom);\n\nvar colors = [&apos;#FBB65B&apos;, &apos;#FBCF3B&apos;, &apos;#de3163&apos;, &apos;#4A79A4&apos;];\n\nvar data = [\n\t{day: 1, apricots: 100, bananas: 140, cherries: 105, damsons: 80},\n\t{day: 2, apricots: 110, bananas: 150, cherries: 105, damsons: 40},\n\t{day: 3, apricots: 130, bananas: 160, cherries: 115, damsons: 50},\n\t{day: 4, apricots: 110, bananas: 200, cherries: 110, damsons: 90},\n\t{day: 5, apricots: 100, bananas: 220, cherries: 105, damsons: 120},\n\t{day: 6, apricots: 120, bananas: 240, cherries: 105, damsons: 150},\n\t{day: 7, apricots: 80, bananas: 230, cherries: 105, damsons: 150},\n\t{day: 8, apricots: 100, bananas: 215, cherries: 110, damsons: 100},\n\t{day: 9, apricots: 60, bananas: 185, cherries: 105, damsons: 150},\n\t{day: 10, apricots: 120, bananas: 180, cherries: 130, damsons: 150}\n];\n\nvar stack = d3.stack()\n\t.keys([&apos;apricots&apos;, &apos;bananas&apos;, &apos;cherries&apos;, &apos;damsons&apos;])\n\t.order(d3.stackOrderInsideOut)\n\t.offset(d3.stackOffsetWiggle);\n\nvar stackedSeries = stack(data);\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(stackedSeries)\n\t.join(&apos;path&apos;)\n\t.style(&apos;fill&apos;, function(d, i) {\n\t\treturn colors[i];\n\t})\n\t.attr(&apos;d&apos;, areaGenerator)\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/3c7cb147aab8cf0cdbfb83b4ee7a847c" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/3c7cb147aab8cf0cdbfb83b4ee7a847c?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=3c7cb147aab8cf0cdbfb83b4ee7a847c" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="arc-generator">Arc generator</h3>
+
+<p>Arc generators produce path data from angle and radius values. An arc generator is created using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">arcGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">arc</span><span class="p">();</span></code></pre></figure>
+
+<p>It can then be passed an object containing <code class="language-plaintext highlighter-rouge">startAngle</code>, <code class="language-plaintext highlighter-rouge">endAngle</code>, <code class="language-plaintext highlighter-rouge">innerRadius</code> and <code class="language-plaintext highlighter-rouge">outerRadius</code> properties to produce the path data:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pathData</span> <span class="o">=</span> <span class="nx">arcGenerator</span><span class="p">({</span>
+  <span class="na">startAngle</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="na">endAngle</span><span class="p">:</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">,</span>
+  <span class="na">innerRadius</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+  <span class="na">outerRadius</span><span class="p">:</span> <span class="mi">100</span>
+<span class="p">});</span>
+
+<span class="c1">// pathData is "M6.123233995736766e-15,-100A100,100,0,0,1,70.71067811865476,-70.710678</span>
+<span class="c1">// 11865474L35.35533905932738,-35.35533905932737A50,50,0,0,0,3.061616997868383e-15,-50Z"</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/arc/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/arc/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;110\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 110)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: orange;\n}\n&quot;,&quot;js&quot;:&quot;\n// Create an arc generator with configuration\nvar arcGenerator = d3.arc();\n\n// Generate the path string\nvar pathData = arcGenerator({\n  startAngle: 0,\n  endAngle: 0.25 * Math.PI,\n  innerRadius: 50,\n  outerRadius: 100\n});\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.append(&apos;path&apos;)\n\t.attr(&apos;d&apos;, pathData);\n  &quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/3bb2dc908c090e8d2405257caadb20fa" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/3bb2dc908c090e8d2405257caadb20fa?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=3bb2dc908c090e8d2405257caadb20fa" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">startAngle</code> and <code class="language-plaintext highlighter-rouge">endAngle</code> are measured clockwise from the 12 o’clock in radians.</p>
+</blockquote>
+
+<h4 id="configuration">Configuration</h4>
+
+<p>You can configure <code class="language-plaintext highlighter-rouge">innerRadius</code>, <code class="language-plaintext highlighter-rouge">outerRadius</code>, <code class="language-plaintext highlighter-rouge">startAngle</code>, <code class="language-plaintext highlighter-rouge">endAngle</code> so that you don’t have to pass them in each time:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">arcGenerator</span>
+  <span class="p">.</span><span class="nx">innerRadius</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">outerRadius</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+
+<span class="nx">pathData</span> <span class="o">=</span> <span class="nx">arcGenerator</span><span class="p">({</span>
+  <span class="na">startAngle</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="na">endAngle</span><span class="p">:</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span>
+<span class="p">});</span>
+
+<span class="c1">// pathData is "M6.123233995736766e-15,-100A100,100,0,0,1,70.71067811865476,-70.71067811</span>
+<span class="c1">// 865474L14.142135623730951,-14.14213562373095A20,20,0,0,0,1.2246467991473533e-15,-20Z"</span></code></pre></figure>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/b52f9ab1dde3a1953367395d10483be4" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/b52f9ab1dde3a1953367395d10483be4?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=b52f9ab1dde3a1953367395d10483be4" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>You can also configure corner radius (<code class="language-plaintext highlighter-rouge">cornerRadius</code>) and the padding between arc segments (<code class="language-plaintext highlighter-rouge">padAngle</code> and <code class="language-plaintext highlighter-rouge">padRadius</code>):</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">arcGenerator</span>
+  <span class="p">.</span><span class="nx">padAngle</span><span class="p">(.</span><span class="mi">02</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">padRadius</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">cornerRadius</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/arc-padding-and-radius/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/arc-padding-and-radius/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;220\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 110)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: orange;\n}\n&quot;,&quot;js&quot;:&quot;var arcGenerator = d3.arc()\n\t.innerRadius(20)\n\t.outerRadius(100)\n\t.padAngle(.02)\n\t.padRadius(100)\n\t.cornerRadius(4);\n\nvar arcData = [\n\t{startAngle: 0, endAngle: 0.2},\n\t{startAngle: 0.2, endAngle: 0.6},\n\t{startAngle: 0.6, endAngle: 1.4},\n\t{startAngle: 1.4, endAngle: 3},\n\t{startAngle: 3, endAngle: 2* Math.PI}\n];\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(arcData)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/ef3c33c21668db4217bf538cff522d5b" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/ef3c33c21668db4217bf538cff522d5b?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=ef3c33c21668db4217bf538cff522d5b" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>Arc padding takes two parameters <code class="language-plaintext highlighter-rouge">padAngle</code> and <code class="language-plaintext highlighter-rouge">padRadius</code> which when multiplied together define the distance between adjacent segments. Thus in the example above, the padding distance is <code class="language-plaintext highlighter-rouge">0.02 * 100 = 2</code>. Note that the padding is calculated to maintain (where possible) parallel segment boundaries.</p>
+
+<blockquote>You might ask why there isn't a single parameter padDistance for defining the padding distance. It's split into two parameters so that the pie generator (see later) doesn't need to concern itself with radius.</blockquote>
+
+<h4 id="accessor-functions">Accessor functions</h4>
+
+<p>You can define accessor functions for <code class="language-plaintext highlighter-rouge">startAngle</code>, <code class="language-plaintext highlighter-rouge">endAngle</code>, <code class="language-plaintext highlighter-rouge">innerRadius</code> and <code class="language-plaintext highlighter-rouge">outerRadius</code>. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">arcGenerator</span>
+  <span class="p">.</span><span class="nx">startAngle</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">startAngleOfMyArc</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">endAngle</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">endAngleOfMyArc</span><span class="p">;</span>
+  <span class="p">});</span>
+
+<span class="nx">arcGenerator</span><span class="p">({</span>
+  <span class="na">startAngleOfMyArc</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="na">endAngleOfMyArc</span><span class="p">:</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span>
+<span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/arc-accessor/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/arc-accessor/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;220\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 110)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: orange;\n\tstroke: white;\n}\n&quot;,&quot;js&quot;:&quot;// Create an arc generator with configuration and accessor functions\nvar arcGenerator = d3.arc()\n\t.innerRadius(20)\n\t.outerRadius(100)\n\t.startAngle(function(d) {\t\n\t\treturn d.startAngleOfMyArc;\n\t})\n\t.endAngle(function(d) {\n\t\treturn d.endAngleOfMyArc;\n\t});\n\nvar arcData = [\n\t{startAngleOfMyArc: 0, endAngleOfMyArc: 0.2},\n\t{startAngleOfMyArc: 0.2, endAngleOfMyArc: 0.6},\n\t{startAngleOfMyArc: 0.6, endAngleOfMyArc: 1.4},\n\t{startAngleOfMyArc: 1.4, endAngleOfMyArc: 3},\n\t{startAngleOfMyArc: 3, endAngleOfMyArc: 2* Math.PI}\n];\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(arcData)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/3d912bbaaebcf01a05b75d088a1c9976" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/3d912bbaaebcf01a05b75d088a1c9976?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=3d912bbaaebcf01a05b75d088a1c9976" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h4 id="centroid">Centroid</h4>
+
+<p>It’s sometimes useful to calculate the centroid of an arc, such as when positioning labels, and D3 has a function <code class="language-plaintext highlighter-rouge">.centroid()</code> for doing this:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">arcGenerator</span><span class="p">.</span><span class="nx">centroid</span><span class="p">({</span>
+  <span class="na">startAngle</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="na">endAngle</span><span class="p">:</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span>
+<span class="p">});</span>
+<span class="c1">// returns [22.96100594190539, -55.43277195067721]</span></code></pre></figure>
+
+<p>Here’s an example where <code class="language-plaintext highlighter-rouge">.centroid()</code> is used to compute the label positions:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/arc-centroid/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/arc-centroid/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;220\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 110)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 12px;\n  font-weight: bold;\n  fill: white;\n  text-anchor: middle;\n}\npath {\n\tfill: orange;\n\tstroke: white;\n}\n&quot;,&quot;js&quot;:&quot;// Create an arc generator with configuration\nvar arcGenerator = d3.arc()\n\t.innerRadius(20)\n\t.outerRadius(100);\n\nvar arcData = [\n\t{label: &apos;A&apos;, startAngle: 0, endAngle: 0.2},\n\t{label: &apos;B&apos;, startAngle: 0.2, endAngle: 0.6},\n\t{label: &apos;C&apos;, startAngle: 0.6, endAngle: 1.4},\n\t{label: &apos;D&apos;, startAngle: 1.4, endAngle: 3},\n\t{label: &apos;E&apos;, startAngle: 3, endAngle: 2* Math.PI}\n];\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(arcData)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n\n// Add labels, using .centroid() to position\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;text&apos;)\n\t.data(arcData)\n\t.join(&apos;text&apos;)\n\t.each(function(d) {\n\t\tvar centroid = arcGenerator.centroid(d);\n\t\td3.select(this)\n\t\t\t.attr(&apos;x&apos;, centroid[0])\n\t\t\t.attr(&apos;y&apos;, centroid[1])\n\t\t\t.attr(&apos;dy&apos;, &apos;0.33em&apos;)\n\t\t\t.text(d.label);\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/c9fd848b9410cc543a437b34c266ac64" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/c9fd848b9410cc543a437b34c266ac64?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=c9fd848b9410cc543a437b34c266ac64" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="pie-generator">Pie generator</h3>
+
+<p>The pie generator goes hand in hand with the arc generator. Given an array of data, the pie generator will output an array of objects containing the original data augmented by <strong>start</strong> and <strong>end angles</strong>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pieGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">pie</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">80</span><span class="p">];</span>
+<span class="kd">var</span> <span class="nx">arcData</span> <span class="o">=</span> <span class="nx">pieGenerator</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="c1">// arcData is an array of objects: [</span>
+<span class="c1">//   {</span>
+<span class="c1">//     data: 10,</span>
+<span class="c1">//     endAngle: 6.28...,</span>
+<span class="c1">//     index: 5,</span>
+<span class="c1">//     padAngle: 0,</span>
+<span class="c1">//     startAngle: 6.02...,</span>
+<span class="c1">//     value: 10</span>
+<span class="c1">//   },</span>
+<span class="c1">//   ...</span>
+<span class="c1">// ]</span></code></pre></figure>
+
+<p>You can then use an arc generator to create the path strings:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">arcGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">arc</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">innerRadius</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">outerRadius</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">arcData</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">enter</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">d</span><span class="dl">'</span><span class="p">,</span> <span class="nx">arcGenerator</span><span class="p">);</span></code></pre></figure>
+
+<p>Notice that the output of <code class="language-plaintext highlighter-rouge">pieGenerator</code> contains the properties <code class="language-plaintext highlighter-rouge">startAngle</code> and <code class="language-plaintext highlighter-rouge">endAngle</code>. These are the same properties required by <code class="language-plaintext highlighter-rouge">arcGenerator</code>.</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/pie/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/pie/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;220\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 110)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: orange;\n\tstroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var pieGenerator = d3.pie();\nvar data = [10, 40, 30, 20, 60, 80];\nvar arcData = pieGenerator(data);\n\nvar arcGenerator = d3.arc()\n\t.innerRadius(20)\n\t.outerRadius(100);\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(arcData)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/25efacedfc463eead5e77fb336a90caa" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/25efacedfc463eead5e77fb336a90caa?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=25efacedfc463eead5e77fb336a90caa" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>The pie generator has a number of configuration functions including <code class="language-plaintext highlighter-rouge">.padAngle()</code>, <code class="language-plaintext highlighter-rouge">.startAngle()</code>, <code class="language-plaintext highlighter-rouge">.endAngle()</code> and <code class="language-plaintext highlighter-rouge">.sort()</code>. <code class="language-plaintext highlighter-rouge">.padAngle()</code> specifies an angular padding (in radians) between neighbouring segments.</p>
+
+<p><code class="language-plaintext highlighter-rouge">.startAngle()</code> and <code class="language-plaintext highlighter-rouge">.endAngle()</code> configure the start and end angle of the pie chart. This allows, for example, the creation of semi-circular pie charts:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pieGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">pie</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">startAngle</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">endAngle</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/pie-start-end-angle/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/pie-start-end-angle/" marginwidth="0" marginheight="0" style="width: 100%; height: 120px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;110\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 110)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: orange;\n\tstroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var pieGenerator = d3.pie()\n\t.startAngle(-0.5 * Math.PI)\n\t.endAngle(0.5 * Math.PI);\n\nvar data = [10, 40, 30, 20, 60, 80];\n\n// Create an arc generator with configuration\nvar arcGenerator = d3.arc()\n\t.innerRadius(20)\n\t.outerRadius(100);\n\nvar arcData = pieGenerator(data);\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(arcData)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/5cc68ffe573562772bed1e394b50f7dc" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/5cc68ffe573562772bed1e394b50f7dc?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=5cc68ffe573562772bed1e394b50f7dc" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>By default the segment start and end angles are specified such that the segments are in descending order. However we can change the sort order using <code class="language-plaintext highlighter-rouge">.sort</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pieGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">pie</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">value</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">quantity</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">localeCompare</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+  <span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Apples</span><span class="dl">'</span><span class="p">,</span> <span class="na">quantity</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Bananas</span><span class="dl">'</span><span class="p">,</span> <span class="na">quantity</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Cherries</span><span class="dl">'</span><span class="p">,</span> <span class="na">quantity</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Damsons</span><span class="dl">'</span><span class="p">,</span> <span class="na">quantity</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Elderberries</span><span class="dl">'</span><span class="p">,</span> <span class="na">quantity</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
+<span class="p">];</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/shapes/pie-sort/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/pie-sort/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;220\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(300, 110)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: orange;\n\tstroke: white;\n}\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 12px;\n  font-weight: bold;\n  fill: white;\n  text-anchor: middle;\n}\n&quot;,&quot;js&quot;:&quot;var pieGenerator = d3.pie()\n\t.value(function(d) {return d.quantity;})\n\t.sort(function(a, b) {\n\t\treturn a.name.localeCompare(b.name);\n\t});\n\nvar fruits = [\n\t{name: &apos;Apples&apos;, quantity: 20},\n\t{name: &apos;Bananas&apos;, quantity: 40},\n\t{name: &apos;Cherries&apos;, quantity: 50},\n\t{name: &apos;Damsons&apos;, quantity: 10},\n\t{name: &apos;Elderberries&apos;, quantity: 30},\n];\n\n// Create an arc generator with configuration\nvar arcGenerator = d3.arc()\n\t.innerRadius(20)\n\t.outerRadius(100);\n\nvar arcData = pieGenerator(fruits);\n\n// Create a path element and set its d attribute\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(arcData)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n\n\n// Labels\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;text&apos;)\n\t.data(arcData)\n\t.join(&apos;text&apos;)\n\t.each(function(d) {\n\t\tvar centroid = arcGenerator.centroid(d);\n\t\td3.select(this)\n\t\t\t.attr(&apos;x&apos;, centroid[0])\n\t\t\t.attr(&apos;y&apos;, centroid[1])\n\t\t\t.attr(&apos;dy&apos;, &apos;0.33em&apos;)\n\t\t\t.text(d.data.name);\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/62b1c3bbe89a48f986e334a971e4825f" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/62b1c3bbe89a48f986e334a971e4825f?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=62b1c3bbe89a48f986e334a971e4825f" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="symbols">Symbols</h3>
+
+<p>The symbol generator produces path data for symbols commonly used in data visualisation:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">symbolGenerator</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">symbol</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">type</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">symbolStar</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">size</span><span class="p">(</span><span class="mi">80</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">pathData</span> <span class="o">=</span> <span class="nx">symbolGenerator</span><span class="p">();</span></code></pre></figure>
+
+<p>You can use <code class="language-plaintext highlighter-rouge">pathData</code> to define the <code class="language-plaintext highlighter-rouge">d</code> attribute of a path element:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">d</span><span class="dl">'</span><span class="p">,</span> <span class="nx">pathData</span><span class="p">);</span></code></pre></figure>
+
+<p>Here’s a simple chart using the symbol generator:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/symbol/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/symbol/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;700\&quot; height=\&quot;120\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(20, 10)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n\tfill: #ddd;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;var symbolGenerator = d3.symbol()\n\t.type(d3.symbolStar)\n\t.size(80);\n\nvar points = [\n\t[0, 80],\n\t[100, 100],\n\t[200, 30],\n\t[300, 50],\n\t[400, 40],\n\t[500, 80]\n];\n\nvar pathData = symbolGenerator();\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(points)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;transform&apos;, function(d) {\n\t\treturn &apos;translate(&apos; + d + &apos;)&apos;;\n\t})\n\t.attr(&apos;d&apos;, pathData);\n  \n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/a1fea300b04eaee5abbf58236fe01705" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/a1fea300b04eaee5abbf58236fe01705?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=a1fea300b04eaee5abbf58236fe01705" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>D3 provides a number of symbol types:</p>
+
+<!-- <iframe class="db center" src="/blocks/shapes/symbol-types/" marginwidth="0" marginheight="0" style="width: 100%; height: 80px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/shapes/symbol-types/" marginwidth="0" marginheight="0" style="width: 100%; height: 80px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;70\&quot;&gt;\n  \t&lt;g transform=\&quot;translate(50, 20)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 12px;\n  text-anchor: middle;\n}\npath {\n\tfill: none;\n\tstroke: #999;\n}\n&quot;,&quot;js&quot;:&quot;var symbolGenerator = d3.symbol()\n\t.size(100);\n\nvar symbolTypes = [&apos;symbolCircle&apos;, &apos;symbolCross&apos;, &apos;symbolDiamond&apos;, &apos;symbolSquare&apos;, &apos;symbolStar&apos;, &apos;symbolTriangle&apos;, &apos;symbolWye&apos;];\n\nvar xScale = d3.scaleLinear().domain([0, symbolTypes.length - 1]).range([0, 700]);\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(symbolTypes)\n\t.join(&apos;path&apos;)\n\t.attr(&apos;transform&apos;, function(d, i) {\n\t\treturn &apos;translate(&apos; + xScale(i) + &apos;, 0)&apos;;\n\t})\n\t.attr(&apos;d&apos;, function(d) {\n\t\tsymbolGenerator\n\t\t\t.type(d3[d]);\n\n\t\treturn symbolGenerator();\n\t});\n\nd3.select(&apos;g&apos;)\n\t.selectAll(&apos;text&apos;)\n\t.data(symbolTypes)\n\t.join(&apos;text&apos;)\n\t.attr(&apos;transform&apos;, function(d, i) {\n\t\treturn &apos;translate(&apos; + xScale(i) + &apos;, 40)&apos;;\n\t})\n\t.text(function(d) {\n\t\treturn &apos;d3.&apos; + d;\n\t});\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/bae221df69af953fb06351e1391e89a0" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/bae221df69af953fb06351e1391e89a0?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=bae221df69af953fb06351e1391e89a0" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Transitions | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Transitions" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="D3 transitions let you smoothly animate between different chart states. This article shows how to add transitions to selection updates, how to set transition duration, how to create staggered transitions, how to change the easing function, how to chain transitions and how to create custom tween functions." />
+<meta property="og:description" content="D3 transitions let you smoothly animate between different chart states. This article shows how to add transitions to selection updates, how to set transition duration, how to create staggered transitions, how to change the easing function, how to chain transitions and how to create custom tween functions." />
+<link rel="canonical" href="https://www.d3indepth.com/transitions/" />
+<meta property="og:url" content="https://www.d3indepth.com/transitions/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-19T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Transitions" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-19T00:00:00+01:00","datePublished":"2021-05-19T00:00:00+01:00","description":"D3 transitions let you smoothly animate between different chart states. This article shows how to add transitions to selection updates, how to set transition duration, how to create staggered transitions, how to change the easing function, how to chain transitions and how to create custom tween functions.","headline":"D3 Transitions","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/transitions/"},"url":"https://www.d3indepth.com/transitions/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 underline" href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Transitions</h2>
+
+  <div class="page-content">
+  	<p><em>D3 transitions let you smoothly <strong>animate</strong> between different <strong>chart states</strong>. This article shows how to add transitions to selection updates, how to set transition duration, how to create staggered transitions, how to change the easing function, how to chain transitions and how to create custom tween functions.</em></p>
+
+<p>For example, let’s <a href="/datajoins">join</a> an array of 5 numbers to SVG circles. When the ‘Update data’ button is clicked, the data is randomised and the circles jump to new positions:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/basic-without-transition/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/basic-without-transition/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 40)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>If we add a transition to the circles the circles move smoothly to their new locations:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 40)\n\t\t.transition()\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>Furthermore, <strong>entering circles</strong> (circles that have just been created) and <strong>exiting circles</strong> (circles that are about to be removed) can be transitioned in specific ways. In this example new circles fade in and exiting circles drop down the page:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;150\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tlet numItems = Math.ceil(Math.random() * 10);\n\tfor(let i=0; i&lt;numItems; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(\n\t\t\tfunction(enter) {\n\t\t\t\treturn enter\n\t\t\t\t\t.append(&apos;circle&apos;)\n\t\t\t\t\t.attr(&apos;cy&apos;, 50)\n\t\t\t\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\t\t\t\treturn d;\n\t\t\t\t\t})\n\t\t\t\t\t.attr(&apos;r&apos;, 40)\n\t\t\t\t\t.style(&apos;opacity&apos;, 0);\n\t\t\t},\n\t\t\tfunction(update) {\n\t\t\t\treturn update;\n\t\t\t},\n\t\t\tfunction(exit) {\n\t\t\t\treturn exit\n\t\t\t\t\t.transition()\n\t\t\t\t\t.duration(1000)\n\t\t\t\t\t.attr(&apos;cy&apos;, 500)\n\t\t\t\t\t.remove();\n\t\t\t}\n\t\t)\n\t\t.transition()\n\t\t.duration(1000)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t})\n\t\t.style(&apos;opacity&apos;, 0.75);\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="how-to-create-a-d3-transition">How to create a D3 transition</h2>
+
+<p>Creating a basic transition using D3 is fairly straightforward. Suppose you have the following code which joins an array of random data to <code class="language-plaintext highlighter-rouge">circle</code> elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="kd">function</span> <span class="nx">updateData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">800</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">updateAll</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">updateData</span><span class="p">();</span>
+  <span class="nx">update</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nx">updateAll</span><span class="p">();</span></code></pre></figure>
+
+<blockquote>
+  <p>If you’re not familiar with the above code I suggest reading the <a href="/datajoins">data joins chapter</a>.</p>
+</blockquote>
+
+<p>The <code class="language-plaintext highlighter-rouge">updateAll</code> function is called when a button is clicked:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;button</span> <span class="na">onClick=</span><span class="s">"updateAll();"</span><span class="nt">&gt;</span>Update data<span class="nt">&lt;/button&gt;</span></code></pre></figure>
+
+<p><code class="language-plaintext highlighter-rouge">updateAll</code> calls <code class="language-plaintext highlighter-rouge">updateData</code> which randomises the <code class="language-plaintext highlighter-rouge">data</code> array. It also calls <code class="language-plaintext highlighter-rouge">update</code> which joins <code class="language-plaintext highlighter-rouge">data</code> to <code class="language-plaintext highlighter-rouge">circle</code> elements.</p>
+
+<p>When the button is clicked the circles jump to new locations:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/basic-without-transition/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/basic-without-transition/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 40)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>You can then add a <code class="language-plaintext highlighter-rouge">.transition()</code> call before the <code class="language-plaintext highlighter-rouge">.attr</code> and <code class="language-plaintext highlighter-rouge">.style</code> methods that you wish to transition:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>In this example, the <code class="language-plaintext highlighter-rouge">.transition</code> call is followed by a single <code class="language-plaintext highlighter-rouge">.attr</code> call. This results in the <code class="language-plaintext highlighter-rouge">cx</code> attribute of the circles transitioning into new positions:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/basic/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 40)\n\t\t.transition()\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">.transition</code> method returns a ‘transition selection’. This is basically the same as a normal D3 selection, except the <code class="language-plaintext highlighter-rouge">.attr</code> and <code class="language-plaintext highlighter-rouge">.style</code> methods animate attributes and style. A transition selection has additional methods such as <code class="language-plaintext highlighter-rouge">.tween</code> which we’ll cover later.</p>
+</blockquote>
+
+<p>Once the <code class="language-plaintext highlighter-rouge">.transition</code> method has been called, subsequent calls to <code class="language-plaintext highlighter-rouge">.attr</code> and <code class="language-plaintext highlighter-rouge">.style</code> will animate attributes and style, respectively.</p>
+
+<p>For example, let’s randomise the radius and colour of each circle:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">...</span>
+
+<span class="kd">function</span> <span class="nx">random</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">x</span><span class="p">);}</span>
+
+<span class="kd">function</span> <span class="nx">updateData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+      <span class="na">x</span><span class="p">:</span> <span class="nx">random</span><span class="p">(</span><span class="mi">800</span><span class="p">),</span>
+      <span class="na">r</span><span class="p">:</span> <span class="nx">random</span><span class="p">(</span><span class="mi">40</span><span class="p">),</span>
+      <span class="na">fill</span><span class="p">:</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">rgb</span><span class="p">(</span><span class="nx">random</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="nx">random</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="nx">random</span><span class="p">(</span><span class="mi">255</span><span class="p">))</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>In the update function we update the radii and fills <strong>after</strong> the <code class="language-plaintext highlighter-rouge">.transition</code> call:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">fill</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Now when the data updates, the <strong>position</strong>, <strong>radius</strong> and <strong>colour</strong> of each circle transitions:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/basic-with-radius-and-color/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/basic-with-radius-and-color/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction random(x) {return Math.floor(Math.random() * x);}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push({\n\t\t\tx: random(800),\n\t\t\tr: random(40),\n\t\t\tfill: d3.rgb(random(255), random(255), random(255))\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.transition()\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x;\n\t\t})\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn d.r;\n\t\t})\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn d.fill;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="duration-and-delay">Duration and delay</h2>
+
+<p>You can change the duration of a transition by calling <code class="language-plaintext highlighter-rouge">.duration</code> after the <code class="language-plaintext highlighter-rouge">.transition</code> call. The <code class="language-plaintext highlighter-rouge">.duration</code> method accepts an argument which specifies the duration in milliseconds:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">duration</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p>In this example we’ve set the duration to 2000 milliseconds:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/duration/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/duration/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 40)\n\t\t.transition()\n\t\t.duration(2000)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>You can also specify a delay before which the transition starts:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">...</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">delay</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p>The delay is usually used to delay each element in the selection by a different amount. For example, you can create <strong>staggered</strong> transitions by passing a <strong>function</strong> into <code class="language-plaintext highlighter-rouge">.delay</code> and setting the delay to a multiple of the element index <code class="language-plaintext highlighter-rouge">i</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">delay</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">75</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/transitions/delay/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/delay/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], side = &apos;right&apos;;\n\nfunction updateData() {\n\tdata = [];\n\tside = side === &apos;left&apos; ? &apos;right&apos; : &apos;left&apos;;\n\tfor(let i=0; i&lt;10; i++) {\n\t\tdata.push(side === \&quot;left\&quot; ? 250 - i * 25 : 775 - i * 25);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 20)\n\t\t.transition()\n\t\t.delay(function(d, i) {\n\t\t\treturn i * 100;\n\t\t})\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="easing-functions">Easing functions</h2>
+
+<p>An <strong>easing function</strong> defines the change in speed of an element during a transition. For example, some easing functions cause the element to start quickly and gradually slow down. Others do the opposite (start slowly and speed up) while others define special effects such as bouncing.</p>
+
+<p>D3 has a number of built in easing functions which you can try out in this explorer:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/ease-playground/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/ease-playground/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;&lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;select&gt;&lt;/select&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], side = &apos;right&apos;;\n\nfunction initOptions() {\n\tlet easeNames = Object.keys(d3).filter(function(d) {\n\t\treturn d.slice(0,4) === &apos;ease&apos;;\n\t});\n\n\td3.select(&apos;select&apos;)\n\t\t.selectAll(&apos;option&apos;)\n\t\t.data(easeNames)\n\t\t.join(&apos;option&apos;)\n\t\t.attr(&apos;value&apos;, function(d) { return d; })\n\t\t.text(function(d) { return &apos;d3.&apos; + d; });\n\n\td3.select(&apos;select&apos;).node().value = &apos;easeCubicOut&apos;;\n}\n\nfunction updateData() {\n\tside = side === &apos;left&apos; ? &apos;right&apos; : &apos;left&apos;;\n\tdata = [side === &apos;left&apos; ? 100 : 700];\n}\n\nfunction update() {\n\tlet easeName = d3.select(&apos;select&apos;).node().value;\n\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 40)\n\t\t.transition()\n\t\t.duration(750)\n\t\t.ease(d3[easeName])\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\ninitOptions();\nupdateAll();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>In general ‘in’ refers to the start of the motion and ‘out’ refers to the end of the motion. Therefore, <code class="language-plaintext highlighter-rouge">easeBounceOut</code> causes the element to bounce at the <strong>end</strong> of the transition. <code class="language-plaintext highlighter-rouge">easeBounceInOut</code> causes the element to bounce at the <strong>start and end</strong> of the transition.</p>
+</blockquote>
+
+<blockquote>
+  <p>It’s usually better to use easings where the element moves quickly at first and slows down. For example <code class="language-plaintext highlighter-rouge">easeCubicOut</code> is a commonly used easing function where the element moves quickly at first and slows down. D3’s default easing function is <code class="language-plaintext highlighter-rouge">easeCubic</code> which is equivalent to <code class="language-plaintext highlighter-rouge">easeCubicInOut</code>. This causes the element to start slowly, accelerate, then finish slowly.</p>
+</blockquote>
+
+<p>To select an easing function use the <code class="language-plaintext highlighter-rouge">.ease</code> method and pass in the easing function (e.g. <code class="language-plaintext highlighter-rouge">d3.easeBounce</code>):</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">ease</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">easeBounceOut</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/transitions/ease/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/ease/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, 40)\n\t\t.transition()\n\t\t.duration(1000)\n\t\t.ease(d3.easeBounceOut)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="chained-transitions">Chained transitions</h2>
+
+<p>Transitions can be chained together by adding multiple calls to <code class="language-plaintext highlighter-rouge">.transition</code>. Each transition takes it in turn to proceed. (When the first transition ends, the second one will start, and so on.)</p>
+
+<p>For example, let’s chain two transitions. The first sets the <code class="language-plaintext highlighter-rouge">cx</code> attribute and the second sets the <code class="language-plaintext highlighter-rouge">r</code> attribute (and uses <code class="language-plaintext highlighter-rouge">easeBounce</code>):</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">duration</span><span class="p">(</span><span class="mi">750</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">ease</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">easeBounce</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>When the chart updates, the circles move to their new positions, then the radius changes (with a bounce):</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/chaining/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/chaining/" marginwidth="0" marginheight="0" style="width: 100%; height: 130px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;100\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;5; i++) {\n\t\tdata.push({\n\t\t\tx: Math.random() * 800,\n\t\t\tr: Math.random() * 40\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.transition()\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d.x;\n\t\t})\n\t\t.transition()\n\t\t.duration(750)\n\t\t.ease(d3.easeBounce)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn d.r;\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="custom-tweens">Custom tweens</h2>
+
+<p>In most circumstances D3 is able to transition attributes and style in a sensible manner. However there are times where the default behaviour might not be suitable.</p>
+
+<p>For example, suppose we join an array of angle values to <code class="language-plaintext highlighter-rouge">circle</code> elements. Each circle is placed on the circumference of a larger circle using the joined value to determine where on the circle it sits. An angle of zero corresponds to 3 o’clock on the large circle.</p>
+
+<p>When the data updates, the circles travel in a straight line:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/tween-without/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/tween-without/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;800\&quot; height=\&quot;300\&quot;&gt;\n  &lt;circle cx=\&quot;150\&quot; cy=\&quot;150\&quot; r=\&quot;100\&quot; style=\&quot;fill: none; stroke: #ccc; stroke-dasharray: 1,1\&quot; /&gt;\n  &lt;g transform=\&quot;translate(150, 150)\&quot;&gt;&lt;/g&gt;\n&lt;/svg&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], r = 100;\n\nfunction updateData() {\n\tdata = [Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI];\n}\n\nfunction update() {\n\td3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, 7)\n\t\t.transition()\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn r * Math.cos(d);\n\t\t})\n\t\t.attr(&apos;cy&apos;, function(d) {\n\t\t\treturn r * Math.sin(d);\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>You can customise the path the elements take (such as along the circumference of the large circle) by using a <strong>tween function</strong>.</p>
+
+<p>To use a tween function, call the <code class="language-plaintext highlighter-rouge">.tween</code> function at some point after <code class="language-plaintext highlighter-rouge">.transition</code>. You pass a name (which can be anything you like) and a function into <code class="language-plaintext highlighter-rouge">.tween</code>.</p>
+
+<p>The function gets called once for each element in the selection. It must return a <strong>tween function</strong> which will get called at each step of the transition. A time value <code class="language-plaintext highlighter-rouge">t</code> between 0 and 1 is passed into the tween function. (<code class="language-plaintext highlighter-rouge">t</code> is 0 at the beginning of the transition and 1 at the end.)</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">tween</span><span class="p">(</span><span class="dl">'</span><span class="s1">my-tween</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+
+    <span class="c1">// Return a tween function</span>
+    <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Do stuff here such as updating your HTML/SVG elements</span>
+    <span class="p">}</span>
+  <span class="p">});</span></code></pre></figure>
+
+<p>Typically you’ll set up <strong>interpolator function(s)</strong> in the outer function. An interpolator function takes a parameter between 0 and 1 and interpolates between two given values. The interpolator function can be used when updating HTML/SVG elements in the tween function.</p>
+
+<p>For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">majorRadius</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">updateData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">getCurrentAngle</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Compute the current angle from the current values of cx and cy</span>
+  <span class="kd">let</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">el</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">el</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">atan2</span><span class="p">(</span><span class="nx">y</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">tween</span><span class="p">(</span><span class="dl">'</span><span class="s1">circumference</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">let</span> <span class="nx">currentAngle</span> <span class="o">=</span> <span class="nx">getCurrentAngle</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+      <span class="kd">let</span> <span class="nx">targetAngle</span> <span class="o">=</span> <span class="nx">d</span><span class="p">;</span>
+
+      <span class="c1">// Create an interpolator function</span>
+      <span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">interpolate</span><span class="p">(</span><span class="nx">currentAngle</span><span class="p">,</span> <span class="nx">targetAngle</span><span class="p">);</span>
+    
+      <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">angle</span> <span class="o">=</span> <span class="nx">i</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span>
+      
+        <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+          <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="nx">majorRadius</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">cos</span><span class="p">(</span><span class="nx">angle</span><span class="p">))</span>
+          <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="nx">majorRadius</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="nx">angle</span><span class="p">));</span>
+      <span class="p">};</span>
+    <span class="p">});</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>In the function that’s passed into <code class="language-plaintext highlighter-rouge">.tween</code> we start by computing <code class="language-plaintext highlighter-rouge">currentAngle</code>.</p>
+
+<p>We then set up an <strong>interpolator function</strong> <code class="language-plaintext highlighter-rouge">i</code>. This is a function that interpolates between two values (<code class="language-plaintext highlighter-rouge">currentAngle</code> and <code class="language-plaintext highlighter-rouge">targetAngle</code> in our case). The function <code class="language-plaintext highlighter-rouge">i</code> accepts a number between <code class="language-plaintext highlighter-rouge">0</code> and <code class="language-plaintext highlighter-rouge">1</code> and interpolates between the two values.</p>
+
+<p>Next we create a tween function and return it. The tween function uses the interpolator function <code class="language-plaintext highlighter-rouge">i</code> to compute <code class="language-plaintext highlighter-rouge">angle</code> for the given time value <code class="language-plaintext highlighter-rouge">t</code>. It then updates the <code class="language-plaintext highlighter-rouge">cx</code> and <code class="language-plaintext highlighter-rouge">cy</code> attributes using <code class="language-plaintext highlighter-rouge">angle</code>. The tween function is called for each step of the transition.</p>
+
+<p>Now when the button is clicked, the circle moves along the circumference of the large circle. Notice also that when the button is rapidly clicked, the transition starts from the circle’s current (mid-transition) position:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/tween/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/tween/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;800\&quot; height=\&quot;300\&quot;&gt;\n  &lt;circle cx=\&quot;150\&quot; cy=\&quot;150\&quot; r=\&quot;100\&quot; style=\&quot;fill: none; stroke: #ccc; stroke-dasharray: 1,1\&quot; /&gt;\n  &lt;g transform=\&quot;translate(150, 150)\&quot;&gt;&lt;/g&gt;\n&lt;/svg&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], majorRadius = 100;\n\nfunction updateData() {\n\tdata = [Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI];\n}\n\nfunction getCurrentAngle(el) {\n\tlet x = d3.select(el).attr(&apos;cx&apos;);\n\tlet y = d3.select(el).attr(&apos;cy&apos;);\n\treturn Math.atan2(y, x);\n}\n\nfunction update() {\n\td3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;r&apos;, 7)\n \t\t.transition()\n\t\t.duration(1000)\n\t\t.tween(&apos;circumference&apos;, function(d) {\n\t\t\tlet currentAngle = getCurrentAngle(this);\n\t\t\tlet targetAngle = d;\n\n\t\t\t// Ensure shortest path is taken\n\t\t\tif (targetAngle - currentAngle &gt; Math.PI) {\n\t\t\t\ttargetAngle -= 2 * Math.PI;\n\t\t\t}\n\t\t\telse if (targetAngle - currentAngle &lt; -Math.PI) {\n\t\t\t\ttargetAngle += 2 * Math.PI;\n\t\t\t}\n\n\t\t\tlet i = d3.interpolate(currentAngle, targetAngle);\n\n\t\t\treturn function(t) {\n\t\t\t\tlet angle = i(t);\n\n\t\t\t\td3.select(this)\n\t\t\t\t\t.attr(&apos;cx&apos;, majorRadius * Math.cos(angle))\n\t\t\t\t\t.attr(&apos;cy&apos;, majorRadius * Math.sin(angle));\n\t\t\t}\n\t\t});\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="entering-and-exiting-elements">Entering and exiting elements</h2>
+
+<p>You can define specific transitions for <strong>entering</strong> and <strong>exiting</strong> elements. (Entering elements are newly created elements and exiting elements are ones that are about to be removed.)</p>
+
+<p>For example you might want entering circles to <strong>fade in</strong> and exiting circles to <strong>fall</strong>:</p>
+
+<!-- <iframe class="db center" src="/blocks/transitions/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;150\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tlet numItems = Math.ceil(Math.random() * 10);\n\tfor(let i=0; i&lt;numItems; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(\n\t\t\tfunction(enter) {\n\t\t\t\treturn enter\n\t\t\t\t\t.append(&apos;circle&apos;)\n\t\t\t\t\t.attr(&apos;cy&apos;, 50)\n\t\t\t\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\t\t\t\treturn d;\n\t\t\t\t\t})\n\t\t\t\t\t.attr(&apos;r&apos;, 40)\n\t\t\t\t\t.style(&apos;opacity&apos;, 0);\n\t\t\t},\n\t\t\tfunction(update) {\n\t\t\t\treturn update;\n\t\t\t},\n\t\t\tfunction(exit) {\n\t\t\t\treturn exit\n\t\t\t\t\t.transition()\n\t\t\t\t\t.duration(1000)\n\t\t\t\t\t.attr(&apos;cy&apos;, 500)\n\t\t\t\t\t.remove();\n\t\t\t}\n\t\t)\n\t\t.transition()\n\t\t.duration(1000)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t})\n\t\t.style(&apos;opacity&apos;, 0.75);\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>To define enter and exit transitions you need to pass <strong>three functions</strong> into the <code class="language-plaintext highlighter-rouge">.join</code> method. This was covered in the <a href="/enterexit">Enter, exit and update</a> chapter so if you’re not familiar with these concepts I suggest you read up on them there.</p>
+
+<p>As a brief reminder, you can pass three functions (instead of an element name) into the <code class="language-plaintext highlighter-rouge">.join</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<p>The first, second and third functions are named the <strong>enter</strong>, <strong>update</strong> and <strong>exit</strong> functions, respectively.</p>
+
+<h3 id="entering-elements">Entering elements</h3>
+
+<p>As covered in <a href="/enterexit">Enter, exit and update</a> chapter the enter function should append an element to each element of the enter selection.</p>
+
+<p>You can also <strong>set the style and attributes</strong> of entering elements and this has the effect of <strong>initialising</strong> elements before any transitions take place.</p>
+
+<p>Let’s initialise <code class="language-plaintext highlighter-rouge">cy</code>, <code class="language-plaintext highlighter-rouge">cx</code>, <code class="language-plaintext highlighter-rouge">r</code> and <code class="language-plaintext highlighter-rouge">opacity</code> on entering circles:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">enter</span>
+      <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+      <span class="p">})</span>
+      <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">update</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">exit</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<p>The initial x and y coordinates of entering circles are initialised so that the circles appear in place (rather than sliding in from the origin).</p>
+
+<p>The initial radius of entering circles is initialised so that the circles appear with a radius of 40.</p>
+
+<p>Finally the opacity of entering circles is initialised to 0 so that entering circles fade in. (We’ll set the final opacity later on.)</p>
+
+<h3 id="exiting-elements">Exiting elements</h3>
+
+<p>The exit function usually removes the elements in the exit selection:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="p">...</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">exit</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<blockquote>
+  <p>If you don’t call <code class="language-plaintext highlighter-rouge">.remove</code> on the exit selection, the elements will remain on the page.</p>
+</blockquote>
+
+<p>You can add a transition to exiting elements by calling <code class="language-plaintext highlighter-rouge">.transition</code> on the exit selection. For example, to make exiting elements fall off the page, use <code class="language-plaintext highlighter-rouge">.transition</code> and set the <code class="language-plaintext highlighter-rouge">cy</code> attribute to a large value:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">exit</span>
+      <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">)</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">.remove</code> method of a transition selection removes the selection’s element(s) when the transition ends.</p>
+
+<h3 id="updating-elements">Updating elements</h3>
+
+<p>You can apply a transition to entering and updating elements by adding a call to <code class="language-plaintext highlighter-rouge">.transition</code> after the <code class="language-plaintext highlighter-rouge">.join</code> call. This will cause all elements (except exiting elements) to transition.</p>
+
+<p>Let’s add a <code class="language-plaintext highlighter-rouge">.transition</code> call and set the <code class="language-plaintext highlighter-rouge">cx</code> attribute and the <code class="language-plaintext highlighter-rouge">opacity</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+  <span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">);</span></code></pre></figure>
+
+<p>This has the following effect:</p>
+
+<ul>
+  <li>when the data changes, the circles transition to new positions (because of <code class="language-plaintext highlighter-rouge">.attr('cx')</code>)</li>
+  <li>when new circles are created, they fade in</li>
+</ul>
+
+<p>The circles fade in because their initial opacity is set to zero in the enter function and the <code class="language-plaintext highlighter-rouge">.style</code> call animates the opacity to 0.75.</p>
+
+<h3 id="putting-it-all-together">Putting it all together</h3>
+
+<p>Here’s the complete example where:</p>
+
+<ul>
+  <li>circles fade in (without sliding or expanding)</li>
+  <li>circles transition to new positions</li>
+  <li>circles fall off the page when they exit</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">enter</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">enter</span>
+        <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">;</span> <span class="p">})</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">update</span><span class="p">;</span>
+    <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">exit</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">exit</span>
+        <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">opacity</span><span class="dl">'</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/transitions/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/transitions/enter-exit/" marginwidth="0" marginheight="0" style="width: 100%; height: 180px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;800\&quot; height=\&quot;150\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;div&gt;\n  &lt;button onClick=\&quot;updateAll();\&quot;&gt;Update data&lt;/button&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\tfill: #6D597A;\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [];\n\nfunction updateData() {\n\tdata = [];\n\tlet numItems = Math.ceil(Math.random() * 10);\n\tfor(let i=0; i&lt;numItems; i++) {\n\t\tdata.push(Math.random() * 800);\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(\n\t\t\tfunction(enter) {\n\t\t\t\treturn enter\n\t\t\t\t\t.append(&apos;circle&apos;)\n\t\t\t\t\t.attr(&apos;cy&apos;, 50)\n\t\t\t\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\t\t\t\treturn d;\n\t\t\t\t\t})\n\t\t\t\t\t.attr(&apos;r&apos;, 40)\n\t\t\t\t\t.style(&apos;opacity&apos;, 0);\n\t\t\t},\n\t\t\tfunction(update) {\n\t\t\t\treturn update;\n\t\t\t},\n\t\t\tfunction(exit) {\n\t\t\t\treturn exit\n\t\t\t\t\t.transition()\n\t\t\t\t\t.duration(1000)\n\t\t\t\t\t.attr(&apos;cy&apos;, 500)\n\t\t\t\t\t.remove();\n\t\t\t}\n\t\t)\n\t\t.transition()\n\t\t.duration(1000)\n\t\t.attr(&apos;cx&apos;, function(d) {\n\t\t\treturn d;\n\t\t})\n\t\t.style(&apos;opacity&apos;, 0.75);\n}\n\nfunction updateAll() {\n\tupdateData();\n\tupdate();\n}\n\nupdateAll();\n\t\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>To summarise:</p>
+
+<ul>
+  <li>entering elements are initialised in the <strong>enter function</strong>. This is first function passed into <code class="language-plaintext highlighter-rouge">.join</code>. This allows you to initialise style and attributes of entering elements (before the transition starts)</li>
+  <li>a transition is applied to exiting elements in the <strong>exit function</strong>. This is the third function passed into <code class="language-plaintext highlighter-rouge">.join</code>.</li>
+  <li>entering and existing elements are transitioned by adding a call to <code class="language-plaintext highlighter-rouge">.transition</code> after <code class="language-plaintext highlighter-rouge">.join</code></li>
+</ul>
+
+<blockquote>
+  <p>The update function (the second argument of <code class="language-plaintext highlighter-rouge">.join</code>) only updates existing elements (and not entering elements) and I rarely add any special code here.</p>
+</blockquote>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Picking, Dragging and Brushing with D3 | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Picking, Dragging and Brushing with D3" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="D3 provides a number of modules that help you add interactivity such as zooming, panning and brushing. In this chapter we cover quadtree and Delaunay triangulation (to make picking small items easier), dragging (for moving elements) and brushing (for selecting regions)" />
+<meta property="og:description" content="D3 provides a number of modules that help you add interactivity such as zooming, panning and brushing. In this chapter we cover quadtree and Delaunay triangulation (to make picking small items easier), dragging (for moving elements) and brushing (for selecting regions)" />
+<link rel="canonical" href="https://www.d3indepth.com/interaction/" />
+<meta property="og:url" content="https://www.d3indepth.com/interaction/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-09T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Picking, Dragging and Brushing with D3" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-06-09T00:00:00+01:00","datePublished":"2021-06-09T00:00:00+01:00","description":"D3 provides a number of modules that help you add interactivity such as zooming, panning and brushing. In this chapter we cover quadtree and Delaunay triangulation (to make picking small items easier), dragging (for moving elements) and brushing (for selecting regions)","headline":"Picking, Dragging and Brushing with D3","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/interaction/"},"url":"https://www.d3indepth.com/interaction/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 underline" href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">Picking, Dragging and Brushing with D3</h2>
+
+  <div class="page-content">
+  	<p>D3 provides a number of modules that help you add interactivity such as zooming, panning and brushing.</p>
+
+<p>In this chapter we cover:</p>
+
+<ul>
+  <li><strong>quadtree</strong> and <strong>Delaunay triangulation</strong> (to make picking small items easier)</li>
+  <li><strong>dragging</strong> (for moving elements)</li>
+  <li><strong>brushing</strong> (for selecting regions)</li>
+</ul>
+
+<p>Zoom and pan are covered in a <a href="/zoom-and-pan">separate chapter</a>.</p>
+
+<h2 id="quadtrees">Quadtrees</h2>
+
+<p>If your chart contains items sized according to a data variable (such as a bubble chart) hovering over (or clicking) tiny items can be difficult.</p>
+
+<p>Try hovering over the tiny circles:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/quadtree-without/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/quadtree-without/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet hoveredId;\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height,\n\t\t\tr: 1 + Math.random() * 20\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, function(d) { return d.r; })\n\t\t.style(&apos;fill&apos;, function(d) { return d.id === hoveredId ? &apos;red&apos; : null;})\n\t\t.on(&apos;mouseover&apos;, function(e, d) { hoveredId = d.id; update(); })\n\t\t.on(&apos;mouseout&apos;, function() { hoveredId = undefined; update(); });\n}\n\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>You can make picking small items easier by searching for the closest item to the mouse pointer each time the mouse is moved. This can be an expensive operation but can be made more efficient using D3’s <strong>quadtree</strong> module.</p>
+
+<blockquote>
+  <p>A quadtree is a tree data structure that recursively divides an area into smaller and smaller areas and can make searching for items more efficient.</p>
+</blockquote>
+
+<blockquote>
+  <p>Line charts can also benefit from quadtrees for picking points along a line.</p>
+</blockquote>
+
+<p>With D3’s quadtree module you can create a quadtree, add some points to it, then find the closest point within the quadtree to a given coordinate.</p>
+
+<p>You can create a quadtree by calling <code class="language-plaintext highlighter-rouge">d3.quadtree()</code>. You can then add single points to it using <code class="language-plaintext highlighter-rouge">.add</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">quadtree</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">quadtree</span><span class="p">();</span>
+
+<span class="nx">quadtree</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]);</span>
+<span class="nx">quadtree</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">]);</span></code></pre></figure>
+
+<p>In the above example two points have been added: <code class="language-plaintext highlighter-rouge">50, 100</code> and <code class="language-plaintext highlighter-rouge">100, 100</code>.</p>
+
+<p>Given a coodinate <code class="language-plaintext highlighter-rouge">x, y</code> you can find the nearest point in the quadtree using <code class="language-plaintext highlighter-rouge">.find(x, y)</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">quadtree</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="mi">105</span><span class="p">);</span> <span class="c1">// returns [50, 100]</span>
+<span class="nx">quadtree</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="mi">95</span><span class="p">);</span> <span class="c1">// returns [100, 100]</span></code></pre></figure>
+
+<p>You can also add a distance (as the third argument) so that only points within that distance are returned:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">quadtree</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span> <span class="c1">// returns [50, 100]</span>
+<span class="nx">quadtree</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span> <span class="c1">// returns undefined</span></code></pre></figure>
+
+<p>The first <code class="language-plaintext highlighter-rouge">.find</code> returns <code class="language-plaintext highlighter-rouge">[50, 100]</code> because this is the closest point and is within a distance of <code class="language-plaintext highlighter-rouge">20</code>. The second <code class="language-plaintext highlighter-rouge">.find</code> returns <code class="language-plaintext highlighter-rouge">undefined</code> because the closest point <code class="language-plaintext highlighter-rouge">[50, 100]</code> is more than 5 away. This is useful for ensuring the returned point is close to the requested point. Without this constraint, outlier points can get selected even though the pointer isn’t very close.</p>
+
+<p>You can add an array of points using <code class="language-plaintext highlighter-rouge">.addAll</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">quadtree</span><span class="p">.</span><span class="nx">addAll</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">80</span><span class="p">,</span> <span class="mi">20</span><span class="p">]]);</span></code></pre></figure>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">.add</code> and <code class="language-plaintext highlighter-rouge">.addAll</code> methods are cumulative i.e. the existing quadtree points persist.</p>
+</blockquote>
+
+<p>If you’ve an array of objects, you can specify accessor functions using the <code class="language-plaintext highlighter-rouge">.x</code> and <code class="language-plaintext highlighter-rouge">.y</code> methods:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">x</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="na">y</span><span class="p">:</span> <span class="mi">100</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">x</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="na">y</span><span class="p">:</span> <span class="mi">100</span> <span class="p">}</span>
+<span class="p">];</span>
+
+<span class="kd">let</span> <span class="nx">quadtree</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">quadtree</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">x</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">y</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;});</span>
+
+<span class="nx">quadtree</span><span class="p">.</span><span class="nx">addAll</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="nx">quadtree</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span> <span class="c1">// returns {x: 50, y: 100}</span></code></pre></figure>
+
+<h3 id="example">Example</h3>
+
+<p>Let’s look at an example where we create some randomised points (<code class="language-plaintext highlighter-rouge">updateData</code>) and add them to a quadtree (<code class="language-plaintext highlighter-rouge">updateQuadtree</code>). We draw the points (<code class="language-plaintext highlighter-rouge">update</code>) and set up a <code class="language-plaintext highlighter-rouge">mousemove</code> event on the <code class="language-plaintext highlighter-rouge">svg</code> element (<code class="language-plaintext highlighter-rouge">initEvents</code>).</p>
+
+<p>When the mouse moves (see <code class="language-plaintext highlighter-rouge">handleMousemove</code>) we search for the nearest point to the mouse pointer using the quadtree. We update <code class="language-plaintext highlighter-rouge">hoveredId</code> with the found point’s id then call <code class="language-plaintext highlighter-rouge">update</code> again so that the hovered point is coloured red:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span> <span class="nx">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="nx">numPoints</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">quadtree</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">quadtree</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">x</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">y</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;});</span>
+
+<span class="kd">let</span> <span class="nx">hoveredId</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">updateData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">numPoints</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">i</span><span class="p">,</span>
+      <span class="na">x</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">width</span><span class="p">,</span>
+      <span class="na">y</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">height</span><span class="p">,</span>
+      <span class="na">r</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">20</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">handleMousemove</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">pos</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">pointer</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">quadtree</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">20</span><span class="p">);</span>
+  <span class="nx">hoveredId</span> <span class="o">=</span> <span class="nx">d</span> <span class="p">?</span> <span class="nx">d</span><span class="p">.</span><span class="nx">id</span> <span class="p">:</span> <span class="kc">undefined</span><span class="p">;</span>
+  <span class="nx">update</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">initEvents</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">mousemove</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleMousemove</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">updateQuadtree</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">quadtree</span><span class="p">.</span><span class="nx">addAll</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">id</span> <span class="o">===</span> <span class="nx">hoveredId</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">red</span><span class="dl">'</span> <span class="p">:</span> <span class="kc">null</span><span class="p">;});</span>
+<span class="p">}</span>
+
+<span class="nx">updateData</span><span class="p">();</span>
+<span class="nx">updateQuadtree</span><span class="p">();</span>
+<span class="nx">update</span><span class="p">();</span>
+<span class="nx">initEvents</span><span class="p">();</span></code></pre></figure>
+
+<blockquote>
+  <p>In <code class="language-plaintext highlighter-rouge">handleMousemove</code> we use <code class="language-plaintext highlighter-rouge">d3.pointer</code> which given the event object <code class="language-plaintext highlighter-rouge">e</code> and an HTML/SVG element, returns the mouse position relative to the HTML/SVG element. In our example, <code class="language-plaintext highlighter-rouge">this</code> is the <code class="language-plaintext highlighter-rouge">SVG</code> element because this is the element <code class="language-plaintext highlighter-rouge">.on</code> was called on (see <code class="language-plaintext highlighter-rouge">initEvents</code>).</p>
+</blockquote>
+
+<p>Now your mouse pointer only needs to be within 20 pixels of its nearest circle:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/quadtree/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/quadtree/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet quadtree = d3.quadtree()\n\t.x(function(d) {return d.x;})\n\t.y(function(d) {return d.y;});\n\nlet hoveredId;\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height,\n\t\t\tr: 1 + Math.random() * 20\n\t\t});\n\t}\n}\n\nfunction handleMousemove(e) {\n\tlet pos = d3.pointer(e, this);\n\tlet d = quadtree.find(pos[0], pos[1], 20);\n\thoveredId = d ? d.id : undefined;\n\tupdate();\n}\n\nfunction initEvents() {\n\td3.select(&apos;svg&apos;)\n\t\t.on(&apos;mousemove&apos;, handleMousemove);\n}\n\nfunction updateQuadtree() {\n\tquadtree.addAll(data);\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, function(d) { return d.r; })\n\t\t.style(&apos;fill&apos;, function(d) { return d.id === hoveredId ? &apos;red&apos; : null;});\n}\n\nupdateData();\nupdateQuadtree();\nupdate();\ninitEvents();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>D3’s quadtree is also used by <a href="/force-layout/#forcecollide"><code class="language-plaintext highlighter-rouge">d3.forceCollide</code></a> when detecting collisions in the force layout.</p>
+</blockquote>
+
+<h2 id="delaunay-triangles">Delaunay triangles</h2>
+
+<p>You can also use D3’s Delaunay module for finding closest points. Given an array of points, a Delaunay triangulation connects all the points with triangles in such a way that slivers are minimised.</p>
+
+<p>As with the quadtree, Delaunay triangles have several uses but we’ll just demonstrate how they can be used to find nearest points.</p>
+
+<p>You can create Delaunay triangles using the <code class="language-plaintext highlighter-rouge">.from</code> method on <code class="language-plaintext highlighter-rouge">d3.Delaunay</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">triangles</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">Delaunay</span><span class="p">.</span><span class="k">from</span><span class="p">([[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">]]);</span></code></pre></figure>
+
+<p>You can then search for the nearest point to a coordinate <code class="language-plaintext highlighter-rouge">x, y</code> using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">triangles</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="mi">105</span><span class="p">);</span> <span class="c1">// returns 0</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">.find</code> method returns the array index of the nearest point. Unlike the quadtree, adding a maximum distance as the third argument isn’t supported.</p>
+
+<p>Here’s a full example that uses Delaunay triangulation to find the closest point (click ‘Edit in CodePen’ to view the code):</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/delaunay/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/delaunay/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\nlet triangles;\nlet hoveredId;\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height,\n\t\t\tr: 1 + Math.random() * 20\n\t\t});\n\t}\n}\n\nfunction handleMousemove(e) {\n\tlet pos = d3.pointer(e, this);\n\tlet i = triangles.find(pos[0], pos[1]);\n\thoveredId = data[i].id;\n\tupdate();\n}\n\nfunction initEvents() {\n\td3.select(&apos;svg&apos;)\n\t\t.on(&apos;mousemove&apos;, handleMousemove);\n}\n\nfunction updateDelaunay() {\n\ttriangles = d3.Delaunay\n\t\t.from(data,\n\t\t\t  function(d) {return d.x;},\n\t\t\t  function(d) {return d.y;}\n\t\t\t );\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, function(d) { return d.r; })\n\t\t.style(&apos;fill&apos;, function(d) { return d.id === hoveredId ? &apos;red&apos; : null;});\n}\n\ninitEvents();\nupdateData();\nupdateDelaunay();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="dragging">Dragging</h2>
+
+<p>D3 has a module for adding drag behaviour to elements. Dragging is where you hover over an element, press the mouse button, move the pointer, then release the mouse button, in order to move the element. D3’s drag module also supports touch gestures.</p>
+
+<p>(I rarely need to add drag behaviour to data visualizations so feel free to skip this section if it isn’t important to you!)</p>
+
+<p>There’s three steps to making HTML/SVG elements draggable:</p>
+
+<ul>
+  <li>call <code class="language-plaintext highlighter-rouge">d3.drag()</code> to create a <strong>drag behaviour</strong> function</li>
+  <li>add an event handler that’s called when a drag event occurs. The event handler receives an event object with which you can update the position of the dragged element</li>
+  <li>attach the drag behaviour to the elements you want to make draggable</li>
+</ul>
+
+<p>Calling <code class="language-plaintext highlighter-rouge">d3.drag()</code> creates a drag behaviour:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">drag</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">drag</span><span class="p">();</span></code></pre></figure>
+
+<blockquote>
+  <p>A drag behaviour is a function that adds event listeners to elements. It also has methods such as <code class="language-plaintext highlighter-rouge">.on</code> defined on it.</p>
+</blockquote>
+
+<p>You can attach an event handler to the drag behaviour by calling the <code class="language-plaintext highlighter-rouge">.on</code> method. This accepts two arguments:</p>
+
+<ul>
+  <li>the event type (<code class="language-plaintext highlighter-rouge">'drag'</code>, <code class="language-plaintext highlighter-rouge">'start'</code> or <code class="language-plaintext highlighter-rouge">'end'</code>)</li>
+  <li>the name of your event handler function</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleDrag</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+ <span class="c1">// update the dragged element with its new position</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">drag</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">drag</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">drag</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleDrag</span><span class="p">);</span></code></pre></figure>
+
+<blockquote>
+  <p>The event types are <code class="language-plaintext highlighter-rouge">'drag'</code>, <code class="language-plaintext highlighter-rouge">'start'</code> and <code class="language-plaintext highlighter-rouge">'end'</code>. <code class="language-plaintext highlighter-rouge">'drag'</code> indicates a drag. <code class="language-plaintext highlighter-rouge">'start'</code> indicates the start of the drag (e.g. the user has pressed the mouse button). <code class="language-plaintext highlighter-rouge">'end'</code> indicates the end of the drag (e.g. the user has released the mouse button).</p>
+</blockquote>
+
+<p><code class="language-plaintext highlighter-rouge">handleDrag</code> receives a single parameter <code class="language-plaintext highlighter-rouge">e</code> which is an object representing the drag event. The drag event object has several properties, the most useful of which are:</p>
+
+<table class="table table-bordered">
+  <tr>
+    <th>Property name</th><th>Description</th>
+  </tr>
+  <tr><td><code>.subject</code></td><td>The joined data of the dragged element (or a <a href="https://github.com/d3/d3-drag/tree/v3.0.0#drag_subject">fallback object</a>)</td></tr>
+  <tr><td><code>.x</code> &amp; <code>.y</code></td><td>The new coordinates of the dragged element</td></tr>
+  <tr><td><code>.dx</code> &amp; <code>.dy</code></td><td>The new coordinates of the dragged element, relative to the previous coordinates</td></tr>
+</table>
+
+<blockquote>
+  <p>You can see a full list of drag event properties in the <a href="https://github.com/d3/d3-drag/tree/v3.0.0#drag-events">official documentation</a>.</p>
+</blockquote>
+
+<p>If the dragged element was created by a <a href="/datajoins">data join</a> and the joined data has <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> properties, the <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> properties of the drag event object are computed such that the <strong>relative position of the element and pointer are maintained</strong>. (This prevents the element’s center ‘snapping’ to the pointer position.) Otherwise <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> are the pointer position <strong>relative to the dragged element’s parent element</strong>.</p>
+
+<p>You attach the drag behaviour to elements by selecting the elements and passing the drag behaviour into the <a href="/selections/#call"><code class="language-plaintext highlighter-rouge">.call</code> method</a>.</p>
+
+<p>For example to add drag behaviour to <code class="language-plaintext highlighter-rouge">circle</code> elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">drag</span><span class="p">);</span></code></pre></figure>
+
+<blockquote>
+  <p>The drag behaviour is a function that sets up event listeners on the selected elements (each <code class="language-plaintext highlighter-rouge">circle</code> element in the above example). When drag events occur the event handler (<code class="language-plaintext highlighter-rouge">handleDrag</code> in the above examples) is called.</p>
+</blockquote>
+
+<h3 id="examples">Examples</h3>
+
+<p>In the following code an array of random coordinates is joined to <code class="language-plaintext highlighter-rouge">circle</code> elements (<code class="language-plaintext highlighter-rouge">updateData</code> and <code class="language-plaintext highlighter-rouge">update</code>).</p>
+
+<p>A drag behaviour is created using <code class="language-plaintext highlighter-rouge">d3.drag()</code> and attached to the <code class="language-plaintext highlighter-rouge">circle</code> elements (<code class="language-plaintext highlighter-rouge">initDrag</code>).</p>
+
+<p>When a circle is dragged, <code class="language-plaintext highlighter-rouge">handleDrag</code> gets called and an event object <code class="language-plaintext highlighter-rouge">e</code> is passed in as the first argument. <code class="language-plaintext highlighter-rouge">e.subject</code> represents the joined data of the dragged element. The <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> properties of the joined data are updated to <code class="language-plaintext highlighter-rouge">e.x</code> and <code class="language-plaintext highlighter-rouge">e.y</code>. <code class="language-plaintext highlighter-rouge">update</code> is then called to update the circle positions.</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span> <span class="nx">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="nx">numPoints</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">drag</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">drag</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">drag</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleDrag</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">handleDrag</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">e</span><span class="p">.</span><span class="nx">subject</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span>
+  <span class="nx">e</span><span class="p">.</span><span class="nx">subject</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span>
+  <span class="nx">update</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">initDrag</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">drag</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">updateData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">numPoints</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">i</span><span class="p">,</span>
+      <span class="na">x</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">width</span><span class="p">,</span>
+      <span class="na">y</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">height</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateData</span><span class="p">();</span>
+<span class="nx">update</span><span class="p">();</span>
+<span class="nx">initDrag</span><span class="p">();</span></code></pre></figure>
+
+<p>Notice that the relative position of the pointer and dragged circle is maintained (try initiating a drag near the edge of a circle):</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/drag/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/drag/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 10;\n\nlet drag = d3.drag()\n\t.on(&apos;drag&apos;, handleDrag);\n\nfunction handleDrag(e) {\n\te.subject.x = e.x;\n\te.subject.y = e.y;\n\tupdate();\n}\n\nfunction initDrag() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.call(drag);\n}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 40);\n}\n\nupdateData();\nupdate();\ninitDrag();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h2 id="brushing">Brushing</h2>
+
+<p>Brushing lets you user <strong>specify an area</strong> (by pressing the mouse button, moving the mouse, then releasing) in order to, for example, select a group of elements.</p>
+
+<p>Try selecting circles by pressing the mouse button, dragging, then releasing the button:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/brush/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/brush/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n  &lt;g&gt;&lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet brush = d3.brush()\n\t.on(&apos;start brush&apos;, handleBrush);\n\nlet brushExtent;\n\nfunction handleBrush(e) {\n\tbrushExtent = e.selection;\n\tupdate();\n}\n\nfunction initBrush() {\n\td3.select(&apos;svg g&apos;)\n\t\t.call(brush);\n}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction isInBrushExtent(d) {\n\treturn brushExtent &amp;&amp;\n\t\td.x &gt;= brushExtent[0][0] &amp;&amp;\n\t\td.x &lt;= brushExtent[1][0] &amp;&amp;\n\t\td.y &gt;= brushExtent[0][1] &amp;&amp;\n\t\td.y &lt;= brushExtent[1][1];\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 4)\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn isInBrushExtent(d) ? &apos;red&apos; : null;\n\t\t});\n}\n\ninitBrush();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>D3 has a module for adding brushing behaviour to an element (or, less commonly, multiple elements).</p>
+
+<p>There’s three steps to adding brush behaviour to an HTML or SVG element:</p>
+
+<ul>
+  <li>call <code class="language-plaintext highlighter-rouge">d3.brush()</code> to create a <strong>brush behaviour</strong> function</li>
+  <li>add an event handler that’s called when a brush event occurs. The event handler receives the brush extent which can then be used to select elements, define a zoom area etc.</li>
+  <li>attach the brush behaviour to an element (or elements)</li>
+</ul>
+
+<p>Calling <code class="language-plaintext highlighter-rouge">d3.brush()</code> creates a brush behaviour:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">brush</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">brush</span><span class="p">();</span></code></pre></figure>
+
+<blockquote>
+  <p>A brush behaviour is a function that has methods such as <code class="language-plaintext highlighter-rouge">.on</code> defined on it. The function itself adds event listeners to an element as well as additional elements (mainly <code class="language-plaintext highlighter-rouge">rect</code> elements) for rendering the brush extent.</p>
+</blockquote>
+
+<p>You can attach an event handler to a brush behaviour by calling the <code class="language-plaintext highlighter-rouge">.on</code> method. This accepts two arguments:</p>
+
+<ul>
+  <li>the event type (<code class="language-plaintext highlighter-rouge">'brush'</code>, <code class="language-plaintext highlighter-rouge">'start'</code> or <code class="language-plaintext highlighter-rouge">'end'</code>)</li>
+  <li>the name of your event handler function</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleBrush</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+ <span class="c1">// get the brush extent and use it to, for example, select elements</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">brush</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">brush</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">brush</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleBrush</span><span class="p">);</span></code></pre></figure>
+
+<blockquote>
+  <p>The event types are <code class="language-plaintext highlighter-rouge">'brush'</code>, <code class="language-plaintext highlighter-rouge">'start'</code> and <code class="language-plaintext highlighter-rouge">'end'</code>. <code class="language-plaintext highlighter-rouge">'brush'</code> indicates that the brush extent has changed. <code class="language-plaintext highlighter-rouge">'start'</code> indicates the brushing has started (e.g. the user has pressed the mouse button). <code class="language-plaintext highlighter-rouge">'end'</code> indicates the end of brushing (e.g. the user has released the mouse button).</p>
+</blockquote>
+
+<p><code class="language-plaintext highlighter-rouge">handleBrush</code> receives a single parameter <code class="language-plaintext highlighter-rouge">e</code> which is an object representing the brush event. The most useful property on the brush event is <code class="language-plaintext highlighter-rouge">.selection</code> which represents the extent of the brush as an array <code class="language-plaintext highlighter-rouge">[[x0, y0], [x1, y1]]</code> where <code class="language-plaintext highlighter-rouge">x0, y0</code> and <code class="language-plaintext highlighter-rouge">x1, y1</code> are the opposite corners of the brush. Typically <code class="language-plaintext highlighter-rouge">handleBrush</code> will compute which elements are within the brush extent and update them accordingly.</p>
+
+<p>You attach the brush behaviour to an element by selecting the element and passing the brush behaviour into the <a href="/selections/#call"><code class="language-plaintext highlighter-rouge">.call</code> method</a>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">brush</span><span class="p">);</span></code></pre></figure>
+
+<h3 id="examples-1">Examples</h3>
+
+<h4 id="basic-example">Basic example</h4>
+
+<p>In the following example a brush is created using <code class="language-plaintext highlighter-rouge">d3.brush()</code>. An event handler <code class="language-plaintext highlighter-rouge">handleBrush</code> is added to the brush behaviour using the <code class="language-plaintext highlighter-rouge">.on</code> method.</p>
+
+<p><code class="language-plaintext highlighter-rouge">handleBrush</code> gets called whenever brushing starts (the <code class="language-plaintext highlighter-rouge">'start'</code> event type) or the brush extent changes (the <code class="language-plaintext highlighter-rouge">'brush'</code> event type).</p>
+
+<p>The brush behaviour is attached to the <code class="language-plaintext highlighter-rouge">svg</code> element by calling <code class="language-plaintext highlighter-rouge">.call</code> and passing in the brush behaviour (see <code class="language-plaintext highlighter-rouge">initBrush</code>).</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">brush</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">brush</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">start brush</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleBrush</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">handleBrush</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Use the brush extent e.selection to compute, for example, which elements to select</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">initBrush</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">brush</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">initBrush</span><span class="p">();</span></code></pre></figure>
+
+<h4 id="full-example">Full example</h4>
+
+<p>Here’s a complete example where an array of random coordinates is joined to <code class="language-plaintext highlighter-rouge">circle</code> elements (<code class="language-plaintext highlighter-rouge">updateData</code> and <code class="language-plaintext highlighter-rouge">update</code>). When the brush is active, the circles within the brush extent are coloured red.</p>
+
+<p>The brush is initialised in <code class="language-plaintext highlighter-rouge">initBrush</code>. (Note that it’s attached to a <code class="language-plaintext highlighter-rouge">g</code> element within the <code class="language-plaintext highlighter-rouge">svg</code> element, in order to keep the elements used to render the brush separate to the circles.)</p>
+
+<p>When brushing occurs, <code class="language-plaintext highlighter-rouge">handleBrush</code> is called. This receives a brush event object <code class="language-plaintext highlighter-rouge">e</code> which has a property <code class="language-plaintext highlighter-rouge">selection</code> that defines the extent of the brush. This is saved to the variable <code class="language-plaintext highlighter-rouge">brushExtent</code> and <code class="language-plaintext highlighter-rouge">update</code> is called.</p>
+
+<p><code class="language-plaintext highlighter-rouge">update</code> performs the data join and colours circles red if they’re within the extent defined by <code class="language-plaintext highlighter-rouge">brushExtent</code> (see <code class="language-plaintext highlighter-rouge">isInBrushExtent</code>):</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span> <span class="nx">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="nx">numPoints</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">brush</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">brush</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">start brush</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleBrush</span><span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">brushExtent</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">handleBrush</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">brushExtent</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">selection</span><span class="p">;</span>
+  <span class="nx">update</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">initBrush</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">brush</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">updateData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">numPoints</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">i</span><span class="p">,</span>
+      <span class="na">x</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">width</span><span class="p">,</span>
+      <span class="na">y</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">height</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">isInBrushExtent</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">brushExtent</span> <span class="o">&amp;&amp;</span>
+    <span class="nx">d</span><span class="p">.</span><span class="nx">x</span> <span class="o">&gt;=</span> <span class="nx">brushExtent</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+    <span class="nx">d</span><span class="p">.</span><span class="nx">x</span> <span class="o">&lt;=</span> <span class="nx">brushExtent</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+    <span class="nx">d</span><span class="p">.</span><span class="nx">y</span> <span class="o">&gt;=</span> <span class="nx">brushExtent</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+    <span class="nx">d</span><span class="p">.</span><span class="nx">y</span> <span class="o">&lt;=</span> <span class="nx">brushExtent</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">isInBrushExtent</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">red</span><span class="dl">'</span> <span class="p">:</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">initBrush</span><span class="p">();</span>
+<span class="nx">updateData</span><span class="p">();</span>
+<span class="nx">update</span><span class="p">();</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/interaction/brush/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/brush/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n  &lt;g&gt;&lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet brush = d3.brush()\n\t.on(&apos;start brush&apos;, handleBrush);\n\nlet brushExtent;\n\nfunction handleBrush(e) {\n\tbrushExtent = e.selection;\n\tupdate();\n}\n\nfunction initBrush() {\n\td3.select(&apos;svg g&apos;)\n\t\t.call(brush);\n}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction isInBrushExtent(d) {\n\treturn brushExtent &amp;&amp;\n\t\td.x &gt;= brushExtent[0][0] &amp;&amp;\n\t\td.x &lt;= brushExtent[1][0] &amp;&amp;\n\t\td.y &gt;= brushExtent[0][1] &amp;&amp;\n\t\td.y &lt;= brushExtent[1][1];\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 4)\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn isInBrushExtent(d) ? &apos;red&apos; : null;\n\t\t});\n}\n\ninitBrush();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="one-dimensional-brushes">One dimensional brushes</h3>
+
+<p>D3 also provides brushes <code class="language-plaintext highlighter-rouge">d3.brushX</code> and <code class="language-plaintext highlighter-rouge">d3.brushY</code> that constrain the brush to a single dimension.</p>
+
+<p>They work in a simlar fashion to <code class="language-plaintext highlighter-rouge">d3.brush</code>, the main difference being the event object’s <code class="language-plaintext highlighter-rouge">.selection</code> property which is an array of two numbers <code class="language-plaintext highlighter-rouge">[min, max]</code> which represent the extent of the brush.</p>
+
+<p>Here’s an example using <code class="language-plaintext highlighter-rouge">d3.brushX</code>:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/brush-x/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/brush-x/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g&gt;&lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 100, numPoints = 100;\n\nlet brush = d3.brushX()\n\t.on(&apos;start brush&apos;, handleBrush);\n\nlet brushExtent;\n\nfunction handleBrush(e) {\n\tbrushExtent = e.selection;\n\tupdate();\n}\n\nfunction initBrush() {\n\td3.select(&apos;svg g&apos;)\n\t\t.call(brush);\n}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 4)\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\tlet inBrushExtent = brushExtent &amp;&amp;\n\t\t\t\td.x &gt;= brushExtent[0] &amp;&amp;\n\t\t\t\td.x &lt;= brushExtent[1];\n\n\t\t\treturn inBrushExtent ? &apos;red&apos; : null;\n\t\t});\n}\n\ninitBrush();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="programmatic-control-of-brushing">Programmatic control of brushing</h3>
+
+<p>You can also set the brush extent programmatically. For example you can create a button that sets the brush to maximum size.</p>
+
+<p>The brush behaviour has two methods for setting the brush extent <code class="language-plaintext highlighter-rouge">.move</code> and <code class="language-plaintext highlighter-rouge">.clear</code>. The first sets the brush extent to <code class="language-plaintext highlighter-rouge">[[x0, y0], [x1, y1]]</code> and the second clears the brush.</p>
+
+<p><code class="language-plaintext highlighter-rouge">.move</code> and <code class="language-plaintext highlighter-rouge">.clear</code> should be called on the element that receives the brush gestures. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">brush</span><span class="p">.</span><span class="nx">move</span><span class="p">,</span> <span class="p">[[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">]]);</span></code></pre></figure>
+
+<p>Here’s an example that has two buttons. One button sets the brush extent to the size of the <code class="language-plaintext highlighter-rouge">svg</code> element and the other button clears the brush:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/brush-move/" marginwidth="0" marginheight="0" style="width: 100%; height: 430px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/brush-move/" marginwidth="0" marginheight="0" style="width: 100%; height: 430px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n\t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;button onclick=\&quot;selectAll()\&quot;&gt;Select all&lt;/button&gt;\n&lt;button onclick=\&quot;clearSelection()\&quot;&gt;Clear selection&lt;/button&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.5;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet brush = d3.brush()\n\t.extent([[0, 0], [width, height]])\n\t.on(&apos;start brush&apos;, handleBrush);\n\nlet brushExtent;\n\nfunction handleBrush(e) {\n\tbrushExtent = e.selection;\n\tupdate();\n}\n\nfunction initBrush() {\n\td3.select(&apos;svg g&apos;)\n\t\t.call(brush);\n}\n\nfunction selectAll() {\n\td3.select(&apos;svg g&apos;)\n\t\t.call(brush.move, [[0, 0], [width, height]]);\n}\n\nfunction clearSelection() {\n\td3.select(&apos;svg g&apos;)\n\t\t.call(brush.clear);\n}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 4)\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\tlet inBrushExtent = brushExtent &amp;&amp;\n\t\t\t\td.x &gt;= brushExtent[0][0] &amp;&amp;\n\t\t\t\td.x &lt;= brushExtent[1][0] &amp;&amp;\n\t\t\t\td.y &gt;= brushExtent[0][1] &amp;&amp;\n\t\t\t\td.y &lt;= brushExtent[1][1];\n\n\t\t\treturn inBrushExtent ? &apos;red&apos; : null;\n\t\t});\n}\n\ninitBrush();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

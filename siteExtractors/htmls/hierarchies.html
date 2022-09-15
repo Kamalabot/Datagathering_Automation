@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Hierarchies | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Hierarchies" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How to visualise hierarchical data (data in the shape of trees) using D3.js. This article shows how to create a nested (or hierarchical) data structure from an array of data. It also covers visualising hierarchies using D3, including treemaps, circle packing and sunburst charts." />
+<meta property="og:description" content="How to visualise hierarchical data (data in the shape of trees) using D3.js. This article shows how to create a nested (or hierarchical) data structure from an array of data. It also covers visualising hierarchies using D3, including treemaps, circle packing and sunburst charts." />
+<link rel="canonical" href="https://www.d3indepth.com/hierarchies/" />
+<meta property="og:url" content="https://www.d3indepth.com/hierarchies/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-12T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Hierarchies" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-12T00:00:00+01:00","datePublished":"2021-05-12T00:00:00+01:00","description":"How to visualise hierarchical data (data in the shape of trees) using D3.js. This article shows how to create a nested (or hierarchical) data structure from an array of data. It also covers visualising hierarchies using D3, including treemaps, circle packing and sunburst charts.","headline":"D3 Hierarchies","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/hierarchies/"},"url":"https://www.d3indepth.com/hierarchies/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Hierarchies</h2>
+
+  <div class="page-content">
+  	<p><em>How to visualise hierarchical data (data in the shape of trees) using D3.js. This article shows how to create a nested (or hierarchical) data structure from an array of data. It also covers visualising hierarchies using D3, including treemaps, circle packing and sunburst charts.</em></p>
+
+<p>A common technique when analysing or visualising data is to organise your data into <strong>groups</strong>.</p>
+
+<p>For example, here’s some film data:</p>
+
+<table class="table table-bordered">
+<tr><th>Title</th><th>Distributor</th><th>Genre</th><th>Worldwide_Gross</th><th>Rotten_Tomatoes_Rating</th></tr>
+<tr><td>Adaptation</td><td>Sony Pictures</td><td>Comedy</td><td>22498520</td><td>91</td></tr>
+<tr><td>Air Bud</td><td>Walt Disney Pictures</td><td>Comedy</td><td>27555061</td><td>45</td></tr>
+<tr><td>Air Force One</td><td>Sony Pictures</td><td>Action</td><td>315268353</td><td>78</td></tr>
+<tr><td>Alex &amp; Emma</td><td>Warner Bros.</td><td>Drama</td><td>15358583</td><td>11</td></tr>
+<tr><td>Alexander</td><td>Warner Bros.</td><td>Adventure</td><td>167297191</td><td>16</td></tr>
+<tr><td>Ali</td><td>Sony Pictures</td><td>Drama</td><td>84383966</td><td>67</td></tr>
+<tr><td>Alice in Wonderland</td><td>Walt Disney Pictures</td><td>Adventure</td><td>1023291110</td><td>51</td></tr>
+<tr><td>Alive</td><td>Walt Disney Pictures</td><td>Adventure</td><td>36299670</td><td>71</td></tr>
+<tr><td>All the King's Men</td><td>Sony Pictures</td><td>Drama</td><td>9521458</td><td>11</td></tr>
+<tr><td>Amadeus</td><td>Warner Bros.</td><td>Drama</td><td>51973029</td><td>96</td></tr>
+</table>
+
+<p>Let’s group it according to <strong>Distributor</strong> and count the number of films in each group:</p>
+
+<table class="table table-bordered">
+  <tr><th>Distributor</th><th>Count</th></tr>
+  <tr><td>Sony Pictures</td><td>4</td></tr>
+  <tr><td>Walt Disney Pictures</td><td>3</td></tr>
+  <tr><td>Warner Bros.</td><td>3</td></tr>
+</table>
+
+<p>You can also group by more than one category. For example let’s group by <strong>Distributor</strong>, then group by <strong>Genre</strong>:</p>
+
+<table class="table table-bordered">
+  <thead><tr><th class="pvtAxisLabel">Distributor</th><th class="pvtAxisLabel">Genre</th><th class="pvtTotalLabel pvtRowTotalLabel">Count</th></tr></thead>
+  <tbody>
+    <tr><td class="pvtRowLabel" rowspan="3">Sony Pictures</td><td class="pvtRowLabel" rowspan="1">Action</td><td class="pvtTotal rowTotal" data-value="1" data-for="row0">1</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Comedy</td><td class="pvtTotal rowTotal" data-value="1" data-for="row1">1</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Drama</td><td class="pvtTotal rowTotal" data-value="2" data-for="row2">2</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="2">Walt Disney Pictures</td><td class="pvtRowLabel" rowspan="1">Adventure</td><td class="pvtTotal rowTotal" data-value="2" data-for="row3">2</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Comedy</td><td class="pvtTotal rowTotal" data-value="1" data-for="row4">1</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="2">Warner Bros.</td><td class="pvtRowLabel" rowspan="1">Adventure</td><td class="pvtTotal rowTotal" data-value="1" data-for="row5">1</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Drama</td><td class="pvtTotal rowTotal" data-value="2" data-for="row6">2</td></tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>In the world of spreadsheets, the above table is also known as a pivot table. If you’re familiar with databases you can achieve similar affects using the SQL statement <code class="language-plaintext highlighter-rouge">GROUP BY</code>.</p>
+</blockquote>
+
+<p>The data how has a hierachical structure. At the top level are <strong>Distributors</strong> (Sony Pictures, Walt Disney Pictures etc.) and at the next level are <strong>Genres</strong> (Action, Adventure, Comedy etc.).</p>
+
+<p>You can think of a hiearchical structure as a tree-like struture where a root item (or ‘node’) splits into top level groups (Distributors in our example). Each top level group splits into second level groups (Genres in our example), and so on:</p>
+
+<!-- <iframe class="db center" src="/blocks/arrays/hierarchy-tree/" marginwidth="0" marginheight="0" style="width: 720px; height: 270px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/arrays/hierarchy-tree/" marginwidth="0" marginheight="0" style="width: 720px; height: 270px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;700\&quot; height=\&quot;260\&quot;&gt;\n  &lt;g transform=\&quot;translate(0, 5)\&quot;&gt;&lt;/g&gt;\n&lt;/svg&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;body {\n\tfont-family: Sans-Serif;\n}\n\ncircle {\n  fill: steelblue;\n  stroke: none;\n}\n\nline {\n  fill: none;\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n\ntext {\n\tfont-size: 12px;\n\ttext-anchor: middle;\n}\n&quot;,&quot;js&quot;:&quot;let width = 400, height = 200\n\nlet data = [\n\t{\&quot;Title\&quot;: \&quot;Adaptation\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 22498520, \&quot;Rating\&quot;: 91},\n\t{\&quot;Title\&quot;: \&quot;Air Bud\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 27555061, \&quot;Rating\&quot;: 45},\n\t{\&quot;Title\&quot;: \&quot;Air Force One\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Action\&quot;, \&quot;Worldwide_Gross\&quot;: 315268353, \&quot;Rating\&quot;: 78},\n\t{\&quot;Title\&quot;: \&quot;Alex &amp; Emma\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 15358583, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Alexander\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 167297191, \&quot;Rating\&quot;: 16},\n\t{\&quot;Title\&quot;: \&quot;Ali\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 84383966, \&quot;Rating\&quot;: 67},\n\t{\&quot;Title\&quot;: \&quot;Alice in Wonderland\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 1023291110, \&quot;Rating\&quot;: 51},\n\t{\&quot;Title\&quot;: \&quot;Alive\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 36299670, \&quot;Rating\&quot;: 71},\n\t{\&quot;Title\&quot;: \&quot;All the King&apos;s Men\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 9521458, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Amadeus\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 51973029, \&quot;Rating\&quot;: 96}\n];\n\nlet groups = d3.rollup(data,\n\t\t\t\t\t   function(d) { return d.length; },\n\t\t\t\t\t   function(d) { return d.Distributor; },\n\t\t\t\t\t   function(d) { return d.Genre; }\n\t\t\t\t\t  );\n\nlet root = d3.hierarchy(groups);\n\nroot.sum(function(d) {\n\treturn d[1];\n});\n\nlet treeLayout = d3.tree()\n\t.size([700, 220])\n\ntreeLayout(root)\n\n// Links\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;line&apos;)\n\t.data(root.links())\n\t.join(&apos;line&apos;)\n\t.attr(&apos;x1&apos;, function(d) {return d.source.x;})\n\t.attr(&apos;y1&apos;, function(d) {return d.source.y;})\n\t.attr(&apos;x2&apos;, function(d) {return d.target.x;})\n\t.attr(&apos;y2&apos;, function(d) {return d.target.y;});\n\n// Nodes\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;circle&apos;)\n\t.data(root.descendants())\n\t.join(&apos;circle&apos;)\n\t.attr(&apos;cx&apos;, function(d) {return d.x;})\n\t.attr(&apos;cy&apos;, function(d) {return d.y;})\n\t.attr(&apos;r&apos;, 4);\n\n// Labels\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;text.label&apos;)\n\t.data(root.descendants())\n\t.join(&apos;text&apos;)\n\t.classed(&apos;label&apos;, true)\n\t.attr(&apos;x&apos;, function(d) {return d.x;})\n\t.attr(&apos;y&apos;, function(d) {return d.y - 10;})\n\t.text(function(d) {\n\t\treturn d.data[0];\n\t});\n\n// Leaf count labels\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;text.count-label&apos;)\n\t.data(root.descendants())\n\t.join(&apos;text&apos;)\n\t.classed(&apos;count-label&apos;, true)\n\t.attr(&apos;x&apos;, function(d) {return d.x;})\n\t.attr(&apos;y&apos;, function(d) {return d.y + 20;})\n\t.text(function(d) {\n\t\tif (d.height &gt; 0) return &apos;&apos;;\n\t\treturn d.data[1];\n\t});\n\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The topmost item (or <strong>node</strong>) is known as the <strong>root node</strong>. The bottommost items are known as <strong>leaves</strong> or <strong>leaf nodes</strong>. In the leaf nodes of the above example, the count is displayed under the dot.</p>
+
+<p>You can also aggregate (or ‘rollup’) the groups in different ways. For example you can sum <code class="language-plaintext highlighter-rouge">Worldwide_Gross</code>:</p>
+
+<table class="table table-bordered">
+  <thead><tr><th class="pvtAxisLabel">Distributor</th><th class="pvtAxisLabel">Genre</th><th class="pvtTotalLabel pvtRowTotalLabel">Sum of Worldwide_Gross</th></tr></thead>
+  <tbody>
+    <tr><td class="pvtRowLabel" rowspan="3">Sony Pictures</td><td class="pvtRowLabel" rowspan="1">Action</td><td class="pvtTotal rowTotal" data-value="1" data-for="row0">315268353</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Comedy</td><td class="pvtTotal rowTotal" data-value="1" data-for="row1">22498520</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Drama</td><td class="pvtTotal rowTotal" data-value="2" data-for="row2">93905424</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="2">Walt Disney Pictures</td><td class="pvtRowLabel" rowspan="1">Adventure</td><td class="pvtTotal rowTotal" data-value="2" data-for="row3">1059590780</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Comedy</td><td class="pvtTotal rowTotal" data-value="1" data-for="row4">27555061</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="2">Warner Bros.</td><td class="pvtRowLabel" rowspan="1">Adventure</td><td class="pvtTotal rowTotal" data-value="1" data-for="row5">167297191</td></tr>
+	<tr><td class="pvtRowLabel" rowspan="1">Drama</td><td class="pvtTotal rowTotal" data-value="2" data-for="row6">67331612</td></tr>
+  </tbody>
+</table>
+
+<p>There are several ways in which hierarchical data can be visualised including <strong>trees</strong>, <strong>treemaps</strong>, <strong>packed circles</strong> and <strong>sunbursts</strong>. Each of these can be created using D3 and we’ll cover each of them later in this chapter.</p>
+
+<p>First we’ll look at how D3 can help us create a hierarchical data structure from flat data.</p>
+
+<h2 id="creating-a-hierarchy-from-an-array-of-data">Creating a hierarchy from an array of data</h2>
+
+<p>Given an array of data such as:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">Title</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Adaptation</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Distributor</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Sony Pictures</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Genre</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Comedy</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Worldwide_Gross</span><span class="dl">"</span><span class="p">:</span> <span class="mi">22498520</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Rating</span><span class="dl">"</span><span class="p">:</span> <span class="mi">91</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">Title</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Air Bud</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Distributor</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Walt Disney Pictures</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Genre</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Comedy</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Worldwide_Gross</span><span class="dl">"</span><span class="p">:</span> <span class="mi">27555061</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Rating</span><span class="dl">"</span><span class="p">:</span> <span class="mi">45</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">Title</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Air Force One</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Distributor</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Sony Pictures</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Genre</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Action</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Worldwide_Gross</span><span class="dl">"</span><span class="p">:</span> <span class="mi">315268353</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">Rating</span><span class="dl">"</span><span class="p">:</span> <span class="mi">78</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">];</span></code></pre></figure>
+
+<p>you can use D3’s <code class="language-plaintext highlighter-rouge">.rollup</code> function to group the data by any of the categorical properties.</p>
+
+<blockquote>
+  <p>The above array is similar to the output of d3.csv. (See <a href="/requests">requests chapter</a>.)</p>
+</blockquote>
+
+<p>The first argument of <code class="language-plaintext highlighter-rouge">.rollup</code> is the array you’re wanting to group.</p>
+
+<p>The next argument is a <strong>reduce</strong> function. This is a function that takes an array of values and outputs a single value. For example it might iterate through the array, summing one of the properties (such as <code class="language-plaintext highlighter-rouge">Worldwide_Gross</code>).</p>
+
+<p>The remaining argument(s) are functions which specify which properties to group by.</p>
+
+<p>Let’s group by <code class="language-plaintext highlighter-rouge">Distributor</code> and <code class="language-plaintext highlighter-rouge">Genre</code> and sum <code class="language-plaintext highlighter-rouge">Worldwide_Gross</code> across the items in each group:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">sumWorldwideGross</span><span class="p">(</span><span class="nx">group</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="nx">group</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Worldwide_Gross</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">groups</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">rollup</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span>
+                       <span class="nx">sumWorldwideGross</span><span class="p">,</span>
+                       <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Distributor</span><span class="p">;</span> <span class="p">},</span>
+                       <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Genre</span><span class="p">;</span> <span class="p">}</span>
+                      <span class="p">);</span></code></pre></figure>
+
+<p>In the above example <code class="language-plaintext highlighter-rouge">d3.rollup</code> groups <code class="language-plaintext highlighter-rouge">data</code> by <code class="language-plaintext highlighter-rouge">Distributor</code> and <code class="language-plaintext highlighter-rouge">Genre</code>. Each of the groups is then passed into <code class="language-plaintext highlighter-rouge">sumWorldwideGross</code> which returns the sum of <code class="language-plaintext highlighter-rouge">Worldwide_Gross</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">d3.rollup</code> returns a nested map object. (Maps, just like regular JavaScript objects, hold key-value pairs. You can read more about them <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">here</a>.)</p>
+
+<p>You can inspect the map returned by <code class="language-plaintext highlighter-rouge">d3.rollup</code> using <code class="language-plaintext highlighter-rouge">.get</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Get Sony Pictures</span>
+<span class="nx">groups</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">Sony Pictures</span><span class="dl">'</span><span class="p">);</span>  <span class="c1">// {"Comedy" =&gt; 22498520, "Action" =&gt; 315268353, "Drama" =&gt; 93905424}</span>
+
+<span class="c1">// Get Drama within Sony Pictures</span>
+<span class="nx">groups</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">Sony Pictures</span><span class="dl">'</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">Drama</span><span class="dl">'</span><span class="p">);</span>  <span class="c1">// 93905424</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/arrays/rollup/" marginwidth="0" marginheight="0" style="width: 400px; height: 0px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/arrays/rollup/" marginwidth="0" marginheight="0" style="width: 400px; height: 0px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n&lt;/div&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n&quot;,&quot;js&quot;:&quot;let data = [\n\t{\&quot;Title\&quot;: \&quot;Adaptation\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 22498520, \&quot;Rating\&quot;: 91},\n\t{\&quot;Title\&quot;: \&quot;Air Bud\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 27555061, \&quot;Rating\&quot;: 45},\n\t{\&quot;Title\&quot;: \&quot;Air Force One\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Action\&quot;, \&quot;Worldwide_Gross\&quot;: 315268353, \&quot;Rating\&quot;: 78},\n\t{\&quot;Title\&quot;: \&quot;Alex &amp; Emma\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 15358583, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Alexander\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 167297191, \&quot;Rating\&quot;: 16},\n\t{\&quot;Title\&quot;: \&quot;Ali\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 84383966, \&quot;Rating\&quot;: 67},\n\t{\&quot;Title\&quot;: \&quot;Alice in Wonderland\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 1023291110, \&quot;Rating\&quot;: 51},\n\t{\&quot;Title\&quot;: \&quot;Alive\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 36299670, \&quot;Rating\&quot;: 71},\n\t{\&quot;Title\&quot;: \&quot;All the King&apos;s Men\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 9521458, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Amadeus\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 51973029, \&quot;Rating\&quot;: 96}\n];\n\nfunction sumWorldwideGross(group) {\n\treturn d3.sum(group, function(d) {\n\t\treturn d.Worldwide_Gross;\n\t});\n}\n\nfunction doRollup(data) {\n\tlet groups = d3.rollup(data, sumWorldwideGross,\n\t\t\t\t\t\t   function(d) { return d.Distributor; },\n\t\t\t\t\t\t   function(d) { return d.Genre; }\n\t\t\t\t\t\t  );\n\n\t// Get Sony Pictures\n\tconsole.log(groups.get(&apos;Sony Pictures&apos;));\n\n\t// Get Drama within Sony Pictures\n\tconsole.log(groups.get(&apos;Sony Pictures&apos;).get(&apos;Drama&apos;));\n}\n\n\ndoRollup(data);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The first <code class="language-plaintext highlighter-rouge">.get</code> returns the group associated with <code class="language-plaintext highlighter-rouge">Sony Pictures</code>. This group contains 3 items: <code class="language-plaintext highlighter-rouge">Comedy</code>, <code class="language-plaintext highlighter-rouge">Action</code> and <code class="language-plaintext highlighter-rouge">Drama</code>. (You can compare this with the table we showed previously.)</p>
+
+<p>The second <code class="language-plaintext highlighter-rouge">.get</code> returns the value associated with <code class="language-plaintext highlighter-rouge">Drama</code> within the <code class="language-plaintext highlighter-rouge">Sony Pictures</code> group (93905424). This returns the value computed by the rollup function (<code class="language-plaintext highlighter-rouge">sumWorldwideGross</code>) because we’re at the lowest level of the hieararchy.</p>
+
+<h2 id="d3hierarchy-structure">d3.hierarchy structure</h2>
+
+<p>D3 has a bespoke hierarchy data structure that gives you some useful features over and above the map object seen previously.</p>
+
+<p>It’s created by calling <code class="language-plaintext highlighter-rouge">d3.hierarchy</code> and passing in the map object generated by <code class="language-plaintext highlighter-rouge">d3.rollup</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">sumWorldwideGross</span><span class="p">(</span><span class="nx">group</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="nx">group</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Worldwide_Gross</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">groups</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">rollup</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span>
+                       <span class="nx">sumWorldwideGross</span><span class="p">,</span>
+                       <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Distributor</span><span class="p">;</span> <span class="p">},</span>
+                       <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Genre</span><span class="p">;</span> <span class="p">}</span>
+                      <span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">root</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">hierarchy</span><span class="p">(</span><span class="nx">groups</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/arrays/rollup-hierarchy/" marginwidth="0" marginheight="0" style="width: 400px; height: 0px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/arrays/rollup-hierarchy/" marginwidth="0" marginheight="0" style="width: 400px; height: 0px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n&lt;/div&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n&quot;,&quot;js&quot;:&quot;let data = [\n\t{\&quot;Title\&quot;: \&quot;Adaptation\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 22498520, \&quot;Rating\&quot;: 91},\n\t{\&quot;Title\&quot;: \&quot;Air Bud\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 27555061, \&quot;Rating\&quot;: 45},\n\t{\&quot;Title\&quot;: \&quot;Air Force One\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Action\&quot;, \&quot;Worldwide_Gross\&quot;: 315268353, \&quot;Rating\&quot;: 78},\n\t{\&quot;Title\&quot;: \&quot;Alex &amp; Emma\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 15358583, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Alexander\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 167297191, \&quot;Rating\&quot;: 16},\n\t{\&quot;Title\&quot;: \&quot;Ali\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 84383966, \&quot;Rating\&quot;: 67},\n\t{\&quot;Title\&quot;: \&quot;Alice in Wonderland\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 1023291110, \&quot;Rating\&quot;: 51},\n\t{\&quot;Title\&quot;: \&quot;Alive\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 36299670, \&quot;Rating\&quot;: 71},\n\t{\&quot;Title\&quot;: \&quot;All the King&apos;s Men\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 9521458, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Amadeus\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 51973029, \&quot;Rating\&quot;: 96}\n];\n\nfunction sumWorldwideGross(group) {\n\treturn d3.sum(group, function(d) {\n\t\treturn d.Worldwide_Gross;\n\t});\n}\n\nfunction doRollup(data) {\n\tlet groups = d3.rollup(data, sumWorldwideGross,\n\t\t\t\t\t\t   function(d) { return d.Distributor; },\n\t\t\t\t\t\t   function(d) { return d.Genre; }\n\t\t\t\t\t\t  );\n\n\tlet root = d3.hierarchy(groups);\n\n\tconsole.log(root);\n}\n\n\ndoRollup(data);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>You can also pass a nested object into <code class="language-plaintext highlighter-rouge">d3.hierarchy</code>. The layout examples later on use this approach.</p>
+</blockquote>
+
+<p>The output of <code class="language-plaintext highlighter-rouge">d3.hierarchy</code> is a nested object that looks something like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+  data: [undefined, Map(3)],
+  children: [
+    {
+      data: ["Sony Pictures", Map(3)],
+      children: [...],
+      depth: 1,
+      height: 1,
+      parent: {...} // this item's parent node
+    }.
+    {
+      data: ["Walt Disney Pictures", Map(2)],
+      children: [...],
+      depth: 1,
+      height: 1,
+      parent: {...} // this item's parent node
+    }.
+    {
+      data: ["Warner Bros.", Map(3)],
+      children: [...],
+      depth: 1,
+      height: 1,
+      parent: {...} // this item's parent node
+    }
+  ],
+  depth: 0,
+  height: 2,
+  parent: null
+}
+</code></pre></div></div>
+
+<p>It’s similar in structure to the map object that’s passed into <code class="language-plaintext highlighter-rouge">d3.hierarchy</code>. The difference is that it’s a regular JavaScript object and has various properties and methods defined on it that provides additional functionality.</p>
+
+<p>Each item (or <strong>node</strong>) in the hierarchy has properties: <code class="language-plaintext highlighter-rouge">data</code>, <code class="language-plaintext highlighter-rouge">children</code>, <code class="language-plaintext highlighter-rouge">depth</code>, <code class="language-plaintext highlighter-rouge">height</code> and <code class="language-plaintext highlighter-rouge">parent</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">data</code> is the associated item from the map or object that’s passed into <code class="language-plaintext highlighter-rouge">d3.hierarchy</code>. In this example it’s a two-element array containing the group name and the group’s value. For leaf nodes (the nodes at the bottom-most level), the value is the aggregated value (for example, the sum of <code class="language-plaintext highlighter-rouge">Worldwide_Gross</code>). Otherwise, it’s the map representing the items in the group. Typically you won’t need to access the value because the hierarchy makes this data available through its <code class="language-plaintext highlighter-rouge">children</code> and <code class="language-plaintext highlighter-rouge">value</code> properties.</p>
+
+<p><code class="language-plaintext highlighter-rouge">children</code> is an array containing the node’s children. <code class="language-plaintext highlighter-rouge">depth</code> and <code class="language-plaintext highlighter-rouge">height</code> indicate the depth and height of the node within the hierarchy. (The root node has a depth of zero and leaf nodes have a height of zero.)</p>
+
+<p><code class="language-plaintext highlighter-rouge">parent</code> references the node’s parent node.</p>
+
+<p>The leaf nodes look something like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+  data: ["Comedy", 22498520],
+  depth: 2,
+  height: 0,
+  parent: {...} // this item's parent node
+}
+</code></pre></div></div>
+
+<p>You can see that the <code class="language-plaintext highlighter-rouge">data</code> property contains the rolled up value. If the rolled up value is a sum or count, it can be be propagated back up the tree using the hierachy’s <code class="language-plaintext highlighter-rouge">.sum</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">sumWorldwideGross</span><span class="p">(</span><span class="nx">group</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="nx">group</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Worldwide_Gross</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">groups</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">rollup</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span>
+                       <span class="nx">sumWorldwideGross</span><span class="p">,</span>
+                       <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Distributor</span><span class="p">;</span> <span class="p">},</span>
+                       <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Genre</span><span class="p">;</span> <span class="p">}</span>
+                      <span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">root</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">hierarchy</span><span class="p">(</span><span class="nx">groups</span><span class="p">);</span>
+<span class="nx">root</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">d</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/arrays/rollup-hierarchy-with-sum/" marginwidth="0" marginheight="0" style="width: 400px; height: 0px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/arrays/rollup-hierarchy-with-sum/" marginwidth="0" marginheight="0" style="width: 400px; height: 0px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n&lt;/div&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;\nbody {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n&quot;,&quot;js&quot;:&quot;let data = [\n\t{\&quot;Title\&quot;: \&quot;Adaptation\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 22498520, \&quot;Rating\&quot;: 91},\n\t{\&quot;Title\&quot;: \&quot;Air Bud\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Comedy\&quot;, \&quot;Worldwide_Gross\&quot;: 27555061, \&quot;Rating\&quot;: 45},\n\t{\&quot;Title\&quot;: \&quot;Air Force One\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Action\&quot;, \&quot;Worldwide_Gross\&quot;: 315268353, \&quot;Rating\&quot;: 78},\n\t{\&quot;Title\&quot;: \&quot;Alex &amp; Emma\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 15358583, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Alexander\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 167297191, \&quot;Rating\&quot;: 16},\n\t{\&quot;Title\&quot;: \&quot;Ali\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 84383966, \&quot;Rating\&quot;: 67},\n\t{\&quot;Title\&quot;: \&quot;Alice in Wonderland\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 1023291110, \&quot;Rating\&quot;: 51},\n\t{\&quot;Title\&quot;: \&quot;Alive\&quot;, \&quot;Distributor\&quot;: \&quot;Walt Disney Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Adventure\&quot;, \&quot;Worldwide_Gross\&quot;: 36299670, \&quot;Rating\&quot;: 71},\n\t{\&quot;Title\&quot;: \&quot;All the King&apos;s Men\&quot;, \&quot;Distributor\&quot;: \&quot;Sony Pictures\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 9521458, \&quot;Rating\&quot;: 11},\n\t{\&quot;Title\&quot;: \&quot;Amadeus\&quot;, \&quot;Distributor\&quot;: \&quot;Warner Bros.\&quot;, \&quot;Genre\&quot;: \&quot;Drama\&quot;, \&quot;Worldwide_Gross\&quot;: 51973029, \&quot;Rating\&quot;: 96}\n];\n\nfunction sumWorldwideGross(group) {\n\treturn d3.sum(group, function(d) {\n\t\treturn d.Worldwide_Gross;\n\t});\n}\n\nfunction doRollup(data) {\n\tlet groups = d3.rollup(data, sumWorldwideGross,\n\t\t\t\t\t\t   function(d) { return d.Distributor; },\n\t\t\t\t\t\t   function(d) { return d.Genre; }\n\t\t\t\t\t\t  );\n\n\tlet root = d3.hierarchy(groups);\n\troot.sum(function(d) {\n\t\treturn d[1];\n\t});\n\n\tconsole.log(root);\n}\n\n\ndoRollup(data);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The <code class="language-plaintext highlighter-rouge">.sum</code> method takes an accessor function whose first parameter is the node’s <code class="language-plaintext highlighter-rouge">data</code> property. The accessor function returns the value to sum by.</p>
+
+<blockquote>
+  <p>If you’re passing the output of <code class="language-plaintext highlighter-rouge">d3.rollup</code> into <code class="language-plaintext highlighter-rouge">d3.hierarchy</code>, the accessor function will usually return <code class="language-plaintext highlighter-rouge">d[1]</code> which is the rolled up value generated by <code class="language-plaintext highlighter-rouge">d3.rollup</code>.</p>
+</blockquote>
+
+<p>Each leaf node will now have a <code class="language-plaintext highlighter-rouge">value</code> property equivalent to its rolled up value. For example:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+  data: ["Comedy", 22498520],
+  depth: 2,
+  height: 0,
+  parent: {...}, // this item's parent node
+  value: 22498520
+}
+</code></pre></div></div>
+
+<p>The non-leaf nodes will also have a <code class="language-plaintext highlighter-rouge">value</code> property which is the sum of the values of its children.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+  data: ["Sony Pictures", Map(3)],
+  depth: 1,
+  height: 1,
+  parent: {...}, // this item's parent node
+  value: 431672297
+}
+</code></pre></div></div>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">.value</code> property generated by the <code class="language-plaintext highlighter-rouge">.sum</code> method is used by some of the layouts we’ll cover later such as treemap and packed circles.</p>
+</blockquote>
+
+<p>Each node in a D3 hierarchy has handy methods such as <code class="language-plaintext highlighter-rouge">.descendants</code>, <code class="language-plaintext highlighter-rouge">.ancestors</code> and <code class="language-plaintext highlighter-rouge">.links</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">.descendants</code> returns an array containing the node and its descendants. <code class="language-plaintext highlighter-rouge">.ancestors</code> returns an array containing the node and its ancestors (all the way to the root).</p>
+
+<p><code class="language-plaintext highlighter-rouge">.links</code> returns an array of objects representing the connections between the node and its children, all the way to the leaves. We’ll see this in use later on.</p>
+
+<h2 id="visualising-hierarchies">Visualising hierarchies</h2>
+
+<p>There are several ways in which hierarchies can be visualised including trees:</p>
+
+<!-- <iframe class="db center" src="/blocks/layouts/tree/" marginwidth="0" marginheight="0" style="width: 400px; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/tree/" marginwidth="0" marginheight="0" style="width: 400px; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;400\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g transform=\&quot;translate(5, 5)\&quot;&gt;\n      &lt;g class=\&quot;links\&quot;&gt;&lt;/g&gt;\n      &lt;g class=\&quot;nodes\&quot;&gt;&lt;/g&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n.node {\n  fill: steelblue;\n  stroke: none;\n}\n\n.link {\n  fill: none;\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n}\n\nvar treeLayout = d3.tree()\n\t.size([400, 200])\n\nvar root = d3.hierarchy(data)\n\ntreeLayout(root)\n\n// Nodes\nd3.select(&apos;svg g.nodes&apos;)\n\t.selectAll(&apos;circle.node&apos;)\n\t.data(root.descendants())\n\t.join(&apos;circle&apos;)\n\t.classed(&apos;node&apos;, true)\n\t.attr(&apos;cx&apos;, function(d) {return d.x;})\n\t.attr(&apos;cy&apos;, function(d) {return d.y;})\n\t.attr(&apos;r&apos;, 4);\n\n// Links\nd3.select(&apos;svg g.links&apos;)\n\t.selectAll(&apos;line.link&apos;)\n\t.data(root.links())\n\t.join(&apos;line&apos;)\n\t.classed(&apos;link&apos;, true)\n\t.attr(&apos;x1&apos;, function(d) {return d.source.x;})\n\t.attr(&apos;y1&apos;, function(d) {return d.source.y;})\n\t.attr(&apos;x2&apos;, function(d) {return d.target.x;})\n\t.attr(&apos;y2&apos;, function(d) {return d.target.y;});\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>treemaps:</p>
+
+<!-- <iframe class="db center" src="/blocks/layouts/treemap-labels/" marginwidth="0" marginheight="0" style="width: 420px; height: 240px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/treemap-labels/" marginwidth="0" marginheight="0" style="width: 420px; height: 240px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;420\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nrect {\n  fill: cadetblue;\n  opacity: 0.3;\n  stroke: white;\n}\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  fill: white;\n  font-size: 10px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar treemapLayout = d3.treemap()\n\t.size([400, 200])\n\t.paddingOuter(16);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\ntreemapLayout(rootNode);\n\nvar nodes = d3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;g&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;g&apos;)\n\t.attr(&apos;transform&apos;, function(d) {return &apos;translate(&apos; + [d.x0, d.y0] + &apos;)&apos;})\n\nnodes\n\t.append(&apos;rect&apos;)\n\t.attr(&apos;width&apos;, function(d) { return d.x1 - d.x0; })\n\t.attr(&apos;height&apos;, function(d) { return d.y1 - d.y0; })\n\nnodes\n\t.append(&apos;text&apos;)\n\t.attr(&apos;dx&apos;, 4)\n\t.attr(&apos;dy&apos;, 14)\n\t.text(function(d) {\n\t\treturn d.data.name;\n\t})\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>packed circles:</p>
+
+<!-- <iframe class="db center" src="/blocks/layouts/pack-labels/" marginwidth="0" marginheight="0" style="width: 320px; height: 350px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/pack-labels/" marginwidth="0" marginheight="0" style="width: 320px; height: 350px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;320\&quot; height=\&quot;320\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: indianred;\n  opacity: 0.3;\n  stroke: white;\n}\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  fill: white;\n  font-size: 10px;\n  text-anchor: middle;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar packLayout = d3.pack()\n\t.size([300, 300]);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\npackLayout(rootNode);\n\nvar nodes = d3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;g&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;g&apos;)\n\t.attr(&apos;transform&apos;, function(d) {return &apos;translate(&apos; + [d.x, d.y] + &apos;)&apos;})\n\nnodes\n\t.append(&apos;circle&apos;)\n\t.attr(&apos;r&apos;, function(d) { return d.r; })\n\nnodes\n\t.append(&apos;text&apos;)\n\t.attr(&apos;dy&apos;, 4)\n\t.text(function(d) {\n\t\treturn d.children === undefined ? d.data.name : &apos;&apos;;\n\t})\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>and sunburst charts:</p>
+
+<!-- <iframe class="db center" src="/blocks/layouts/partition-sunburst/" marginwidth="0" marginheight="0" style="width: 320px; height: 330px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/partition-sunburst/" marginwidth="0" marginheight="0" style="width: 320px; height: 330px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;320\&quot; height=\&quot;320\&quot;&gt;\n    &lt;g transform=\&quot;translate(160, 160)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n  fill: #333;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar radius = 150;\n\nvar partitionLayout = d3.partition()\n\t.size([2 * Math.PI, radius]);\n\nvar arcGenerator = d3.arc()\n\t.startAngle(function(d) { return d.x0; })\n\t.endAngle(function(d) { return d.x1; })\n\t.innerRadius(function(d) { return d.y0; })\n\t.outerRadius(function(d) { return d.y1; });\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\npartitionLayout(rootNode);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<blockquote>
+  <p>You can also use stacked bar charts for visualising hierarchies!</p>
+</blockquote>
+
+<p>D3 supports the above visualisations using <strong>layout functions</strong>. These take a <code class="language-plaintext highlighter-rouge">d3.hierarchy</code> structure and add <strong>visual variables such as position and size</strong> to it.</p>
+
+<p>For example the tree layout adds <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> values to each node such that the nodes form a tree-like shape.</p>
+
+<p>In this chapter we’ll look at the <code class="language-plaintext highlighter-rouge">tree</code>, <code class="language-plaintext highlighter-rouge">cluster</code>, <code class="language-plaintext highlighter-rouge">treemap</code>, <code class="language-plaintext highlighter-rouge">pack</code> and <code class="language-plaintext highlighter-rouge">partition</code> layouts. Note that <code class="language-plaintext highlighter-rouge">treemap</code>, <code class="language-plaintext highlighter-rouge">pack</code> and <code class="language-plaintext highlighter-rouge">partition</code> are designed to lay out hierarchies where the nodes have an associated numeric value (e.g. revenue, population etc.).</p>
+
+<h3 id="tree-layout">Tree layout</h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">tree</code> layout arranges the nodes of a hierarchy in a <strong>tree like arrangement</strong>.</p>
+
+<!-- <iframe class="db center" src="/blocks/layouts/tree/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/tree/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;400\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g transform=\&quot;translate(5, 5)\&quot;&gt;\n      &lt;g class=\&quot;links\&quot;&gt;&lt;/g&gt;\n      &lt;g class=\&quot;nodes\&quot;&gt;&lt;/g&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n.node {\n  fill: steelblue;\n  stroke: none;\n}\n\n.link {\n  fill: none;\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n}\n\nvar treeLayout = d3.tree()\n\t.size([400, 200])\n\nvar root = d3.hierarchy(data)\n\ntreeLayout(root)\n\n// Nodes\nd3.select(&apos;svg g.nodes&apos;)\n\t.selectAll(&apos;circle.node&apos;)\n\t.data(root.descendants())\n\t.join(&apos;circle&apos;)\n\t.classed(&apos;node&apos;, true)\n\t.attr(&apos;cx&apos;, function(d) {return d.x;})\n\t.attr(&apos;cy&apos;, function(d) {return d.y;})\n\t.attr(&apos;r&apos;, 4);\n\n// Links\nd3.select(&apos;svg g.links&apos;)\n\t.selectAll(&apos;line.link&apos;)\n\t.data(root.links())\n\t.join(&apos;line&apos;)\n\t.classed(&apos;link&apos;, true)\n\t.attr(&apos;x1&apos;, function(d) {return d.source.x;})\n\t.attr(&apos;y1&apos;, function(d) {return d.source.y;})\n\t.attr(&apos;x2&apos;, function(d) {return d.target.x;})\n\t.attr(&apos;y2&apos;, function(d) {return d.target.y;});\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>Start by creating a tree layout function using <code class="language-plaintext highlighter-rouge">d3.tree()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">treeLayout</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">tree</span><span class="p">();</span></code></pre></figure>
+
+<blockquote>
+  <p>d3.tree() returns a layout function into which you can pass a hierarchy object.</p>
+</blockquote>
+
+<p>You can configure the tree’s size using <code class="language-plaintext highlighter-rouge">.size</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">treeLayout</span><span class="p">.</span><span class="nx">size</span><span class="p">([</span><span class="mi">400</span><span class="p">,</span> <span class="mi">200</span><span class="p">]);</span></code></pre></figure>
+
+<p>You can then call <code class="language-plaintext highlighter-rouge">treeLayout</code>, passing in the hierarchy object <code class="language-plaintext highlighter-rouge">root</code> that was defined above:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">treeLayout</span><span class="p">(</span><span class="nx">root</span><span class="p">);</span></code></pre></figure>
+
+<p>This’ll write <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> values on each node of <code class="language-plaintext highlighter-rouge">root</code>.</p>
+
+<p>To draw the nodes:</p>
+
+<ul>
+  <li>use <code class="language-plaintext highlighter-rouge">root.descendants()</code> to get an array of all the nodes</li>
+  <li>join this array to circles (or any other type of SVG element)</li>
+  <li>use <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> to position the circles</li>
+</ul>
+
+<p>To draw the links:</p>
+
+<ul>
+  <li>use <code class="language-plaintext highlighter-rouge">root.links()</code> to get an array of all the links</li>
+  <li>join the array to line (or path) elements</li>
+  <li>use <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> of the link’s <code class="language-plaintext highlighter-rouge">source</code> and <code class="language-plaintext highlighter-rouge">target</code> properties to position the line</li>
+</ul>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">root.links()</code> returns an array where each element is an object containing two properties <code class="language-plaintext highlighter-rouge">source</code> and <code class="language-plaintext highlighter-rouge">target</code> which represent the link’s source and target nodes.</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Nodes</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g.nodes</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle.node</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">descendants</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">classed</span><span class="p">(</span><span class="dl">'</span><span class="s1">node</span><span class="dl">'</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+
+<span class="c1">// Links</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g.links</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">line.link</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">links</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">line</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">classed</span><span class="p">(</span><span class="dl">'</span><span class="s1">link</span><span class="dl">'</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">x1</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">source</span><span class="p">.</span><span class="nx">x</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">y1</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">source</span><span class="p">.</span><span class="nx">y</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">x2</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">x</span><span class="p">;})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">y2</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">y</span><span class="p">;});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/tree/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/tree/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;400\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g transform=\&quot;translate(5, 5)\&quot;&gt;\n      &lt;g class=\&quot;links\&quot;&gt;&lt;/g&gt;\n      &lt;g class=\&quot;nodes\&quot;&gt;&lt;/g&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n.node {\n  fill: steelblue;\n  stroke: none;\n}\n\n.link {\n  fill: none;\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n}\n\nvar treeLayout = d3.tree()\n\t.size([400, 200])\n\nvar root = d3.hierarchy(data)\n\ntreeLayout(root)\n\n// Nodes\nd3.select(&apos;svg g.nodes&apos;)\n\t.selectAll(&apos;circle.node&apos;)\n\t.data(root.descendants())\n\t.join(&apos;circle&apos;)\n\t.classed(&apos;node&apos;, true)\n\t.attr(&apos;cx&apos;, function(d) {return d.x;})\n\t.attr(&apos;cy&apos;, function(d) {return d.y;})\n\t.attr(&apos;r&apos;, 4);\n\n// Links\nd3.select(&apos;svg g.links&apos;)\n\t.selectAll(&apos;line.link&apos;)\n\t.data(root.links())\n\t.join(&apos;line&apos;)\n\t.classed(&apos;link&apos;, true)\n\t.attr(&apos;x1&apos;, function(d) {return d.source.x;})\n\t.attr(&apos;y1&apos;, function(d) {return d.source.y;})\n\t.attr(&apos;x2&apos;, function(d) {return d.target.x;})\n\t.attr(&apos;y2&apos;, function(d) {return d.target.y;});\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/f349b9aedec5206fbb9e83a6e246304a" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/f349b9aedec5206fbb9e83a6e246304a?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=f349b9aedec5206fbb9e83a6e246304a" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<blockquote>
+  <p>For simplicity, in this and the following CodePen examples, a hierarchy object is created from a nested object (rather than from an array).</p>
+</blockquote>
+
+<h3 id="cluster-layout">Cluster layout</h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">cluster</code> layout is very similar to the <code class="language-plaintext highlighter-rouge">tree</code> layout the main difference being <strong>all leaf nodes are placed at the same depth</strong>.</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">clusterLayout</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">cluster</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">size</span><span class="p">([</span><span class="mi">400</span><span class="p">,</span> <span class="mi">200</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">root</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">hierarchy</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="nx">clusterLayout</span><span class="p">(</span><span class="nx">root</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/cluster/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/cluster/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;400\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g transform=\&quot;translate(5, 5)\&quot;&gt;\n      &lt;g class=\&quot;links\&quot;&gt;&lt;/g&gt;\n      &lt;g class=\&quot;nodes\&quot;&gt;&lt;/g&gt;\n    &lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n.node {\n  fill: steelblue;\n  stroke: none;\n}\n\n.link {\n  fill: none;\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n}\n\nvar clusterLayout = d3.cluster()\n\t.size([400, 200])\n\nvar root = d3.hierarchy(data)\n\nclusterLayout(root)\n\n// Nodes\nd3.select(&apos;svg g.nodes&apos;)\n\t.selectAll(&apos;circle.node&apos;)\n\t.data(root.descendants())\n\t.join(&apos;circle&apos;)\n\t.classed(&apos;node&apos;, true)\n\t.attr(&apos;cx&apos;, function(d) {return d.x;})\n\t.attr(&apos;cy&apos;, function(d) {return d.y;})\n\t.attr(&apos;r&apos;, 4);\n\n// Links\nd3.select(&apos;svg g.links&apos;)\n\t.selectAll(&apos;line.link&apos;)\n\t.data(root.links())\n\t.join(&apos;line&apos;)\n\t.classed(&apos;link&apos;, true)\n\t.attr(&apos;x1&apos;, function(d) {return d.source.x;})\n\t.attr(&apos;y1&apos;, function(d) {return d.source.y;})\n\t.attr(&apos;x2&apos;, function(d) {return d.target.x;})\n\t.attr(&apos;y2&apos;, function(d) {return d.target.y;});\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/ceb8d9e5ded610a9df1e0adb98efd748" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/ceb8d9e5ded610a9df1e0adb98efd748?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=ceb8d9e5ded610a9df1e0adb98efd748" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="treemap-layout">Treemap layout</h3>
+
+<p>Treemaps were invented by <a href="https://en.wikipedia.org/wiki/Ben_Shneiderman">Ben Shneiderman</a> to visually represent hierarchies where <strong>each item has an associated value</strong>.</p>
+
+<p>For example, imagine you have country population data where each country has a region and a population value.</p>
+
+<p>You can use a treemap to represent each region as a rectangle. Each region consists of smaller rectangles which represent a country. Each country is sized proportionally to the population:</p>
+
+<p><img src="/img/layouts/treemap.png" /></p>
+
+<p>Create a treemap layout function by calling <code class="language-plaintext highlighter-rouge">d3.treemap()</code>	:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">treemapLayout</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">treemap</span><span class="p">();</span></code></pre></figure>
+
+<p>As before you can configure the layout:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">treemapLayout</span>
+  <span class="p">.</span><span class="nx">size</span><span class="p">([</span><span class="mi">400</span><span class="p">,</span> <span class="mi">200</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">paddingOuter</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span></code></pre></figure>
+
+<p>Before applying this layout to your hierarchy <strong>you must run <code class="language-plaintext highlighter-rouge">.sum()</code> on the hierarchy</strong>. This traverses the tree and sets <code class="language-plaintext highlighter-rouge">.value</code> on each node to be the sum of its children:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">root</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+<span class="p">});</span></code></pre></figure>
+
+<blockquote>
+  <p>Note an accessor function has been passed into <code class="language-plaintext highlighter-rouge">.sum()</code> to specify which property to sum.</p>
+</blockquote>
+
+<p>You can now call <code class="language-plaintext highlighter-rouge">treemapLayout</code>, passing in the hierarchy object <code class="language-plaintext highlighter-rouge">root</code> that was defined earlier:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">treemapLayout</span><span class="p">(</span><span class="nx">root</span><span class="p">);</span></code></pre></figure>
+
+<p>The treemap layout function adds 4 properties <code class="language-plaintext highlighter-rouge">x0</code>, <code class="language-plaintext highlighter-rouge">x1</code>, <code class="language-plaintext highlighter-rouge">y0</code> and <code class="language-plaintext highlighter-rouge">y1</code> to each node which specify the dimensions of each rectangle in the treemap.</p>
+
+<p>Now you can join the nodes to <code class="language-plaintext highlighter-rouge">rect</code> elements and update the <code class="language-plaintext highlighter-rouge">x</code>, <code class="language-plaintext highlighter-rouge">y</code>, <code class="language-plaintext highlighter-rouge">width</code> and <code class="language-plaintext highlighter-rouge">height</code> properties of each <code class="language-plaintext highlighter-rouge">rect</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">descendants</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">y</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">width</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">height</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">;</span> <span class="p">})</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/treemap/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/treemap/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;420\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nrect {\n  fill: cadetblue;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar treemapLayout = d3.treemap()\n\t.size([400, 200])\n\t.paddingOuter(10);\n\nvar root = d3.hierarchy(data)\n\nroot.sum(function(d) {\n\treturn d.value;\n});\n\ntreemapLayout(root);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;rect&apos;)\n\t.data(root.descendants())\n\t.join(&apos;rect&apos;)\n\t.attr(&apos;x&apos;, function(d) { return d.x0; })\n\t.attr(&apos;y&apos;, function(d) { return d.y0; })\n\t.attr(&apos;width&apos;, function(d) { return d.x1 - d.x0; })\n\t.attr(&apos;height&apos;, function(d) { return d.y1 - d.y0; })\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/d4f8938a1fd0914b41ea7cb4e2480ca8" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/d4f8938a1fd0914b41ea7cb4e2480ca8?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=d4f8938a1fd0914b41ea7cb4e2480ca8" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>If you’d like labels in each rectangle you can join <code class="language-plaintext highlighter-rouge">g</code> elements to the array and add <code class="language-plaintext highlighter-rouge">rect</code> and <code class="language-plaintext highlighter-rouge">text</code> elements to each <code class="language-plaintext highlighter-rouge">g</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">rootNode</span><span class="p">.</span><span class="nx">descendants</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">transform</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="dl">'</span><span class="s1">translate(</span><span class="dl">'</span> <span class="o">+</span> <span class="p">[</span><span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">]</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">})</span>
+
+<span class="nx">nodes</span>
+  <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">width</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">height</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">;</span> <span class="p">})</span>
+
+<span class="nx">nodes</span>
+  <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">text</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">dx</span><span class="dl">'</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">dy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">text</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+  <span class="p">})</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/treemap-labels/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/treemap-labels/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;420\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nrect {\n  fill: cadetblue;\n  opacity: 0.3;\n  stroke: white;\n}\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  fill: white;\n  font-size: 10px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar treemapLayout = d3.treemap()\n\t.size([400, 200])\n\t.paddingOuter(16);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\ntreemapLayout(rootNode);\n\nvar nodes = d3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;g&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;g&apos;)\n\t.attr(&apos;transform&apos;, function(d) {return &apos;translate(&apos; + [d.x0, d.y0] + &apos;)&apos;})\n\nnodes\n\t.append(&apos;rect&apos;)\n\t.attr(&apos;width&apos;, function(d) { return d.x1 - d.x0; })\n\t.attr(&apos;height&apos;, function(d) { return d.y1 - d.y0; })\n\nnodes\n\t.append(&apos;text&apos;)\n\t.attr(&apos;dx&apos;, 4)\n\t.attr(&apos;dy&apos;, 14)\n\t.text(function(d) {\n\t\treturn d.data.name;\n\t})\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/96649ce5ef72d53386790908fe785a6a" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/96649ce5ef72d53386790908fe785a6a?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=96649ce5ef72d53386790908fe785a6a" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p><code class="language-plaintext highlighter-rouge">treemap</code> layouts can be configured in a number of ways:</p>
+
+<ul>
+  <li>the padding around a node’s children can be set using <code class="language-plaintext highlighter-rouge">.paddingOuter</code></li>
+  <li>the padding between sibling nodes can be set using <code class="language-plaintext highlighter-rouge">.paddingInner</code></li>
+  <li>outer and inner padding can be set at the same time using <code class="language-plaintext highlighter-rouge">.padding</code></li>
+  <li>the outer padding can also be fine tuned using <code class="language-plaintext highlighter-rouge">.paddingTop</code>, <code class="language-plaintext highlighter-rouge">.paddingBottom</code>, <code class="language-plaintext highlighter-rouge">.paddingLeft</code> and <code class="language-plaintext highlighter-rouge">.paddingRight</code>.</li>
+</ul>
+
+<!-- <iframe class="db center" src="/blocks/layouts/treemap-padding/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/treemap-padding/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;420\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nrect {\n  fill: cadetblue;\n  opacity: 0.3;\n  stroke: white;\n}\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  fill: white;\n  font-size: 10px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar treemapLayout = d3.treemap()\n\t.size([400, 200])\n\t.paddingTop(20)\n\t.paddingInner(2);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\ntreemapLayout(rootNode);\n\nvar nodes = d3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;g&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;g&apos;)\n\t.attr(&apos;transform&apos;, function(d) {return &apos;translate(&apos; + [d.x0, d.y0] + &apos;)&apos;})\n\nnodes\n\t.append(&apos;rect&apos;)\n\t.attr(&apos;width&apos;, function(d) { return d.x1 - d.x0; })\n\t.attr(&apos;height&apos;, function(d) { return d.y1 - d.y0; })\n\nnodes\n\t.append(&apos;text&apos;)\n\t.attr(&apos;dx&apos;, 4)\n\t.attr(&apos;dy&apos;, 14)\n\t.text(function(d) {\n\t\treturn d.data.name;\n\t})\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/a6ca05860b7249ebe163a212a4abd9cf" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/a6ca05860b7249ebe163a212a4abd9cf?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=a6ca05860b7249ebe163a212a4abd9cf" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>In the above example <code class="language-plaintext highlighter-rouge">paddingTop</code> is 20 and <code class="language-plaintext highlighter-rouge">paddingInner</code> is 2.</p>
+
+<p>Treemaps have more than one strategy for arranging the rectangles. D3 has a few built-in ones such as <code class="language-plaintext highlighter-rouge">treemapBinary</code>, <code class="language-plaintext highlighter-rouge">treemapDice</code>, <code class="language-plaintext highlighter-rouge">treemapSlice</code>, <code class="language-plaintext highlighter-rouge">treemapSliceDice</code> and  <code class="language-plaintext highlighter-rouge">treemapSquarify</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">treemapBinary</code> strives for a balance between horizontal and vertical partitions, <code class="language-plaintext highlighter-rouge">treemapDice</code> partitions horizontally, <code class="language-plaintext highlighter-rouge">treemapSlice</code> partitions vertically, <code class="language-plaintext highlighter-rouge">treemapSliceDice</code> alternates between horizontal and vertical partioning and <code class="language-plaintext highlighter-rouge">treemapSquarify</code> allows the aspect ratio of the rectangles to be influenced.</p>
+
+<p>You can select a tiling strategy using the <code class="language-plaintext highlighter-rouge">.tile</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">treemapLayout</span><span class="p">.</span><span class="nx">tile</span><span class="p">(</span><span class="nx">d3</span><span class="p">.</span><span class="nx">treemapDice</span><span class="p">)</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/treemap-tiling/" marginwidth="0" marginheight="0" style="width: 100%; height: 1040px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/treemap-tiling/" marginwidth="0" marginheight="0" style="width: 100%; height: 1040px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;div id=\&quot;content\&quot;&gt;&lt;/div&gt;\n\n  &quot;,&quot;css&quot;:&quot;\n#content {\n  width: 850px;\n  height: 680px;\n}\nrect {\n  fill: darkblue;\n  opacity: 0.3;\n  stroke: white;\n}\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 12px;\n}\ng text {\n  fill: white;\n  font-size: 10px;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;1.1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;1.1.1\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;1.1.2\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;1.1.3\&quot;,\n\t\t\t\t\t\&quot;children\&quot;: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\&quot;name\&quot;: &apos;1.1.3.1&apos;,\n\t\t\t\t\t\t\t&apos;size&apos;: 200\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\&quot;name\&quot;: &apos;1.1.3.2&apos;,\n\t\t\t\t\t\t\t&apos;size&apos;: 200\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\&quot;name\&quot;: &apos;1.1.3.3&apos;,\n\t\t\t\t\t\t\t&apos;size&apos;: 400\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;1.2\&quot;,\n\t\t\t\&quot;size\&quot;: 300\n\t\t}\n\t]\n};\n\nvar width = 420, height = 340;\n\nvar layouts = [&apos;treemapBinary&apos;, &apos;treemapDice&apos;, &apos;treemapSlice&apos;, &apos;treemapSliceDice&apos;, &apos;treemapSquarify&apos;];\n\nvar treemapLayout = d3.treemap()\n\t.size([400, 300])\n\t.paddingOuter(16);\n\nvar rootNode = d3.hierarchy(data)\nrootNode.sum(function(d) {\n\treturn d.size;\n});\n\nfunction enteringTreemap(d) {\n\ttreemapLayout.tile(d3[d])\n\ttreemapLayout(rootNode);\n\n\td3.select(this)\n\t\t.append(&apos;text&apos;)\n\t\t.text(function(d) {return d})\n\t\t.attr(&apos;dy&apos;, 14)\n\n\tvar nodes = d3.select(this)\n\t\t.append(&apos;g&apos;)\n\t\t.attr(&apos;transform&apos;, &apos;translate(0, 20)&apos;)\n\t\t.selectAll(&apos;g&apos;)\n\t\t.data(rootNode.descendants())\n\t\t.join(&apos;g&apos;)\n\t\t.attr(&apos;transform&apos;, function(d) {return &apos;translate(&apos; + [d.x0, d.y0] + &apos;)&apos;})\n\n\tnodes\n\t\t.append(&apos;rect&apos;)\n\t\t.attr(&apos;width&apos;, function(d) { return d.x1 - d.x0; })\n\t\t.attr(&apos;height&apos;, function(d) { return d.y1 - d.y0; })\n\n\tnodes\n\t\t.append(&apos;text&apos;)\n\t\t.attr(&apos;dx&apos;, 4)\n\t\t.attr(&apos;dy&apos;, 14)\n\t\t.text(function(d) {\n\t\t\treturn d.data.name;\n\t\t})\n}\n\nvar treemaps = d3.select(&apos;#content&apos;)\n\t.selectAll(&apos;svg&apos;)\n\t.data(layouts)\n\t.join(&apos;svg&apos;)\n\t.attr(&apos;width&apos;, width + &apos;px&apos;)\n\t.attr(&apos;height&apos;, height + &apos;px&apos;)\n\t.each(enteringTreemap)\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The effect of different squarify ratios can be seen <a href="/examples-merged/layouts/treemap-squarify-ratios">here</a>.</p>
+
+<h3 id="pack-layout">Pack layout</h3>
+
+<p>The pack layout is similar to the tree layout but <strong>circles</strong> are used to represent nodes.</p>
+
+<p>In this example each country is represented by a circle (sized according to population) and the countries are grouped by region.</p>
+
+<p><img src="/img/layouts/pack.png" /></p>
+
+<p>Create a pack layout function using <code class="language-plaintext highlighter-rouge">d3.pack()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">packLayout</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">pack</span><span class="p">();</span></code></pre></figure>
+
+<p>As before you can configure its size by passing an array <code class="language-plaintext highlighter-rouge">[width, height]</code> into the <code class="language-plaintext highlighter-rouge">.size</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">packLayout</span><span class="p">.</span><span class="nx">size</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">]);</span></code></pre></figure>
+
+<p>As with the <code class="language-plaintext highlighter-rouge">treemap</code> you must <strong>call <code class="language-plaintext highlighter-rouge">.sum()</code> on the hierarchy object <code class="language-plaintext highlighter-rouge">root</code></strong> before applying the <code class="language-plaintext highlighter-rouge">pack</code> layout:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">rootNode</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="nx">packLayout</span><span class="p">(</span><span class="nx">rootNode</span><span class="p">);</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">pack</code> layout adds <code class="language-plaintext highlighter-rouge">x</code>, <code class="language-plaintext highlighter-rouge">y</code> and <code class="language-plaintext highlighter-rouge">r</code> (for radius) properties to each node.</p>
+
+<p>Now you can join <code class="language-plaintext highlighter-rouge">circle</code> elements to each descendant of <code class="language-plaintext highlighter-rouge">root</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">rootNode</span><span class="p">.</span><span class="nx">descendants</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span> <span class="p">})</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/pack/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/pack/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;320\&quot; height=\&quot;320\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: #333;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar packLayout = d3.pack()\n\t.size([300, 300]);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\npackLayout(rootNode);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;circle&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;circle&apos;)\n\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t.attr(&apos;r&apos;, function(d) { return d.r; })\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/6f592569629eaa241e755d4de1aed509" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/6f592569629eaa241e755d4de1aed509?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=6f592569629eaa241e755d4de1aed509" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>Labels can be added by creating <code class="language-plaintext highlighter-rouge">g</code> elements for each descendant:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">rootNode</span><span class="p">.</span><span class="nx">descendants</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">transform</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="dl">'</span><span class="s1">translate(</span><span class="dl">'</span> <span class="o">+</span> <span class="p">[</span><span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">]</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">})</span>
+
+<span class="nx">nodes</span>
+  <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span> <span class="p">})</span>
+
+<span class="nx">nodes</span>
+  <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">'</span><span class="s1">text</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">dy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">text</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">children</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="p">?</span> <span class="nx">d</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">name</span> <span class="p">:</span> <span class="dl">''</span><span class="p">;</span>
+  <span class="p">})</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/pack-labels/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/pack-labels/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;320\&quot; height=\&quot;320\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: indianred;\n  opacity: 0.3;\n  stroke: white;\n}\ntext {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  fill: white;\n  font-size: 10px;\n  text-anchor: middle;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar packLayout = d3.pack()\n\t.size([300, 300]);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\npackLayout(rootNode);\n\nvar nodes = d3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;g&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;g&apos;)\n\t.attr(&apos;transform&apos;, function(d) {return &apos;translate(&apos; + [d.x, d.y] + &apos;)&apos;})\n\nnodes\n\t.append(&apos;circle&apos;)\n\t.attr(&apos;r&apos;, function(d) { return d.r; })\n\nnodes\n\t.append(&apos;text&apos;)\n\t.attr(&apos;dy&apos;, 4)\n\t.text(function(d) {\n\t\treturn d.children === undefined ? d.data.name : &apos;&apos;;\n\t})\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/e9e845cb419049497369af4347e4348a" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/e9e845cb419049497369af4347e4348a?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=e9e845cb419049497369af4347e4348a" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>The padding around each circle can be configured using <code class="language-plaintext highlighter-rouge">.padding()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">packLayout</span><span class="p">.</span><span class="nx">padding</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/pack-padding/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/pack-padding/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;320\&quot; height=\&quot;320\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\ncircle {\n  fill: indianred;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar packLayout = d3.pack()\n\t.size([300, 300])\n\t.padding(10)\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\npackLayout(rootNode);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;circle&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;circle&apos;)\n\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t.attr(&apos;r&apos;, function(d) { return d.r; })\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/582b86d5ec3e3a0885d9add68fd837ad" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/582b86d5ec3e3a0885d9add68fd837ad?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=582b86d5ec3e3a0885d9add68fd837ad" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<h3 id="partition-layout">Partition layout</h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">partition</code> layout subdivides a rectangular space into layers, each of which represents a layer in the hierarchy. Each layer is further subdivided for each node in the layer:</p>
+
+<p><img src="/img/layouts/partition.png" /></p>
+
+<p>Create a partition layout function using <code class="language-plaintext highlighter-rouge">d3.partition()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">partitionLayout</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">partition</span><span class="p">();</span></code></pre></figure>
+
+<p>As before you can configure its size by passing an array <code class="language-plaintext highlighter-rouge">[width, height]</code> into the <code class="language-plaintext highlighter-rouge">.size</code> method:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">partitionLayout</span><span class="p">.</span><span class="nx">size</span><span class="p">([</span><span class="mi">400</span><span class="p">,</span> <span class="mi">200</span><span class="p">]);</span></code></pre></figure>
+
+<p>As with the <code class="language-plaintext highlighter-rouge">treemap</code> you must call <code class="language-plaintext highlighter-rouge">.sum()</code> on the hierarchy object <code class="language-plaintext highlighter-rouge">root</code> and before applying the <code class="language-plaintext highlighter-rouge">partition</code> layout:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">rootNode</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="nx">partitionLayout</span><span class="p">(</span><span class="nx">rootNode</span><span class="p">);</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">partition</code> layout adds <code class="language-plaintext highlighter-rouge">x0</code>, <code class="language-plaintext highlighter-rouge">x1</code>, <code class="language-plaintext highlighter-rouge">y0</code> and <code class="language-plaintext highlighter-rouge">y1</code> properties to each node.</p>
+
+<p>You can now join <code class="language-plaintext highlighter-rouge">rect</code> elements to each descendant of <code class="language-plaintext highlighter-rouge">root</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">rootNode</span><span class="p">.</span><span class="nx">descendants</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">y</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">width</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">height</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">;</span> <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/partition/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/partition/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;420\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nrect {\n  fill: #333;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar partitionLayout = d3.partition()\n\t.size([400, 200]);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\npartitionLayout(rootNode);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;rect&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;rect&apos;)\n\t.attr(&apos;x&apos;, function(d) { return d.x0; })\n\t.attr(&apos;y&apos;, function(d) { return d.y0; })\n\t.attr(&apos;width&apos;, function(d) { return d.x1 - d.x0; })\n\t.attr(&apos;height&apos;, function(d) { return d.y1 - d.y0; });\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/c4eb1f1a888c94bcd3f57df805a34cc4" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/c4eb1f1a888c94bcd3f57df805a34cc4?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=c4eb1f1a888c94bcd3f57df805a34cc4" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>Padding can be added between nodes using <code class="language-plaintext highlighter-rouge">.padding()</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">partitionLayout</span><span class="p">.</span><span class="nx">padding</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/partition-padding/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/partition-padding/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;420\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nrect {\n  fill: #333;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;size\&quot;: 200\n\t\t}\n\t]\n};\n\nvar partitionLayout = d3.partition()\n\t.size([400, 200])\n\t.padding(2);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.size;\n});\n\npartitionLayout(rootNode);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;rect&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;rect&apos;)\n\t.attr(&apos;x&apos;, function(d) { return d.x0; })\n\t.attr(&apos;y&apos;, function(d) { return d.y0; })\n\t.attr(&apos;width&apos;, function(d) { return d.x1 - d.x0; })\n\t.attr(&apos;height&apos;, function(d) { return d.y1 - d.y0; })\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/f30f900b9534c7caa509eb5219bfa6bc" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/f30f900b9534c7caa509eb5219bfa6bc?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=f30f900b9534c7caa509eb5219bfa6bc" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>If you’d like to change the orientation of the partition layout so that the layers run left to right you can swap <code class="language-plaintext highlighter-rouge">x0</code> with <code class="language-plaintext highlighter-rouge">y0</code> and <code class="language-plaintext highlighter-rouge">x1</code> with <code class="language-plaintext highlighter-rouge">y1</code> when defining the <code class="language-plaintext highlighter-rouge">rect</code> elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">y</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">width</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y0</span><span class="p">;</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">height</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x1</span> <span class="o">-</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x0</span><span class="p">;</span> <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/layouts/partition-rotated/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/partition-rotated/" marginwidth="0" marginheight="0" style="width: 100%; height: 230px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;420\&quot; height=\&quot;220\&quot;&gt;\n    &lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\nrect {\n  fill: #333;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;size\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;size\&quot;: 200\n\t\t}\n\t]\n};\n\nvar partitionLayout = d3.partition()\n\t.size([200, 400]);\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.size;\n});\n\npartitionLayout(rootNode);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;rect&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;rect&apos;)\n\t.attr(&apos;x&apos;, function(d) { return d.y0; })\n\t.attr(&apos;y&apos;, function(d) { return d.x0; })\n\t.attr(&apos;width&apos;, function(d) { return d.y1 - d.y0; })\n\t.attr(&apos;height&apos;, function(d) { return d.x1 - d.x0; })\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/379926741d6600ab6c8af7f5f8707373" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/379926741d6600ab6c8af7f5f8707373?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=379926741d6600ab6c8af7f5f8707373" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>You can also map the <code class="language-plaintext highlighter-rouge">x</code> dimension into a rotation angle and <code class="language-plaintext highlighter-rouge">y</code> into a radius to create a sunburst partition:</p>
+
+<!-- <iframe class="db center" src="/blocks/layouts/partition-sunburst/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/layouts/partition-sunburst/" marginwidth="0" marginheight="0" style="width: 100%; height: 330px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;\n  &lt;svg width=\&quot;320\&quot; height=\&quot;320\&quot;&gt;\n    &lt;g transform=\&quot;translate(160, 160)\&quot;&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n\n  &quot;,&quot;css&quot;:&quot;\npath {\n  fill: #333;\n  opacity: 0.3;\n  stroke: white;\n}\n&quot;,&quot;js&quot;:&quot;var data = {\n\t\&quot;name\&quot;: \&quot;A1\&quot;,\n\t\&quot;children\&quot;: [\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B1\&quot;,\n\t\t\t\&quot;children\&quot;: [\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C1\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 100\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C2\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 300\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\&quot;name\&quot;: \&quot;C3\&quot;,\n\t\t\t\t\t\&quot;value\&quot;: 200\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\&quot;name\&quot;: \&quot;B2\&quot;,\n\t\t\t\&quot;value\&quot;: 200\n\t\t}\n\t]\n};\n\nvar radius = 150;\n\nvar partitionLayout = d3.partition()\n\t.size([2 * Math.PI, radius]);\n\nvar arcGenerator = d3.arc()\n\t.startAngle(function(d) { return d.x0; })\n\t.endAngle(function(d) { return d.x1; })\n\t.innerRadius(function(d) { return d.y0; })\n\t.outerRadius(function(d) { return d.y1; });\n\nvar rootNode = d3.hierarchy(data)\n\nrootNode.sum(function(d) {\n\treturn d.value;\n});\n\npartitionLayout(rootNode);\n\nd3.select(&apos;svg g&apos;)\n\t.selectAll(&apos;path&apos;)\n\t.data(rootNode.descendants())\n\t.join(&apos;path&apos;)\n\t.attr(&apos;d&apos;, arcGenerator);\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/2b928885e915471e5c12d2b8cea948c9" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/2b928885e915471e5c12d2b8cea948c9?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=2b928885e915471e5c12d2b8cea948c9" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

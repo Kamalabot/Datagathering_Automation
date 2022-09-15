@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Zoom and Pan | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Zoom and Pan" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="D3 provides a module ‘d3.zoom’ that adds zoom and pan behaviour to an HTML or SVG element. This article shows how to create zoom behaviours, how to add zoom and pan constraints and how to zoom and pan programmatically." />
+<meta property="og:description" content="D3 provides a module ‘d3.zoom’ that adds zoom and pan behaviour to an HTML or SVG element. This article shows how to create zoom behaviours, how to add zoom and pan constraints and how to zoom and pan programmatically." />
+<link rel="canonical" href="https://www.d3indepth.com/zoom-and-pan/" />
+<meta property="og:url" content="https://www.d3indepth.com/zoom-and-pan/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-15T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Zoom and Pan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-06-15T00:00:00+01:00","datePublished":"2021-06-15T00:00:00+01:00","description":"D3 provides a module ‘d3.zoom’ that adds zoom and pan behaviour to an HTML or SVG element. This article shows how to create zoom behaviours, how to add zoom and pan constraints and how to zoom and pan programmatically.","headline":"D3 Zoom and Pan","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/zoom-and-pan/"},"url":"https://www.d3indepth.com/zoom-and-pan/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 underline" href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Zoom and Pan</h2>
+
+  <div class="page-content">
+  	<p><em>D3 provides a module ‘d3.zoom’ that adds zoom and pan behaviour to an HTML or SVG element. This article shows how to create zoom behaviours, how to add zoom and pan constraints and how to zoom and pan programmatically.</em></p>
+
+<p>D3 can add <strong>zoom</strong> and <strong>pan</strong> behaviour to an HTML or SVG element. In the following example, click and move the mouse to pan and use the mouse wheel to zoom. Touch gestures should also work:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/zoompan/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/zoompan/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n\t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet zoom = d3.zoom()\n\t.on(&apos;zoom&apos;, handleZoom);\n\nfunction handleZoom(e) {\n\td3.select(&apos;svg g&apos;)\n\t\t.attr(&apos;transform&apos;, e.transform);\n}\n\nfunction initZoom() {\n\td3.select(&apos;svg&apos;)\n\t\t.call(zoom);\n}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 3);\n}\n\ninitZoom();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>When zoom and pan gestures (such as dragging or a pinch gesture) occur, a transform (consisting of scale and translate) is computed by D3 and passed into an event handler. The event handler typically applies the transform to chart elements.</p>
+
+<p>There’s three steps to add zoom and pan behaviour to an element:</p>
+
+<ul>
+  <li>call <code class="language-plaintext highlighter-rouge">d3.zoom()</code> to create a <strong>zoom behaviour</strong> function</li>
+  <li>add an event handler that gets called when a zoom or pan event occurs. The event handler receives a transform which can be applied to chart elements</li>
+  <li>attach the zoom behaviour to an element that receives the zoom and pan gestures</li>
+</ul>
+
+<p>It’s helpful to distinguish between the HTML or SVG element that <strong>receives the zoom and pan gestures</strong> and the elements that <strong>get zoomed and panned</strong> (the elements that get transformed). It’s important that these elements are different, otherwise the panning won’t work properly.</p>
+
+<p>Calling <code class="language-plaintext highlighter-rouge">d3.zoom()</code> creates a zoom behaviour:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">zoom</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">zoom</span><span class="p">();</span></code></pre></figure>
+
+<blockquote>
+  <p>Although it’s called <code class="language-plaintext highlighter-rouge">d3.zoom</code>, this module handles zoom <strong>and</strong> pan events.</p>
+</blockquote>
+
+<blockquote>
+  <p>A zoom behaviour is a function that adds event handlers (for drags, mouse wheel events and touch events etc.) to an element. It also has methods such as <code class="language-plaintext highlighter-rouge">.on</code> defined on it.</p>
+</blockquote>
+
+<p>You can attach an event handler to your zoom behaviour by calling the <code class="language-plaintext highlighter-rouge">.on</code> method. This accepts two arguments:</p>
+
+<ul>
+  <li>the event type (<code class="language-plaintext highlighter-rouge">'zoom'</code>, <code class="language-plaintext highlighter-rouge">'start'</code> or <code class="language-plaintext highlighter-rouge">'end'</code>)</li>
+  <li>the name of your event handler function</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleZoom</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+ <span class="c1">// apply transform to the chart</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">zoom</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">zoom</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">zoom</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleZoom</span><span class="p">);</span></code></pre></figure>
+
+<blockquote>
+  <p>The event types are <code class="language-plaintext highlighter-rouge">'zoom'</code>, <code class="language-plaintext highlighter-rouge">'start'</code> and <code class="language-plaintext highlighter-rouge">'end'</code>. <code class="language-plaintext highlighter-rouge">'zoom'</code> indicates a change of transform (e.g. the user has zoomed or panned). <code class="language-plaintext highlighter-rouge">'start'</code> indicates the start of the zoom or pan (e.g. the user has pressed the mouse button). <code class="language-plaintext highlighter-rouge">'end'</code> indicates the end of the zoom or pan (e.g. the user has released the mouse button).</p>
+</blockquote>
+
+<p><code class="language-plaintext highlighter-rouge">handleZoom</code> receives a single parameter <code class="language-plaintext highlighter-rouge">e</code> which is an object representing the zoom event. The most useful property on this object is <code class="language-plaintext highlighter-rouge">transform</code>. This is an object that represents the latest zoom transform and is typically applied to the chart element(s):</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleZoom</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">g.chart</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">transform</span><span class="dl">'</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">transform</span><span class="p">);</span>
+<span class="p">}</span></code></pre></figure>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">e.transform</code> has three properties <code class="language-plaintext highlighter-rouge">x</code>, <code class="language-plaintext highlighter-rouge">y</code> and <code class="language-plaintext highlighter-rouge">k</code>. <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> specify the translate transform and <code class="language-plaintext highlighter-rouge">k</code> represents the scale factor. It also has a <code class="language-plaintext highlighter-rouge">.toString</code> method which generates a string such as <code class="language-plaintext highlighter-rouge">"translate(38.9,-4.1) scale(1.3)"</code>. This means you can pass <code class="language-plaintext highlighter-rouge">e.transform</code> directly into <code class="language-plaintext highlighter-rouge">.attr</code>.</p>
+</blockquote>
+
+<p>You attach the zoom behaviour to an element by selecting the element and passing the zoom behaviour into the <a href="/selections/#call"><code class="language-plaintext highlighter-rouge">.call</code> method</a>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">zoom</span><span class="p">);</span></code></pre></figure>
+
+<blockquote>
+  <p>The zoom behaviour is a function that sets up event listeners on the selected element (<code class="language-plaintext highlighter-rouge">svg</code> in the above example). When zoom and pan events occur, a transform is computed and passed into the event handler (<code class="language-plaintext highlighter-rouge">handleZoom</code> in the above examples).</p>
+</blockquote>
+
+<h3 id="example">Example</h3>
+
+<p>Suppose you have an SVG element that contains a <code class="language-plaintext highlighter-rouge">g</code> element:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">"600"</span> <span class="na">height=</span><span class="s">"400"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;g&gt;&lt;/g&gt;</span>
+<span class="nt">&lt;/svg&gt;</span></code></pre></figure>
+
+<p>In the following code a zoom behaviour is created using <code class="language-plaintext highlighter-rouge">d3.zoom()</code> and attached to the <code class="language-plaintext highlighter-rouge">svg</code> element.</p>
+
+<p><code class="language-plaintext highlighter-rouge">handleZoom</code> is passed into the <code class="language-plaintext highlighter-rouge">.on</code> method. When a zoom or pan occurs, <code class="language-plaintext highlighter-rouge">handleZoom</code> gets called. This applies the transform <code class="language-plaintext highlighter-rouge">e.transform</code> to the <code class="language-plaintext highlighter-rouge">g</code> element.</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleZoom</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">transform</span><span class="dl">'</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">transform</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">zoom</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">zoom</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">zoom</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleZoom</span><span class="p">);</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">zoom</span><span class="p">);</span></code></pre></figure>
+
+<p>Here’s a full example where an array of random coordinates is joined to <code class="language-plaintext highlighter-rouge">circle</code> elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span> <span class="nx">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="nx">numPoints</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">zoom</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">zoom</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">zoom</span><span class="dl">'</span><span class="p">,</span> <span class="nx">handleZoom</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">handleZoom</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">transform</span><span class="dl">'</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">transform</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">initZoom</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">zoom</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">updateData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">numPoints</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">i</span><span class="p">,</span>
+      <span class="na">x</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">width</span><span class="p">,</span>
+      <span class="na">y</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">height</span>
+  	<span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg g</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">x</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">y</span><span class="p">;</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">initZoom</span><span class="p">();</span>
+<span class="nx">updateData</span><span class="p">();</span>
+<span class="nx">update</span><span class="p">();</span></code></pre></figure>
+
+<p>Use the mouse wheel and dragging, or touch gestures, to zoom and pan the circles:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/zoompan/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/zoompan/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n\t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet zoom = d3.zoom()\n\t.on(&apos;zoom&apos;, handleZoom);\n\nfunction handleZoom(e) {\n\td3.select(&apos;svg g&apos;)\n\t\t.attr(&apos;transform&apos;, e.transform);\n}\n\nfunction initZoom() {\n\td3.select(&apos;svg&apos;)\n\t\t.call(zoom);\n}\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction update() {\n\td3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 3);\n}\n\ninitZoom();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="zoom-and-pan-constraints">Zoom and pan constraints</h3>
+
+<p>You can constrain the zoom and pan so that the user can only zoom and pan within specified bounds.</p>
+
+<p>The zoom can be constrained using <code class="language-plaintext highlighter-rouge">.scaleExtent</code> into which you pass an array <code class="language-plaintext highlighter-rouge">[min, max]</code> where <code class="language-plaintext highlighter-rouge">min</code> is the minimum scale factor and <code class="language-plaintext highlighter-rouge">max</code> is the maximum scale factor:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">zoom</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">zoom</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">scaleExtent</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">]);</span></code></pre></figure>
+
+<p>You can use <code class="language-plaintext highlighter-rouge">.translateExtent</code> to specify bounds <code class="language-plaintext highlighter-rouge">[[x0, y0], [x1, y1]]</code> that the user can’t pan outside of:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span> <span class="nx">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">zoom</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">zoom</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">scaleExtent</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">translateExtent</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">]]);</span></code></pre></figure>
+
+<p>Now you can only zoom in up to a scale factor of 5. Neither can you zoom out beyond the default scale factor of 1. In addition you cannot pan beyond the bounds of the chart:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/zoom-pan-constrained/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/zoom-pan-constrained/" marginwidth="0" marginheight="0" style="width: 100%; height: 410px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n\t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet zoom = d3.zoom()\n\t.scaleExtent([1, 5])\n\t.translateExtent([[0, 0], [width, height]])\n\t.on(&apos;zoom&apos;, handleZoom);\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction initZoom() {\n\td3.select(&apos;svg&apos;)\n\t\t.call(zoom);\n}\n\nfunction handleZoom(e) {\n\td3.select(&apos;svg g&apos;)\n\t\t.attr(&apos;transform&apos;, e.transform);\n}\n\nfunction update() {\n\td3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 3);\n}\n\ninitZoom();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<h3 id="programmatic-zoom-control">Programmatic zoom control</h3>
+
+<p>You can also zoom and pan programmatically. For example you can create buttons that zoom the chart when clicked.</p>
+
+<p>The zoom behaviour has the following methods for setting the zoom and pan programmatically:</p>
+
+<table class="table table-bordered">
+  <tr>
+    <th>Method name</th><th>Description</th>
+  </tr>
+  <tr><td><code>.translateBy</code></td><td>adds a given <code>x, y</code> offset to the current transform</td></tr>
+  <tr><td><code>.translateTo</code></td><td>sets the transform such that a given <code>x, y</code> coordinate is centered (or positioned on a given point <code>[px, py]</code>)</td></tr>
+  <tr><td><code>.scaleBy</code></td><td>multiplies the current scale factor by a given value</td></tr>
+  <tr><td><code>.scaleTo</code></td><td>sets the scale factor to a given value</td></tr>
+  <tr><td><code>.transform</code></td><td>sets the transform to a given transform. (Use <a href="https://github.com/d3/d3-zoom/tree/v3.0.0#zoom-transforms"><code>d3.zoomIdentity</code></a> to create a zoom transform.)</td></tr>
+</table>
+
+<p>The above methods shouldn’t be called directly. Instead, they should be called on the element that receives the zoom and pan gestures. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">zoom</span><span class="p">.</span><span class="nx">scaleBy</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">);</span></code></pre></figure>
+
+<p>You can also call these methods on a transition selection, which results in nice effects:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">svg</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">transition</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">zoom</span><span class="p">.</span><span class="nx">translateBy</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span></code></pre></figure>
+
+<p>Here’s a full example using a few of the above methods:</p>
+
+<!-- <iframe class="db center" src="/blocks/interaction/zoompanbutton/" marginwidth="0" marginheight="0" style="width: 100%; height: 430px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/interaction/zoompanbutton/" marginwidth="0" marginheight="0" style="width: 100%; height: 430px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;400\&quot;&gt;\n\t&lt;g&gt;&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;button onclick=\&quot;zoomIn()\&quot;&gt;Zoom in&lt;/button&gt;\n&lt;button onclick=\&quot;zoomOut()\&quot;&gt;Zoom out&lt;/button&gt;\n&lt;button onclick=\&quot;resetZoom()\&quot;&gt;Reset zoom&lt;/button&gt;\n&lt;button onclick=\&quot;panLeft()\&quot;&gt;Pan left&lt;/button&gt;\n&lt;button onclick=\&quot;panRight()\&quot;&gt;Pan right&lt;/button&gt;\n&lt;button onclick=\&quot;center()\&quot;&gt;Center&lt;/button&gt;\n&quot;,&quot;css&quot;:&quot;circle {\n\topacity: 0.7;\n}\n&quot;,&quot;js&quot;:&quot;let data = [], width = 600, height = 400, numPoints = 100;\n\nlet zoom = d3.zoom()\n\t.scaleExtent([0.25, 10])\n\t.on(&apos;zoom&apos;, handleZoom);\n\nfunction updateData() {\n\tdata = [];\n\tfor(let i=0; i&lt;numPoints; i++) {\n\t\tdata.push({\n\t\t\tid: i,\n\t\t\tx: Math.random() * width,\n\t\t\ty: Math.random() * height\n\t\t});\n\t}\n}\n\nfunction initZoom() {\n\td3.select(&apos;svg&apos;)\n\t\t.call(zoom);\n}\n\nfunction handleZoom(e) {\n\td3.select(&apos;svg g&apos;)\n\t\t.attr(&apos;transform&apos;, e.transform);\n}\n\nfunction zoomIn() {\n\td3.select(&apos;svg&apos;)\n\t\t.transition()\n\t\t.call(zoom.scaleBy, 2);\n}\n\nfunction zoomOut() {\n\td3.select(&apos;svg&apos;)\n\t\t.transition()\n\t\t.call(zoom.scaleBy, 0.5);\n}\n\nfunction resetZoom() {\n\td3.select(&apos;svg&apos;)\n\t\t.transition()\n\t\t.call(zoom.scaleTo, 1);\n}\n\nfunction center() {\n\td3.select(&apos;svg&apos;)\n\t\t.transition()\n\t\t.call(zoom.translateTo, 0.5 * width, 0.5 * height);\n}\n\nfunction panLeft() {\n\td3.select(&apos;svg&apos;)\n\t\t.transition()\n\t\t.call(zoom.translateBy, -50, 0);\n}\n\nfunction panRight() {\n\td3.select(&apos;svg&apos;)\n\t\t.transition()\n\t\t.call(zoom.translateBy, 50, 0);\n}\n\nfunction update() {\n\td3.select(&apos;svg g&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d) { return d.x; })\n\t\t.attr(&apos;cy&apos;, function(d) { return d.y; })\n\t\t.attr(&apos;r&apos;, 3);\n}\n\ninitZoom();\nupdateData();\nupdate();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>

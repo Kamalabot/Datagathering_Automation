@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags --><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Data Joins | D3 in Depth</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="D3 Data Joins" />
+<meta name="author" content="Peter Cook" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How to join an array of data to a D3 selection. This article shows how to create a data join, how to update a data join, how to join an array of objects and key functions. It also shows how to simplify your data join code using layout functions." />
+<meta property="og:description" content="How to join an array of data to a D3 selection. This article shows how to create a data join, how to update a data join, how to join an array of objects and key functions. It also shows how to simplify your data join code using layout functions." />
+<link rel="canonical" href="https://www.d3indepth.com/datajoins/" />
+<meta property="og:url" content="https://www.d3indepth.com/datajoins/" />
+<meta property="og:site_name" content="D3 in Depth" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-11T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Data Joins" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Cook","url":"https://peterrcook.com"},"dateModified":"2021-05-11T00:00:00+01:00","datePublished":"2021-05-11T00:00:00+01:00","description":"How to join an array of data to a D3 selection. This article shows how to create a data join, how to update a data join, how to join an array of objects and key functions. It also shows how to simplify your data join code using layout functions.","headline":"D3 Data Joins","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.d3indepth.com/datajoins/"},"url":"https://www.d3indepth.com/datajoins/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+  <link href="/css/main.css" rel="stylesheet">
+  <link rel="shortcut icon" type="image/jpg" href="/img/favicon.png"/><link type="application/atom+xml" rel="alternate" href="https://www.d3indepth.com/feed.xml" title="D3 in Depth" /><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script></head>
+
+
+
+  <body class="sans-serif ">
+
+    <div class="mw9 center">
+      <header class="flex items-center justify-between pv3 ph3 center">
+  <div class="flex items-end" style="flex-shrink: 0;">
+	<div class="f4 f3-m f2-ns fw7 tracked-tight"><a style="font-family: 'Lora', serif;" class="link" href="/">D3 in Depth</a></div>
+  </div>
+  <p class="black-50 f6 b ph3 tc" style="flex-shrink: 1;">D3 in Depth covers <span class="black-80">versions 6 and 7</span> of D3</p>
+  
+  <div style="flex-shrink: 0;">
+    <a class="link black-70 f6 fw6 mr3 " href="/">Home</a>
+    <a class="link black-70 f6 fw6 mr3 " href="/about">About</a>
+    <a class="link black-70 f6 fw6 " href="/newsletter">Newsletter</a>
+  </div>
+</header>
+
+
+      <section class="content flex flex-column flex-row-l bt b--black-10 mb4">
+        <section class="sidebar w-100 w-20-l mt4 order-3-l">
+          <div class="f6 fw4 tc mb0 black-50">MY BOOKS</div>
+
+<div class="flex flex-row flex-column-l">
+  <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+</div>
+
+        </section>
+
+        <section class="w-100 w-20-l order-1-l">
+          <nav class="ph3 ph5-l pv4">
+  <div class="f6 fw4 mb3 black-50 tc tr-l">CONTENTS</div>
+  <div class="flex flex-column flex-start db-l tc tr-l">
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/introduction">Introduction to D3</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/gettingstarted">Getting Started</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/selections">Selections</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 underline" href="/datajoins">Data joins</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/enterexit">Enter, exit & update</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/scales">Scale functions</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/shapes">Shapes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/axes">Axes</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/hierarchies">Hierarchies</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/chords">Chord Diagrams</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/force-layout">Force layout</a></div>
+    <div class="published mb2"><a class="link black-70 f6 fw6 " href="/geographic">Maps</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/requests">Data Requests</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/transitions">Transitions</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/interaction">Picking, Dragging and Brushing</a></div>
+    <div class="mb2"><a class="link black-70 f6 fw6 " href="/zoom-and-pan">Zoom & pan</a></div>
+  </div>
+</nav>
+
+          <div class="f6 fw4 tc black-50 mt3 mb3">NEWSLETTER</div>
+          <div class="mw5 center w-90 f5 l-copy ph4 mb4 black-70">
+            <p>Get <span class="b">book discounts</span> and receive D3.js related news and tips.</p>
+            <a href="/newsletter" class="w-100 tc f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+              <span class="center">Subscribe</span>
+            </a>
+          </div>
+        </section>
+        
+        <section class="w-100 w-60-l ph3 order-2-l">
+          <div class="black-70">
+  <h1 class="f4 fw6 f2-ns lh-title">D3 Data Joins</h2>
+
+  <div class="page-content">
+  	<p><em>This article shows how to join an array of data to a D3 selection. We cover how to create a data join, how to update a data join, how to join an array of objects and key functions. We also show how to simplify your data join code using layout functions.</em></p>
+
+<p>A data join creates a correspondence between an array of data and a selection of HTML or SVG elements.</p>
+
+<p>Joining an array to HTML/SVG elements means that:</p>
+
+<ul>
+  <li>HTML (or SVG) elements are added or removed such that <strong>each array element has a corresponding HTML (or SVG) element</strong></li>
+  <li>each HTML/SVG element may be <strong>positioned, sized and styled</strong> according to the value of its corresponding array element</li>
+</ul>
+
+<p>For example, suppose you’ve an array of five numbers which you’d like to join to <code class="language-plaintext highlighter-rouge">circle</code> elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">[</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span> <span class="p">]</span></code></pre></figure>
+
+<p>Each time D3 performs the join it’ll add or remove <code class="language-plaintext highlighter-rouge">circle</code> elements so that each array element has a corresponding <code class="language-plaintext highlighter-rouge">circle</code> element.</p>
+
+<p>D3 can also update the position and radius of each circle (and any other attributes or style) based on the value of the corresponding array element.</p>
+
+<p>For example, the radius of each circle can be set to half the value of the corresponding array value. This results in the first circle having a radius of 20, the second a radius of 5 and so on:</p>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/example/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/example/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot; transform=\&quot;translate(50, 0)\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(myData)\n  .join(&apos;circle&apos;)\n  .attr(&apos;cx&apos;, function(d, i) {\n    return i * 100;\n  })\n  .attr(&apos;cy&apos;, 50)\n  .attr(&apos;r&apos;, function(d) {\n    return 0.5 * d;\n  })\n  .style(&apos;fill&apos;, &apos;orange&apos;);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>Prior to version 5 of D3, data joins were not all that easy to learn (you had to learn about enter, exit and update). Fortunately, for versions 5 and up, data joins are much easier!</p>
+
+<h2 id="how-to-create-a-data-join">How to create a data join</h2>
+
+<p>The general pattern for creating a data join is:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">container</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="nx">element</span><span class="o">-</span><span class="nx">type</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">array</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">element</span><span class="o">-</span><span class="nx">type</span><span class="p">);</span></code></pre></figure>
+
+<p>where:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">container</code> is a CSS selector string that specifies a <strong>single element</strong> that’ll contain the joined HTML/SVG elements</li>
+  <li><code class="language-plaintext highlighter-rouge">element-type</code> is a string describing the <strong>type of element</strong> you’re joining (e.g. ‘div’ or ‘circle’)</li>
+  <li><code class="language-plaintext highlighter-rouge">array</code> is the name of <strong>the array</strong> you’re joining</li>
+</ul>
+
+<p>Typically four methods are used in a data join:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">.select</code> defines the element that’ll act as a container (or parent) to the joined HTML/SVG elements</li>
+  <li><code class="language-plaintext highlighter-rouge">.selectAll</code> defines the type of element that’ll be joined to each array element</li>
+  <li><code class="language-plaintext highlighter-rouge">.data</code> defines the array that’s being joined</li>
+  <li><code class="language-plaintext highlighter-rouge">.join</code> performs the join. This is where HTML or SVG elements are added and removed</li>
+</ul>
+
+<h3 id="example">Example</h3>
+
+<p>Given an array:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span></code></pre></figure>
+
+<p>and an <code class="language-plaintext highlighter-rouge">svg</code> element containing a <code class="language-plaintext highlighter-rouge">g</code> element:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;svg&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"chart"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;/svg&gt;</span></code></pre></figure>
+
+<p>you can join <code class="language-plaintext highlighter-rouge">myData</code> to <code class="language-plaintext highlighter-rouge">circle</code> elements using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">myData</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<p>In this example:</p>
+
+<ul>
+  <li>the container is the <code class="language-plaintext highlighter-rouge">g</code> element</li>
+  <li>the element type is <code class="language-plaintext highlighter-rouge">circle</code></li>
+  <li>the array being joined is <code class="language-plaintext highlighter-rouge">myData</code></li>
+</ul>
+
+<p>Running this code results in 5 circles being created:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;svg&gt;</span>
+  <span class="nt">&lt;g</span> <span class="na">class=</span><span class="s">"chart"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;circle&gt;&lt;/circle&gt;</span>
+    <span class="nt">&lt;circle&gt;&lt;/circle&gt;</span>
+    <span class="nt">&lt;circle&gt;&lt;/circle&gt;</span>
+    <span class="nt">&lt;circle&gt;&lt;/circle&gt;</span>
+    <span class="nt">&lt;circle&gt;&lt;/circle&gt;</span>
+  <span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;/svg&gt;</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/five-circles/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/five-circles/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;svg {\n\tbackground-color: #fee;\n}\n&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(myData)\n  .join(&apos;circle&apos;);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>You can’t see any circles because each radius is zero. However if you inspect and expand the SVG element (right click on the SVG element which has been coloured light pink and select Inspect) you’ll see five <code class="language-plaintext highlighter-rouge">circle</code> elements have been added:</p>
+
+<p><img src="/img/datajoins/5circles.png" alt="5 circles added to DOM" /></p>
+
+<p>In the CodePen example you can try adding elements to the array and you’ll see that the data join ensures there are as many circles as array elements.</p>
+
+<h3 id="updating-the-joined-elements">Updating the joined elements</h3>
+
+<p>Joined HTML or SVG elements may be updated using the <code class="language-plaintext highlighter-rouge">.style</code>, <code class="language-plaintext highlighter-rouge">.attr</code> and <code class="language-plaintext highlighter-rouge">.text</code> methods that were covered in the <a href="/selections">selections</a> chapter. (The <code class="language-plaintext highlighter-rouge">.join</code> method returns a selection containing all of the joined elements.)</p>
+
+<p>For example you can set the center, radius and colour of every circle using:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">myData</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/static-update/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/static-update/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;400\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(myData)\n  .join(&apos;circle&apos;)\n  .attr(&apos;cx&apos;, 200)\n  .attr(&apos;cy&apos;, 50)\n  .attr(&apos;r&apos;, 40)\n  .style(&apos;fill&apos;, &apos;orange&apos;);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>You only see one circle because all five circles share the same position and size.</p>
+
+<h3 id="data-driven-updates">Data driven updates</h3>
+
+<p>If a <strong>function</strong> is passed into <code class="language-plaintext highlighter-rouge">.attr</code> or <code class="language-plaintext highlighter-rouge">.style</code> you can update the HTML/SVG elements in a <strong>data-driven</strong> manner.</p>
+
+<p>The function is called for <strong>each element in the selection</strong>. It takes two parameters, typically named <code class="language-plaintext highlighter-rouge">d</code> and <code class="language-plaintext highlighter-rouge">i</code>.</p>
+
+<p>The first parameter (<code class="language-plaintext highlighter-rouge">d</code>) represents the corresponding array element (or the ‘joined value’). The second parameter <code class="language-plaintext highlighter-rouge">i</code> represents the index of the element within the selection.</p>
+
+<p>The return value of the function is used to set the attribute or style value.</p>
+
+<p>Let’s pass a function into the first <code class="language-plaintext highlighter-rouge">.attr</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">myData</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<p>This tells D3 to set each circle’s <code class="language-plaintext highlighter-rouge">cx</code> attribute to <code class="language-plaintext highlighter-rouge">i * 100</code>. <code class="language-plaintext highlighter-rouge">i</code> is the index within the selection, so the first circle will be positioned at <code class="language-plaintext highlighter-rouge">0</code>, the next at <code class="language-plaintext highlighter-rouge">100</code> and so on:</p>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/data-driven-cx/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/data-driven-cx/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(myData)\n  .join(&apos;circle&apos;)\n  .attr(&apos;cx&apos;, function(d, i) {\n    return i * 100;\n  })\n  .attr(&apos;cy&apos;, 50)\n  .attr(&apos;r&apos;, 40)\n  .style(&apos;fill&apos;, &apos;orange&apos;);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>Now let’s set <code class="language-plaintext highlighter-rouge">r</code> according to the joined value:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">myData</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nx">d</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/data-driven-update/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/data-driven-update/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n\n  \n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(myData)\n  .join(&apos;circle&apos;)\n  .attr(&apos;cx&apos;, function(d, i) {\n    return i * 100;\n  })\n  .attr(&apos;cy&apos;, 50)\n  .attr(&apos;r&apos;, function(d) {\n    return 0.5 * d;\n  })\n  .style(&apos;fill&apos;, &apos;orange&apos;);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>(The first circle is clipped because it’s <code class="language-plaintext highlighter-rouge">cx</code> attribute is zero.)</p>
+
+<p>You can put any amount of logic within the functions that are passed into <code class="language-plaintext highlighter-rouge">.attr</code> and <code class="language-plaintext highlighter-rouge">.style</code>. For example, let’s colour the circle if its joined value is greater than 30:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">myData</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nx">d</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span> <span class="o">&gt;</span> <span class="mi">30</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">#eee</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/data-driven-update-greater-than/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/data-driven-update-greater-than/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(myData)\n  .join(&apos;circle&apos;)\n  .attr(&apos;cx&apos;, function(d, i) {\n    return i * 100;\n  })\n  .attr(&apos;cy&apos;, 50)\n  .attr(&apos;r&apos;, function(d) {\n    return 0.5 * d;\n  })\n  .style(&apos;fill&apos;, function(d) {\n    return d &gt; 30 ? &apos;orange&apos; : &apos;#eee&apos;;\n  });\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>The <code class="language-plaintext highlighter-rouge">.join</code> method returns a D3 selection, so you can use any of the methods covered in the <a href="/selections">selections</a> chapter such as <code class="language-plaintext highlighter-rouge">.style</code>, <code class="language-plaintext highlighter-rouge">.attr</code>, <code class="language-plaintext highlighter-rouge">.text</code> and <code class="language-plaintext highlighter-rouge">.each</code></p>
+
+<h3 id="joining-arrays-of-objects">Joining arrays of objects</h3>
+
+<p>When building data visualisations with D3 you’ll typically be joining arrays of objects (rather than arrays of numbers). For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">cities</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">London</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">8674000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">New York</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">8406000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Sydney</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">4293000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Paris</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2244000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Beijing</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">11510000</span><span class="p">}</span>
+<span class="p">];</span></code></pre></figure>
+
+<p>You can join an array of objects in the same manner as before. However, when a function is passed into <code class="language-plaintext highlighter-rouge">.attr</code> or <code class="language-plaintext highlighter-rouge">.style</code>, the <code class="language-plaintext highlighter-rouge">d</code> parameter is an object. This means that you’ll typically reference a <strong>property</strong> of that object.</p>
+
+<p>For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="p">...</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mf">0.0001</span> <span class="o">*</span> <span class="nx">d</span><span class="p">.</span><span class="nx">population</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">...</span></code></pre></figure>
+
+<p>Here’s a full example where <code class="language-plaintext highlighter-rouge">cities</code> is joined to <code class="language-plaintext highlighter-rouge">circle</code> elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">cities</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">London</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">8674000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">New York</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">8406000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Sydney</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">4293000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Paris</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2244000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Beijing</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">11510000</span><span class="p">}</span>
+<span class="p">];</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">cities</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">scaleFactor</span> <span class="o">=</span> <span class="mf">0.00004</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">scaleFactor</span> <span class="o">*</span> <span class="nx">d</span><span class="p">.</span><span class="nx">population</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">#aaa</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/arrays-of-objects/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/arrays-of-objects/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var cities = [\n  { name: &apos;London&apos;, population: 8674000},\n  { name: &apos;New York&apos;, population: 8406000},\n  { name: &apos;Sydney&apos;, population: 4293000},\n  { name: &apos;Paris&apos;, population: 2244000},\n  { name: &apos;Beijing&apos;, population: 11510000}\n];\n\nd3.select(&apos;.chart&apos;)\n  .selectAll(&apos;circle&apos;)\n  .data(cities)\n  .join(&apos;circle&apos;)\n  .attr(&apos;cx&apos;, function(d, i) {\n    return i * 100;\n  })\n  .attr(&apos;cy&apos;, 50)\n  .attr(&apos;r&apos;, function(d) {\n    let scaleFactor = 0.000004;\n    return scaleFactor * d.population;\n  })\n  .style(&apos;fill&apos;, &apos;#aaa&apos;);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>Each circle is sized according to the city’s population. (Note that it’s better practice to set the area, rather than the radius, of a circle proportionally to a data value.)</p>
+
+<p>You can build a simple bar chart using the above techniques. Instead of joining <code class="language-plaintext highlighter-rouge">circle</code> elements, let’s join <code class="language-plaintext highlighter-rouge">rect</code> and <code class="language-plaintext highlighter-rouge">text</code> elements:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">cities</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">London</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">8674000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">New York</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">8406000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Sydney</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">4293000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Paris</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">2244000</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Beijing</span><span class="dl">'</span><span class="p">,</span> <span class="na">population</span><span class="p">:</span> <span class="mi">11510000</span><span class="p">}</span>
+<span class="p">];</span>
+
+<span class="c1">// Join cities to rect elements and modify height, width and position</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.bars</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">cities</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">rect</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">height</span><span class="dl">'</span><span class="p">,</span> <span class="mi">19</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">width</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">scaleFactor</span> <span class="o">=</span> <span class="mf">0.00004</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">population</span> <span class="o">*</span> <span class="nx">scaleFactor</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">y</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span><span class="p">;</span>
+  <span class="p">})</span>
+
+<span class="c1">// Join cities to text elements and modify content and position</span>
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.labels</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">text</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">cities</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">text</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">y</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span> <span class="o">+</span> <span class="mi">13</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">text</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+  <span class="p">});</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/rect/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/rect/" marginwidth="0" marginheight="0" style="width: 100%; height: 170px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;760\&quot; height=\&quot;140\&quot;&gt;\n  &lt;g class=\&quot;bars\&quot; transform=\&quot;translate(70, 30)\&quot;&gt;&lt;/g&gt;\n  &lt;g class=\&quot;labels\&quot; transform=\&quot;translate(66, 30)\&quot;&gt;&lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;body {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 12px;\n  color: #333;\n}\n\n.bars rect {\n  fill: steelblue;\n}\n\n.bars rect:hover {\n  fill: orange;\n}\n\n.labels text {\n  text-anchor: end;\n}\n&quot;,&quot;js&quot;:&quot;var cities = [\n\t{ name: &apos;London&apos;, population: 8674000},\n\t{ name: &apos;New York&apos;, population: 8406000},\n\t{ name: &apos;Sydney&apos;, population: 4293000},\n\t{ name: &apos;Paris&apos;, population: 2244000},\n\t{ name: &apos;Beijing&apos;, population: 11510000}\n];\n\n// Join cities to rect elements and modify height, width and position\nd3.select(&apos;.bars&apos;)\n\t.selectAll(&apos;rect&apos;)\n\t.data(cities)\n\t.join(&apos;rect&apos;)\n\t.attr(&apos;height&apos;, 19)\n\t.attr(&apos;width&apos;, function(d) {\n\t\tvar scaleFactor = 0.00004;\n\t\treturn d.population * scaleFactor;\n\t})\n\t.attr(&apos;y&apos;, function(d, i) {\n\t\treturn i * 20;\n\t});\n\n// Join cities to text elements and modify content and position\nd3.select(&apos;.labels&apos;)\n\t.selectAll(&apos;text&apos;)\n\t.data(cities)\n\t.join(&apos;text&apos;)\n\t.attr(&apos;y&apos;, function(d, i) {\n\t\treturn i * 20 + 13;\n\t})\n\t.text(function(d) {\n\t\treturn d.name;\n\t});\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/90b992355b91f33db7c23e69cda98b5c" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/90b992355b91f33db7c23e69cda98b5c?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=90b992355b91f33db7c23e69cda98b5c" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>How about that? We’ve just built a simple bar chart using D3!</p>
+
+<p>(This example relies on extra code in <code class="language-plaintext highlighter-rouge">index.html</code> and <code class="language-plaintext highlighter-rouge">style.css</code>. Open the CodePen example to see the full example.)</p>
+
+<h2 id="update-functions">Update functions</h2>
+
+<p>If your data array changes <strong>you’ll need to perform the join again</strong>. (Unlike some frameworks such as Vue.js, D3 doesn’t automatically do this for you.)</p>
+
+<p>Therefore we usually put the join code in a function. Whenever the data changes, we’ll call this function.</p>
+
+<p>I usually name the function <code class="language-plaintext highlighter-rouge">update</code>. For example:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">];</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nx">d</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span> <span class="o">&gt;</span> <span class="mi">30</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">#eee</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">update</span><span class="p">(</span><span class="nx">myData</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/update-function/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/update-function/" marginwidth="0" marginheight="0" style="width: 100%; height: 110px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n  &lt;g class=\&quot;chart\&quot;&gt;\n  &lt;/g&gt;\n&lt;/svg&gt;\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;var myData = [40, 10, 20, 60, 30];\n\nfunction update(data) {\n\td3.select(&apos;.chart&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d, i) {\n\t\t\treturn i * 100;\n\t\t})\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn 0.5 * d;\n\t\t})\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn d &gt; 30 ? &apos;orange&apos; : &apos;#eee&apos;;\n\t\t});\n}\n\nupdate(myData);\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p>We pass the data array into <code class="language-plaintext highlighter-rouge">update</code>. Each time <code class="language-plaintext highlighter-rouge">update</code> is called the join is performed.</p>
+
+<p>The data doesn’t ever change in the previous example, so let’s add a button that when clicked gets some randomised data and calls <code class="language-plaintext highlighter-rouge">update</code>:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">getData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="kd">let</span> <span class="nx">numItems</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">5</span><span class="p">);</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">numItems</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">60</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">.chart</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">circle</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cx</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">cy</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">r</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nx">d</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="dl">'</span><span class="s1">fill</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">d</span> <span class="o">&gt;</span> <span class="mi">30</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">orange</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">#eee</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">updateAll</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">myData</span> <span class="o">=</span> <span class="nx">getData</span><span class="p">();</span>
+  <span class="nx">update</span><span class="p">(</span><span class="nx">myData</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateAll</span><span class="p">();</span>
+
+<span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">"</span><span class="s2">button</span><span class="dl">"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">click</span><span class="dl">"</span><span class="p">,</span> <span class="nx">updateAll</span><span class="p">);</span></code></pre></figure>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/update-function-random/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/update-function-random/" marginwidth="0" marginheight="0" style="width: 100%; height: 140px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div&gt;\n  &lt;svg width=\&quot;600\&quot; height=\&quot;100\&quot;&gt;\n\t&lt;g class=\&quot;chart\&quot;&gt;\n\t&lt;/g&gt;\n  &lt;/svg&gt;\n&lt;/div&gt;\n&lt;button&gt;Update&lt;/button&gt;\n&quot;,&quot;css&quot;:&quot;&quot;,&quot;js&quot;:&quot;function getData() {\n\tlet data = [];\n\tlet numItems = Math.ceil(Math.random() * 5);\n\n\tfor(let i=0; i&lt;numItems; i++) {\n\t\tdata.push(Math.random() * 60);\n\t}\n\n\treturn data;\n}\n\nfunction update(data) {\n\td3.select(&apos;.chart&apos;)\n\t\t.selectAll(&apos;circle&apos;)\n\t\t.data(data)\n\t\t.join(&apos;circle&apos;)\n\t\t.attr(&apos;cx&apos;, function(d, i) {\n\t\t\treturn i * 100;\n\t\t})\n\t\t.attr(&apos;cy&apos;, 50)\n\t\t.attr(&apos;r&apos;, function(d) {\n\t\t\treturn 0.5 * d;\n\t\t})\n\t\t.style(&apos;fill&apos;, function(d) {\n\t\t\treturn d &gt; 30 ? &apos;orange&apos; : &apos;#eee&apos;;\n\t\t});\n}\n\nfunction updateAll() {\n\tlet myData = getData();\n\tupdate(myData);\n}\n\nupdateAll();\n\nd3.select(\&quot;button\&quot;)\n\t.on(\&quot;click\&quot;, updateAll);\n\n\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<p><code class="language-plaintext highlighter-rouge">getData</code> returns an array containing a random number of random values. A <code class="language-plaintext highlighter-rouge">button</code> element has been added to <code class="language-plaintext highlighter-rouge">index.html</code> (see the CodePen example). The last two lines add an event handler <code class="language-plaintext highlighter-rouge">updateAll</code> to this button. <code class="language-plaintext highlighter-rouge">updateAll</code> calls <code class="language-plaintext highlighter-rouge">getData</code> and then calls <code class="language-plaintext highlighter-rouge">update</code> to perform the join.</p>
+
+<p>Therefore each time the button is clicked, the data updates and the circles update accordingly.</p>
+
+<h3 id="key-functions">Key functions</h3>
+
+<p>When D3 performs a data join it joins the first array element to the first element in the selection, the second array element to the second element in the selection and so on.</p>
+
+<p>However, if the order of array elements changes (due to sorting, inserting or removing elements) the array elements can get joined <strong>to different DOM elements</strong>.</p>
+
+<p>You can ensure each array element remains joined to the same HTML/SVG element by passing a <strong>key function</strong> into the <code class="language-plaintext highlighter-rouge">.data</code> method. The key function should return a <strong>unique id value</strong> for each array element.</p>
+
+<p>Look at this example where an array <code class="language-plaintext highlighter-rouge">['Z']</code> is joined to <code class="language-plaintext highlighter-rouge">div</code> elements. Each time the button is clicked a new letter is added to the start of the array:</p>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/without-key/" marginwidth="0" marginheight="0" style="width: 100%; height: 70px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/without-key/" marginwidth="0" marginheight="0" style="width: 100%; height: 70px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;&lt;/div&gt;\n\n&lt;div id=\&quot;menu\&quot;&gt;\n  &lt;button onClick=\&quot;doInsert();\&quot;&gt;Insert element&lt;/button&gt;\n&lt;/div&gt;\n\n&quot;,&quot;css&quot;:&quot;body {\n\tfont-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n\tfont-size: 14px;\n\tcolor: #333;\n}\n#content {\n\tposition: relative;\n\theight: 40px;\n}\n#content div {\n\tposition: absolute;\n\tmargin: 2px;\n\tbackground-color: orange;\n\tcolor: white;\n\tpadding: 8px;\n\twidth: 14px;\n\theight: 14px;\n\ttext-align: center;\n}\n&quot;,&quot;js&quot;:&quot;var letters = &apos;ABCDEFGHIJKLMNOPQRSTUVWXYZ&apos;;\nvar i = 25;\n\nfunction doInsert() {\n    if(i &lt; 0)\n        return;\n\n    var myData = letters.slice(i).split(&apos;&apos;);\n    i--;\n    update(myData);\n}\n\nfunction update(data) {\n    d3.select(&apos;#content&apos;)\n        .selectAll(&apos;div&apos;)\n        .data(data)\n        .join(&apos;div&apos;)\n        .transition()\n        .style(&apos;left&apos;, function(d, i) {\n            return i * 32 + &apos;px&apos;;\n        })\n        .text(function(d) {\n            return d;\n        });\n}\n\ndoInsert();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/00bd03fa9ddf292a856a734102e74d9d" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/00bd03fa9ddf292a856a734102e74d9d?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=00bd03fa9ddf292a856a734102e74d9d" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>When ‘Insert element’ is clicked a new <code class="language-plaintext highlighter-rouge">div</code> element is added to the end of the row. However, the text of each existing <code class="language-plaintext highlighter-rouge">div</code> changes, resulting in a rather strange effect.</p>
+
+<p>If a key function is used, each letter will stay joined to the same <code class="language-plaintext highlighter-rouge">div</code> element:</p>
+
+<!-- <iframe class="db center" src="/blocks/datajoins/key/" marginwidth="0" marginheight="0" style="width: 100%; height: 70px;" scrolling="yes"></iframe> -->
+
+<iframe class="db center" src="/examples-merged/datajoins/key/" marginwidth="0" marginheight="0" style="width: 100%; height: 70px;" scrolling="yes"></iframe>
+
+<div class="flex justify-end f6 mt1 mb4">
+  <form action="https://codepen.io/pen/define" method="POST" target="_blank"><input type="hidden" name="data" value="{&quot;title&quot;:&quot;D3 in Depth&quot;,&quot;js_external&quot;:&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js&quot;,&quot;html&quot;:&quot;&lt;div id=\&quot;content\&quot;&gt;\n&lt;/div&gt;\n\n&lt;div id=\&quot;menu\&quot;&gt;\n  &lt;button onClick=\&quot;doInsert();\&quot;&gt;Insert element&lt;/button&gt;\n&lt;/div&gt;\n\n&quot;,&quot;css&quot;:&quot;body {\n  font-family: \&quot;Helvetica Neue\&quot;, Helvetica, sans-serif;\n  font-size: 14px;\n  color: #333;\n}\n#content {\n\tposition: relative;\n\theight: 40px;\n}\n#content div {\n\tposition: absolute;\n\tmargin: 2px;\n\tbackground-color: orange;\n\tcolor: white;\n\tpadding: 8px;\n\twidth: 14px;\n\theight: 14px;\n\ttext-align: center;\n}\n&quot;,&quot;js&quot;:&quot;var letters = &apos;ABCDEFGHIJKLMNOPQRSTUVWXYZ&apos;;\nvar i = 25;\n\nfunction doInsert() {\n    if(i &lt; 0)\n        return;\n\n    var myData = letters.slice(i).split(&apos;&apos;);\n    i--;\n    update(myData);\n}\n\nfunction update(data) {\n    d3.select(&apos;#content&apos;)\n        .selectAll(&apos;div&apos;)\n        .data(data, function(d) {\n            return d;\n        })\n        .join(&apos;div&apos;)\n        .transition()\n        .style(&apos;left&apos;, function(d, i) {\n            return i * 32 + &apos;px&apos;;\n        })\n        .text(function(d) {\n            return d;\n        });\n}\n\ndoInsert();\n&quot;}" /><input type="submit" value="Edit in CodePen" /></form>
+</div>
+
+<div>
+<!-- <div class="example-links tr f8 blue mt2 mb4"> -->
+	<!-- <a class="f7 black-50" href="https://bl.ocks.org/d3indepth/5e721266739f8324213171e2ef535c54" target="_blank">View source</a> -->
+	<!-- | <a href="https://gist.jsbin.com/d3indepth/5e721266739f8324213171e2ef535c54?html,output" target="_blank">Edit in JS Bin</a> -->
+	<!-- | <a class="f7 black-50" href="https://gist.run/?id=5e721266739f8324213171e2ef535c54" target="_blank">Edit in GistRun</a> -->
+<!-- </div> -->
+</div>
+
+<p>In general, if your array elements can change position within the array you should probably use a key function.</p>
+
+<h3 id="debugging">Debugging</h3>
+
+<p>When D3 performs a data join it adds an attribute <code>__data__</code> to each DOM element in the selection and assigns the joined data to it.</p>
+
+<p>We can inspect this in Google Chrome by right clicking on an element, choosing ‘Inspect’ and typing:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$0</span><span class="p">.</span><span class="nx">__data__</span></code></pre></figure>
+
+<p>in the debug console. (<code class="language-plaintext highlighter-rouge">$0</code> represents the element that’s being inspected.)</p>
+
+<p><img src="/img/datajoins/inspect_data.gif" alt="Inspecting __data__" /></p>
+
+<p>Being able to check the joined data in this manner is particularly useful when debugging as it allows us to check whether our data join is behaving as expected.</p>
+
+
+  </div>
+</div>
+
+        </section>
+      </section>
+
+      
+      <section class="mt5">
+  <div class="f6 fw4 tc black-50">MY BOOKS</div>
+
+  <div class="flex flex-row justify-center">
+    <div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://www.createwithdata.com/d3-start-to-finish-book/"><img src="/img/d3-start-to-finish.png" class="shadow-5"></a>
+  <p class="mb0"><i>"One of the best D3 books I've read. The contents are very clear, it is easy to follow and the concepts are very solid."</i></p>
+  <p class="mt0 tr"><a href="https://jgf92.github.io/personal-page/">Javier García Fernández</a></p>
+  <p>Learn how to make a custom data visualisation using D3.js.</p>
+  <a href="https://www.createwithdata.com/d3-start-to-finish-book/" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>    
+
+<div class="book pv3 ph4 w-90 mw5 flex flex-column center black-70">
+  <a class="center link" href="https://leanpub.com/html-svg-css-js-for-data-visualisation"><img src="/img/fundamentals.jpg" class="shadow-5"></a>
+  <p>Learn the fundamentals of HTML, SVG, CSS and JavaScript for building data visualisations on the web.</p>
+  <a href="https://leanpub.com/html-svg-css-js-for-data-visualisation" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box">
+    <span class="center">Find out more</span>
+  </a>
+</div>
+
+  </div>
+</section>
+
+      
+
+      <footer class="mt4 bt b--black-10">
+        <p class="tc f6 mv4">&copy; <a href="https://peterrcook.com" target="_blank">Peter Cook</a> 2022</p>
+      </footer>
+    </div>
+
+    <script src="/js/anchor.min.js"></script>
+    <script>
+anchors.add('h2, h3, h4');
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57362118-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js"></script>
+  </body>
+</html>
