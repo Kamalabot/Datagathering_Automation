@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from pytube import YouTube
 from pytube import Channel
 from pytube import Search
