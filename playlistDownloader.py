@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 from pytube import YouTube
 from pytube import Playlist
 
